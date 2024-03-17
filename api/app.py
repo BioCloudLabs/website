@@ -1,26 +1,39 @@
-from quart import Quart
-from flask_smorest import Api
-from quart_cors import cors
-from dotenv import load_dotenv
-import time
-import os
+from quart import Quart, request
+from database import QuartDatabases
 
-load_dotenv()
-
-app = Quart(__name__, static_folder="out", static_url_path="/")
-app.config["API_TITLE"] = os.getenv("API_TITLE")
-app.config["API_VERSION"] = os.getenv("API_VERSION")
-app.config["OPENAPI_VERSION"] = os.getenv("OPENAPI_VERSION")
-
-api = Api(app)
+app = Quart(__name__)
+db = QuartDatabases(app)
 
 @app.route("/")
 async def index():
-    return {"message": "Hello World"}
+    result = await db.fetch_all("SELECT * FROM mytable")
+    return {"data": result}
 
-@app.route("/api/time")
-async def get_current_time():
-    return {"time": time.time()}
+@app.route("/create_example_table", methods=["POST"])
+async def create_example_table():
+    try:
+        await app.db.execute(
+            """
+            CREATE TABLE mytable (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255),
+                age INT
+            )
+            """
+        )
+        return {"message": "Example table created successfully"}
+    except asyncpg.exceptions.DuplicateTableError:
+        return {"message": "Table already exists"}
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8080, host="0.0.0.0")
+    app.run()
+
+
+@app.route("/")
+async def index():
+    result = await db.fetch_all("SELECT * FROM mytable")
+    return {"data": result}
+
+
+if __name__ == "__main__":
+    app.run()

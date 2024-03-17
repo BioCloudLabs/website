@@ -1,14 +1,14 @@
 import asyncpg
-from quart import Quart
+from quart import Quart, jsonify
 
 app = Quart(__name__)
 
 async def init_db():
     try:
         app.db = await asyncpg.connect(
-            user="your_username",
-            password="your_password",
-            database="your_database",
+            user="postgres",
+            password="password",
+            database="postgres",
             host="localhost",
         )
         print("Database connection established successfully")
@@ -17,7 +17,10 @@ async def init_db():
 
 @app.before_serving
 async def create_db_connection():
-    await init_db()
+    try:
+        await init_db()
+    except asyncpg.exceptions.PostgresError as e:
+        print(f"Error connecting to the database: {e}")
 
 @app.after_serving
 async def close_db_connection():
@@ -52,12 +55,27 @@ async def insert_data(name, age):
 
 async def get_data():
     try:
-        rows = await app.db.fetch("SELECT * FROM mytable")
-        return rows
+        records = await app.db.fetch("SELECT * FROM mytable")
+        print(records)
+        return [dict(record) for record in records]
     except asyncpg.exceptions.PostgresError as e:
         return {"error": f"Error fetching data: {e}"}
 
-# Other database functions (update, delete, etc.) can be added here
+@app.route("/createexample")
+async def createexample():
+    result = await create_example_table()
+    return jsonify({"data": result})
+
+@app.route("/addexampledata")
+async def addexample():
+    result = await insert_data('Pepe', 19)
+    return {"data": result}
+
+@app.route("/showdata")
+async def showdata():
+    result = await get_data()
+    print(result[0]) 
+    return {"data": result}
 
 if __name__ == "__main__":
     app.run()

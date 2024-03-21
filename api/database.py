@@ -6,9 +6,9 @@ app = Quart(__name__)
 async def init_db():
     try:
         app.db = await asyncpg.connect(
-            user="postgres",
-            password="password",
-            database="postgres",
+            user="myappuser",
+            password="mysecurepassword",
+            database="myappdb",
             host="localhost",
         )
         print("Database connection established successfully")

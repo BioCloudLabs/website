@@ -75,7 +75,7 @@ async def addexample():
 async def showdata():
     result = await get_data()
     print(result[0]) 
-    return {"data": result}
+    return jsonify({"data": result})
 
 if __name__ == "__main__":
     app.run()

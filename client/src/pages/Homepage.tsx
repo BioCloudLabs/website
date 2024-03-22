@@ -31,7 +31,7 @@ function Homepage() {
 
       {/* Display the fetched user data */}
       <section className="user-data">
-        <h2 className="data-title">User Data:</h2>
+        <h2 className="data-title">User Database Data:</h2>
         <ul>
           {userData.map((user, index) => (
             <li key={index}>

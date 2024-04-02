@@ -1,5 +1,5 @@
-quart
-quart-cors
+flask
+flask-cors
 flask-smorest
 python-dotenv
 asyncpg

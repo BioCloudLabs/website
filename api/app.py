@@ -1,8 +1,10 @@
 import asyncpg
-from quart import Quart, jsonify
+from quart import Quart, jsonify, request
+from werkzeug.security import check_password_hash
 
 app = Quart(__name__)
 
+# Initialize database connection
 async def init_db():
     try:
         app.db = await asyncpg.connect(
@@ -26,6 +28,7 @@ async def create_db_connection():
 async def close_db_connection():
     await app.db.close()
 
+# Sample table creation
 async def create_example_table():
     try:
         await app.db.execute(
@@ -41,6 +44,7 @@ async def create_example_table():
     except asyncpg.exceptions.DuplicateTableError:
         return {"message": "Table already exists"}
 
+# Insert sample data
 async def insert_data(name, age):
     try:
         await app.db.execute(
@@ -53,6 +57,7 @@ async def insert_data(name, age):
     except asyncpg.exceptions.PostgresError as e:
         return {"error": f"Error inserting data: {e}"}
 
+# Fetch data from the sample table
 async def get_data():
     try:
         records = await app.db.fetch("SELECT * FROM mytable")
@@ -61,6 +66,7 @@ async def get_data():
     except asyncpg.exceptions.PostgresError as e:
         return {"error": f"Error fetching data: {e}"}
 
+# Routes for sample operations
 @app.route("/createexample")
 async def createexample():
     result = await create_example_table()
@@ -69,13 +75,36 @@ async def createexample():
 @app.route("/addexampledata")
 async def addexample():
     result = await insert_data('Pepe', 19)
-    return {"data": result}
+    return jsonify({"data": result})
 
 @app.route("/showdata")
 async def showdata():
     result = await get_data()
-    print(result[0]) 
     return jsonify({"data": result})
+
+# User login route
+@app.route('/login', methods=['POST'])
+async def login():
+    data = await request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return jsonify({"error": "Missing username or password"}), 400
+
+    try:
+        # Fetch the user from your database
+        user_record = await app.db.fetchrow("SELECT * FROM users WHERE username=$1", username)
+
+        if user_record and check_password_hash(user_record['password'], password):
+            # Authentication successful
+            return jsonify({"message": "Login successful"}), 200
+        else:
+            # Authentication failed
+            return jsonify({"error": "Invalid username or password"}), 401
+    except asyncpg.exceptions.PostgresError as e:
+        print(f"Database query error: {e}")
+        return jsonify({"error": "An error occurred while processing your request"}), 500
 
 if __name__ == "__main__":
     app.run()

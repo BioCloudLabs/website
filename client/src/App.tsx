@@ -3,6 +3,7 @@ import './App.css';
 import Homepage from './pages/Homepage';
 import BlastPage from './pages/BlastPage';
 import DashboardPage from './pages/DashboardPage';
+import LoginPage from './pages/Loginpage';
 
 function App() {
   // State to track the current page
@@ -17,6 +18,8 @@ function App() {
         return <BlastPage />;
       case 'dashboard':
         return <DashboardPage />;
+      case 'login':
+        return <LoginPage/>;
       default:
         return <Homepage />;
     }
@@ -29,6 +32,8 @@ function App() {
         <button onClick={() => setCurrentPage('home')}>Home</button>
         <button onClick={() => setCurrentPage('blast')}>BLAST</button>
         <button onClick={() => setCurrentPage('dashboard')}>Dashboard</button>
+        <button onClick={() => setCurrentPage('login')}>Login</button>
+
       </div>
       {/* Page content */}
       {renderPage()}

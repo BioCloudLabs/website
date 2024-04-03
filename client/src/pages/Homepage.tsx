@@ -35,7 +35,7 @@ function Homepage() {
         <ul>
           {userData.map((user, index) => (
             <li key={index}>
-              {user.name}, Age: {user.age}
+              {user.name}, Surname: {user.surname}
             </li>
           ))}
         </ul>

@@ -1,21 +1,16 @@
 import { useEffect, useState, FormEvent } from 'react';
-// Assuming you have a CSS file for BlastPage-specific styles
 
 function BlastPage() {
     const [userName, setUserName] = useState<string>('');
     const [sequence, setSequence] = useState<string>('');
 
     useEffect(() => {
-        // Use the ReqRes 'List Users' endpoint to simulate fetching a user's name
-        fetch('https://reqres.in/api/users?page=1')
-            .then(response => response.json())
-            .then(data => {
-                if (data.data.length > 0) {
-                    // Use the first user's first name and last name for demonstration
-                    setUserName(`${data.data[0].first_name} ${data.data[0].last_name}`);
-                }
-            })
-            .catch(error => console.error('Fetching user data failed:', error));
+        // Retrieve user information from LocalStorage
+        const user = localStorage.getItem('user');
+        if (user) {
+            const userData = JSON.parse(user);
+            setUserName(`${userData.first_name} ${userData.last_name}`);
+        }
     }, []);
 
     const handleSubmit = (event: FormEvent) => {

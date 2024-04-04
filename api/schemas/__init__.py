@@ -1,1 +1,2 @@
-from schemas.user_schema import UserSchema
+from api.schemas.user_register_schema import UserRegisterSchema
+from api.schemas.user_login_schema import UserLoginSchema

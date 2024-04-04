@@ -14,7 +14,7 @@ function LoginPage({ onLogin }: LoginPageProps) {
     event.preventDefault();
 
     try {
-        const response = await fetch('https://reqres.in/api/login', {
+        const response = await fetch('/user/login', { // Updated to match your Flask backend endpoint
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password }),
@@ -22,7 +22,7 @@ function LoginPage({ onLogin }: LoginPageProps) {
 
         if (!response.ok) {
             const errorData = await response.json();
-            setLoginError(errorData.error || 'Login failed. Please check your email and password.');
+            setLoginError(errorData.message || 'Login failed. Please check your email and password.'); // Assuming your Flask app returns a message in case of error
             return;
         }
 
@@ -30,36 +30,16 @@ function LoginPage({ onLogin }: LoginPageProps) {
         console.log('Login successful:', data);
 
         // Save the token to LocalStorage
-        localStorage.setItem('token', data.token);
+        localStorage.setItem('token', data.access_token); // Adjusted for your Flask backend response
 
-        // Fetch user information using the token
-        const userResponse = await fetch('https://reqres.in/api/users?page=2', {
-            headers: {
-                'Authorization': `Bearer ${data.token}`,
-            },
-        });
-
-        if (!userResponse.ok) {
-            console.error('Failed to fetch user information');
-            return;
-        }
-
-        const userData = await userResponse.json();
-        console.log('User information:', userData);
-
-        // Save user information to LocalStorage
-        localStorage.setItem('user', JSON.stringify(userData.data[0]));
-
-        // Call the callback to update the current page
+        // Here, instead of fetching user data again (since it might not be needed right away),
+        // you can directly invoke the onLogin callback to update the application state.
         onLogin();
     } catch (error) {
         console.error('Login error:', error);
         setLoginError('An unexpected error occurred. Please try again later.');
     }
-};
-
-
-
+  };
 
   return (
     <div className="login-page-container">

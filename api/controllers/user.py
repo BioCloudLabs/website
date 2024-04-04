@@ -13,6 +13,13 @@ blp = Blueprint("users", __name__, description="Users endpoint", url_prefix="/us
 class UserLogin(MethodView):
     @blp.arguments(schemas.UserLoginSchema)
     def post(self, data):
+        """
+        API Endpoint to log in an user.
+
+        :param data: User login data.
+        :return: HTTP response with the login result. If login it's correct, return an access_token.
+        """
+
         user = models.UserModel.query.filter(
             models.UserModel.email == data["email"]
         ).first()
@@ -27,23 +34,30 @@ class UserLogin(MethodView):
 class UserRegister(MethodView):
     @blp.arguments(schemas.UserRegisterSchema)
 
-    def post(self, data):
-        if models.UserModel.query.filter(models.UserModel.email == data["email"]).first():
+    def post(self, payload):
+        """
+        API Endpoint to register a new user.
+
+        :param payload: User data from the json to register.
+        :return: HTTP response with the registration result.
+        """
+        
+        if models.UserModel.query.filter(models.UserModel.email == payload["email"]).first():
             abort(409, message="Username already exists.")
 
         try:
             user = models.UserModel(
-                email=data["email"],
-                password=pbkdf2_sha256.hash(data["password"]),
-                name=data["name"],
-                surname=data["surname"],
-                location_id=data["location_id"]
+                email=payload["email"],
+                password=pbkdf2_sha256.hash(payload["password"]),
+                name=payload["name"],
+                surname=payload["surname"],
+                location_id=payload["location_id"]
             )
 
             db.session.add(user)
             db.session.commit()
 
-        except IntegrityError as e:
+        except IntegrityError:
             abort(400, message=f"An integrity error has ocurred.")
 
         return {"message": "User created successfully."}, 201

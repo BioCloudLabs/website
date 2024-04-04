@@ -1,4 +1,5 @@
 from flask.views import MethodView
+from bleach import clean
 import schemas
 import models
 from flask_smorest import Blueprint, abort
@@ -20,11 +21,9 @@ class UserLogin(MethodView):
         :return: HTTP response with the login result. If login it's correct, return an access_token.
         """
 
-        user = models.UserModel.query.filter(
-            models.UserModel.email == data["email"]
-        ).first()
+        user = models.UserModel.query.filter(models.UserModel.email == clean(data["email"])).first()
 
-        if user and pbkdf2_sha256.verify(data["password"], user.password):
+        if user and pbkdf2_sha256.verify(clean(data["password"]), user.password):
             access_token = create_access_token(identity=user.id)
             return {"access_token": access_token}, 200
 
@@ -47,10 +46,10 @@ class UserRegister(MethodView):
 
         try:
             user = models.UserModel(
-                email=payload["email"],
-                password=pbkdf2_sha256.hash(payload["password"]),
-                name=payload["name"],
-                surname=payload["surname"],
+                email=clean(payload["email"]),
+                password=pbkdf2_sha256.hash(clean(payload["password"])),
+                name=clean(payload["name"]),
+                surname=clean(payload["surname"]),
                 location_id=payload["location_id"]
             )
 

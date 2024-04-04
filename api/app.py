@@ -32,28 +32,44 @@ api: Api = Api(app)
 
 api.register_blueprint(UserBlueprint)
 
-# with app.app_context():
-#     new_user = models.UserModel(
-#         email='ejemplo@example.com',
-#         password='contraseña',
-#         name='Nombre',
-#         surname='Apellido',
-#         created_at=datetime.now(),
-#         role_id=1,
-#         credits='0',
-#         location_id=1
-#     )
+with app.app_context():
+    new_role = models.RoleModel(
+        name="registered"
+    )
 
-#     new_location = models.LocationModel(
-#         name="España"
-#     )
+    new_role2 = models.RoleModel(
+        name="staff"
+    )
 
-#     new_location2 = models.LocationModel(
-#         name="Portugal"
-#     )
 
-#     db.session.add(new_user)
-#     db.session.add(new_location)
-#     db.session.add(new_location2)
+    new_role3 = models.RoleModel(
+        name="admin"
+    )
 
-#     db.session.commit()
+
+    new_location = models.LocationModel(
+        name="España"
+    )
+
+    new_location2 = models.LocationModel(
+        name="Portugal"
+    )
+    
+    new_user = models.UserModel(
+        email='ejemplo@example.com',
+        password='contraseña',
+        name='Nombre',
+        surname='Apellido',
+        created_at=datetime.now(),
+        location_id=1
+    )
+
+
+    # db.session.add(new_role)
+    # db.session.add(new_role2)
+    # db.session.add(new_role3)
+    # db.session.add(new_user)
+    # db.session.add(new_location)
+    # db.session.add(new_location2)
+
+    # db.session.commit()

@@ -11,8 +11,9 @@ class UserModel(db.Model):
     surname = db.Column(db.String, nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = db.Column(db.DateTime(timezone=True), onupdate=func.now())
-    role = db.Column(db.String, nullable=False)
     credits = db.Column(db.String, default=0, nullable=False)
     location_id = db.Column(db.Integer, db.ForeignKey('locations.id'), nullable=False)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
 
     location = relationship("LocationModel", back_populates="users")
+    role = relationship("RoleModel", back_populates="users")

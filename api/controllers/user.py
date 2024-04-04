@@ -5,17 +5,27 @@ from flask_smorest import Blueprint, abort
 from passlib.hash import pbkdf2_sha256
 from database import db
 from sqlalchemy.exc import IntegrityError
+from flask_jwt_extended import create_access_token
 
 blp = Blueprint("users", __name__, description="Users endpoint", url_prefix="/user")
 
 @blp.route("/login")
 class UserLogin(MethodView):
-    def get(self):
-        pass
+    @blp.arguments(schemas.UserLoginSchema)
+    def post(self, data):
+        user = models.UserModel.query.filter(
+            models.UserModel.email == data["email"]
+        ).first()
+
+        if user and pbkdf2_sha256.verify(data["password"], user.password):
+            access_token = create_access_token(identity=user.id)
+            return {"access_token": access_token}, 200
+
+        abort(401, message="Invalid credentials.")
 
 @blp.route("/register")
 class UserRegister(MethodView):
-    @blp.arguments(schemas.UserSchema)
+    @blp.arguments(schemas.UserRegisterSchema)
 
     def post(self, data):
         if models.UserModel.query.filter(models.UserModel.email == data["email"]).first():

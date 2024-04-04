@@ -8,3 +8,4 @@ bleach
 flask-jwt-extended
 marshmallow
 passlib
+pytest

@@ -2,9 +2,9 @@ flask
 flask-cors
 flask-smorest
 python-dotenv
-<<<<<<< HEAD
 psycopg2
 flask-migrate
-=======
-asyncpg
->>>>>>> origin/main
+bleach 
+flask-jwt-extended
+marshmallow
+passlib

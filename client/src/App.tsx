@@ -4,6 +4,7 @@ import Homepage from './pages/Homepage';
 import BlastPage from './pages/BlastPage';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -21,7 +22,10 @@ function App() {
       case 'dashboard':
         return <DashboardPage />;
       case 'login':
-        return <LoginPage onLogin={handleLogin} />; // Pass the handleLogin function as a prop
+        return <LoginPage onLogin={handleLogin} />; 
+        case 'register':
+          return <RegisterPage />;
+      
       default:
         return <Homepage />;
     }
@@ -34,6 +38,7 @@ function App() {
         <button onClick={() => setCurrentPage('blast')}>BLAST</button>
         <button onClick={() => setCurrentPage('dashboard')}>Dashboard</button>
         <button onClick={() => setCurrentPage('login')}>Login</button>
+        <button onClick={() => setCurrentPage('register')}>Register</button>
       </div>
       {renderPage()}
     </div>

@@ -14,7 +14,7 @@ class UserLogin(MethodView):
     @blp.arguments(schemas.UserLoginSchema)
     def post(self, data):
         user = models.UserModel.query.filter(
-            models.UserModel.username == data["username"]
+            models.UserModel.email == data["email"]
         ).first()
 
         if user and pbkdf2_sha256.verify(data["password"], user.password):
@@ -25,7 +25,7 @@ class UserLogin(MethodView):
 
 @blp.route("/register")
 class UserRegister(MethodView):
-    @blp.arguments(schemas.UserSchema)
+    @blp.arguments(schemas.UserRegisterSchema)
 
     def post(self, data):
         if models.UserModel.query.filter(models.UserModel.email == data["email"]).first():

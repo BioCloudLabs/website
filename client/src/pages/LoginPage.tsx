@@ -1,35 +1,42 @@
 import React, { useState } from 'react';
-import './../css/LoginPage.css'; // Ensure the path is correct
+import './../css/LoginPage.css';
 
-function LoginPage() {
-  const [username, setUsername] = useState('');
+interface LoginPageProps {
+  onLogin: () => void;
+}
+
+function LoginPage({ onLogin }: LoginPageProps) {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    
+
     try {
-      const response = await fetch('/login', {  // Make sure this endpoint matches your backend
+      const response = await fetch('https://reqres.in/api/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log('Login successful:', data);
-        // Here, you can redirect or manage authentication state
-      } else {
-        throw new Error(data.error || 'Login failed');
+      if (!response.ok) {
+        const errorData = await response.json();
+        setLoginError(errorData.error || 'Login failed. Please check your email and password.');
+        return;
       }
+
+      const data = await response.json();
+      console.log('Login successful:', data);
+
+      // Save the token to LocalStorage
+      localStorage.setItem('token', data.token);
+
+      // Call the callback to update the current page
+      onLogin();
     } catch (error) {
       console.error('Login error:', error);
-      // Assert the error as an Error type to access its message property
-      setLoginError((error as Error).message);
+      setLoginError('An unexpected error occurred. Please try again later.');
     }
   };
 
@@ -37,12 +44,13 @@ function LoginPage() {
     <div className="login-page-container">
       <form onSubmit={handleSubmit} className="login-form">
         <div>
-          <label htmlFor="username">Username</label>
+          <label htmlFor="email">Email</label>
           <input
-            type="text"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            type="email"
+            id="email"
+            name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>
@@ -51,6 +59,7 @@ function LoginPage() {
           <input
             type="password"
             id="password"
+            name="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required

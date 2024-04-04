@@ -4,13 +4,13 @@ function DashboardPage() {
     const [userName, setUserName] = useState<string>('');
 
     useEffect(() => {
-        // Fetching user's name in a similar manner to BlastPage
-        fetch('/showdata')
+        // Use the ReqRes 'List Users' endpoint to simulate fetching a user's name
+        fetch('https://reqres.in/api/users?page=1')
             .then(response => response.json())
             .then(data => {
                 if (data.data.length > 0) {
-                    // Assuming the first user is the current user
-                    setUserName(data.data[0].name);
+                    // Use the first user's first name and last name for demonstration
+                    setUserName(`${data.data[0].first_name} ${data.data[0].last_name}`);
                 }
             })
             .catch(error => console.error('Fetching user data failed:', error));
@@ -21,21 +21,22 @@ function DashboardPage() {
             {userName && <h2 className="text-xl font-semibold mb-4">Welcome Back, {userName}!</h2>}
             <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
 
-            {/* The rest of your Dashboard content */}
+            {/* Simulated Recent Projects Section */}
             <div className="mb-6">
                 <h2 className="text-xl font-semibold mb-4">Recent Projects</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* Example Project, you should replace it with actual project data */}
+                    {/* Static example project for demonstration */}
                     <div className="p-4 border rounded-lg shadow">
                         <h3 className="font-semibold">Project A</h3>
                         <p>Status: In Progress</p>
                         <p>Sequences: 20</p>
                         <p>Last Updated: 22/03/2024</p>
                     </div>
-                    {/* Add more projects as needed */}
+                    {/* Additional projects would be fetched and displayed dynamically in a real application */}
                 </div>
             </div>
 
+            {/* Simulated BLAST Analyses Section */}
             <div className="mb-6">
                 <h2 className="text-xl font-semibold mb-4">Your BLAST Analyses</h2>
                 <table className="min-w-full divide-y divide-gray-200">
@@ -56,7 +57,7 @@ function DashboardPage() {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {/* Example Analysis, you should replace it with actual analysis data */}
+                        {/* Static example analysis for demonstration */}
                         <tr>
                             <td className="px-6 py-4 whitespace-nowrap">
                                 BLAST Analysis 1
@@ -65,13 +66,13 @@ function DashboardPage() {
                                 Completed
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                                Date
+                                24/03/2024
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <a href="#" className="text-indigo-600 hover:text-indigo-900">View Results</a>
                             </td>
                         </tr>
-                        {/* Add more analyses as needed */}
+                        {/* Additional analyses would be fetched and displayed dynamically in a real application */}
                     </tbody>
                 </table>
             </div>

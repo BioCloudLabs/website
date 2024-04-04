@@ -1,19 +1,18 @@
 import { useEffect, useState, FormEvent } from 'react';
-// Assuming you have a CSS file for homepage-specific styles
+// Assuming you have a CSS file for BlastPage-specific styles
 
 function BlastPage() {
     const [userName, setUserName] = useState<string>('');
     const [sequence, setSequence] = useState<string>('');
 
     useEffect(() => {
-        // Simulating fetching user's name
-        // In a real-world app, you might fetch this data from your backend
-        fetch('/showdata')
+        // Use the ReqRes 'List Users' endpoint to simulate fetching a user's name
+        fetch('https://reqres.in/api/users?page=1')
             .then(response => response.json())
             .then(data => {
                 if (data.data.length > 0) {
-                    // Assuming the first user is the current user
-                    setUserName(data.data[0].name);
+                    // Use the first user's first name and last name for demonstration
+                    setUserName(`${data.data[0].first_name} ${data.data[0].last_name}`);
                 }
             })
             .catch(error => console.error('Fetching user data failed:', error));
@@ -21,27 +20,23 @@ function BlastPage() {
 
     const handleSubmit = (event: FormEvent) => {
         event.preventDefault();
-        // Submit the sequence to your backend
-        // Adjust the URL and method as necessary for your backend setup
-        fetch('/submit-sequence', {
+        // Simulate submitting the sequence using the ReqRes 'Create' endpoint
+        fetch('https://reqres.in/api/users', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ sequence }),
+            body: JSON.stringify({ name: sequence }), // For demonstration, using 'name' to store sequence
         })
         .then(response => {
             if (response.ok) {
-                // Handle successful submission here, possibly clearing the form or showing a success message
                 console.log('Sequence submitted successfully');
                 setSequence(''); // Clear the textarea after submission
             } else {
-                // Handle server-side validation errors or other issues
                 console.error('Submission failed');
             }
         })
         .catch(error => {
-            // Handle network errors
             console.error('Error submitting the form:', error);
         });
     };

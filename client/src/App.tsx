@@ -5,12 +5,21 @@ import BlastPage from './pages/BlastPage';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import LogoutButton from './components/LogoutButton';
+
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const handleLogin = () => {
-    setCurrentPage('dashboard'); // Update the current page to the dashboard upon successful login
+    setIsAuthenticated(true);
+    setCurrentPage('dashboard');
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setCurrentPage('home'); // Redirect to home or another page as appropriate
   };
 
   const renderPage = () => {
@@ -36,9 +45,17 @@ function App() {
       <div className="navigation">
         <button onClick={() => setCurrentPage('home')}>Home</button>
         <button onClick={() => setCurrentPage('blast')}>BLAST</button>
-        <button onClick={() => setCurrentPage('dashboard')}>Dashboard</button>
-        <button onClick={() => setCurrentPage('login')}>Login</button>
-        <button onClick={() => setCurrentPage('register')}>Register</button>
+        {isAuthenticated ? (
+          <>
+            <button onClick={() => setCurrentPage('dashboard')}>Dashboard</button>
+            <LogoutButton onLogout={handleLogout} />
+          </>
+        ) : (
+          <>
+            <button onClick={() => setCurrentPage('login')}>Login</button>
+            <button onClick={() => setCurrentPage('register')}>Register</button>
+          </>
+        )}
       </div>
       {renderPage()}
     </div>

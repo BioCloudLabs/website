@@ -10,7 +10,7 @@ import LogoutButton from './components/LogoutButton';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
 
   const handleLogin = () => {
     setIsAuthenticated(true);
@@ -19,22 +19,26 @@ function App() {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    setCurrentPage('home'); // Redirect to home or another page as appropriate
+    setCurrentPage('home'); 
   };
 
   const renderPage = () => {
+    if (currentPage === 'dashboard' && !isAuthenticated) {
+      return <LoginPage onLogin={handleLogin} />;
+    }
+
     switch (currentPage) {
       case 'home':
         return <Homepage />;
       case 'blast':
         return <BlastPage />;
       case 'dashboard':
+        // Already checked for authentication above
         return <DashboardPage />;
       case 'login':
-        return <LoginPage onLogin={handleLogin} />; 
-        case 'register':
-          return <RegisterPage />;
-      
+        return <LoginPage onLogin={handleLogin} />;
+      case 'register':
+        return <RegisterPage />;
       default:
         return <Homepage />;
     }

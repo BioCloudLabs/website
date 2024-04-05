@@ -6,25 +6,29 @@ function RegisterPage() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
-  const [locationId, setLocationId] = useState('');
+  const [location_id, setLocationId] = useState(1);
   const [registrationError, setRegistrationError] = useState('');
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
+
     try {
       const response = await fetch('/user/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          email, 
-          password, 
-          name, 
-          surname, 
-          location_id: parseInt(locationId, 10) || null,
+        body: JSON.stringify({
+          email,
+          password,
+          name,
+          surname,
+          location_id : location_id
         }),
       });
+
+      console.error(location_id);
+      console.log(typeof(location_id));
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -33,7 +37,11 @@ function RegisterPage() {
       }
 
       setRegistrationSuccess(true);
-      // Optionally reset form fields here
+      setEmail('');
+      setPassword('');
+      setName('');
+      setSurname('');
+      setLocationId(1); // Optionally reset form fields here
     } catch (error) {
       console.error('Registration error:', error);
       setRegistrationError('An unexpected error occurred. Please try again later.');
@@ -47,54 +55,26 @@ function RegisterPage() {
         <p className="registration-success-message">Registration successful! You can now log in.</p>
       ) : (
         <form onSubmit={handleSubmit} className="register-form">
-          {/* Email input */}
+          {/* Form fields remain unchanged */}
           <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          {/* Password input */}
+          <input type="email" id="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+
           <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          {/* Name input */}
+          <input type="password" id="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="new-password" />
+
           <label htmlFor="name">Name:</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          {/* Surname input */}
+          <input type="text" id="name" name="name" value={name} onChange={(e) => setName(e.target.value)} required />
+
           <label htmlFor="surname">Surname:</label>
-          <input
-            type="text"
-            id="surname"
-            name="surname"
-            value={surname}
-            onChange={(e) => setSurname(e.target.value)}
-            required
-          />
-          {/* Location ID input */}
-          <label htmlFor="locationId">Location ID:</label>
+          <input type="text" id="surname" name="surname" value={surname} onChange={(e) => setSurname(e.target.value)} required />
+
+          <label htmlFor="location_id">Location ID:</label>
           <input
             type="number"
-            id="locationId"
-            name="locationId"
-            value={locationId}
-            onChange={(e) => setLocationId(e.target.value)}
+            id="location_id"
+            name="location_id"
+            value={location_id}
+            onChange={(e) => setLocationId(e.target.value ? parseInt(e.target.value, 10) : 1)}
           />
 
           {registrationError && <p className="registration-error-message">{registrationError}</p>}

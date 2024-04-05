@@ -10,8 +10,6 @@ from datetime import datetime
 from controllers.user import blp as UserBlueprint
 from dotenv import load_dotenv
 
-
-
 app: Flask = Flask(__name__)
 
 load_dotenv()
@@ -31,6 +29,8 @@ Migrate(app, db)
 api: Api = Api(app)
 
 api.register_blueprint(UserBlueprint)
+
+# This section adds test data for integrity checking
 
 with app.app_context():
     new_role = models.RoleModel(
@@ -55,12 +55,16 @@ with app.app_context():
         name="Portugal"
     )
 
-    # Uncomment these lines to add the default and test roles and locations
+    
+# Uncomment these lines to add the default and test roles and locations
+# db.session.add(new_role)
+# db.session.add(new_role2)
+# db.session.add(new_role3)
+# db.session.add(new_location)
+# db.session.add(new_location2)
+   
+# Commit the changes to persist them in the database
+# db.session.commit()
 
-    # db.session.add(new_role)
-    # db.session.add(new_role2)
-    # db.session.add(new_role3)
-    # db.session.add(new_location)
-    # db.session.add(new_location2)
 
-    # db.session.commit()
+

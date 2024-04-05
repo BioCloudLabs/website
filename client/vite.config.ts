@@ -13,8 +13,9 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     host: true,
-    origin: 'http://0.0.0.0:5173',
     proxy: {
-      '/showdata': 'http://localhost:5000', // Showdata is the endpoint link with localhost:5000
-    }}
+      // Proxying requests from /api to your Flask backend
+      '/user': 'http://127.0.0.1:5000',
+    }
+  }
 })

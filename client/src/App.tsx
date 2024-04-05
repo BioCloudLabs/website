@@ -3,12 +3,16 @@ import './App.css';
 import Homepage from './pages/Homepage';
 import BlastPage from './pages/BlastPage';
 import DashboardPage from './pages/DashboardPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 
 function App() {
-  // State to track the current page
   const [currentPage, setCurrentPage] = useState('home');
 
-  // Function to render the current page based on state
+  const handleLogin = () => {
+    setCurrentPage('dashboard'); // Update the current page to the dashboard upon successful login
+  };
+
   const renderPage = () => {
     switch (currentPage) {
       case 'home':
@@ -17,6 +21,11 @@ function App() {
         return <BlastPage />;
       case 'dashboard':
         return <DashboardPage />;
+      case 'login':
+        return <LoginPage onLogin={handleLogin} />; 
+        case 'register':
+          return <RegisterPage />;
+      
       default:
         return <Homepage />;
     }
@@ -24,13 +33,13 @@ function App() {
 
   return (
     <div className="App">
-      {/* Basic navigation */}
       <div className="navigation">
         <button onClick={() => setCurrentPage('home')}>Home</button>
         <button onClick={() => setCurrentPage('blast')}>BLAST</button>
         <button onClick={() => setCurrentPage('dashboard')}>Dashboard</button>
+        <button onClick={() => setCurrentPage('login')}>Login</button>
+        <button onClick={() => setCurrentPage('register')}>Register</button>
       </div>
-      {/* Page content */}
       {renderPage()}
     </div>
   );

@@ -31,6 +31,7 @@ npm install -r requirements.txt
 # Start the development server
 npm run dev
 
+```
 
 ## Acknowledgments
 

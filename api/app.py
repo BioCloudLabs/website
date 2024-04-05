@@ -64,12 +64,18 @@ with app.app_context():
         location_id=1
     )
 
+# Uncomment the code below to add data to the session and commit changes
 
-    # db.session.add(new_role)
-    # db.session.add(new_role2)
-    # db.session.add(new_role3)
-    # db.session.add(new_user)
-    # db.session.add(new_location)
-    # db.session.add(new_location2)
+# Add roles, users, and locations to the session
+# db.session.add(new_role)
+# db.session.add(new_role2)
+# db.session.add(new_role3)
+# db.session.add(new_user)
+# db.session.add(new_location)
+# db.session.add(new_location2)
 
-    # db.session.commit()
+# Commit the changes to persist them in the database
+# db.session.commit()
+
+# This section adds test data for integrity checking
+

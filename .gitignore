@@ -4,3 +4,4 @@ node_modules/
 .env
 ./api/app.py
 ./api/database.py
+migations/

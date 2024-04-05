@@ -103,7 +103,9 @@ def test_register_integrity_error(client):
 
     assert response.status_code == 400
 
-def test_user_login(client):
+
+
+def test_login_correct(client):
     payload = {
         "email": "test@example.com",
         "password": "password123",
@@ -121,3 +123,22 @@ def test_user_login(client):
     response = client.post('/user/login', json=payload)
     assert response.status_code == 200
     assert 'access_token' in response.json
+
+def test_login_missing_fields(client):
+
+    payload = {
+        "email": "test@example.com"
+    }
+
+    response = client.post('/user/login', json=payload)
+    assert response.status_code == 422
+
+def test_login_user_not_exist(client):
+
+    payload = {
+        "email": "test@example.com",
+        "password": "test@example.com"
+    }
+
+    response = client.post('/user/login', json=payload)
+    assert response.status_code == 401

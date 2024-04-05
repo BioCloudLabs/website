@@ -51,6 +51,25 @@ def test_register_correct(client):
     response = client.post('/user/register', json=payload)
     assert response.status_code == 201
 
+def test_register_alredy_exists(client):
+    payload = {
+        "email": "test@example.com",
+        "password": "password123",
+        "name": "Test",
+        "surname": "User",
+        "location_id": 1
+    }
+    response = client.post('/user/register', json=payload)
+    payload = {
+        "email": "test@example.com",
+        "password": "password123",
+        "name": "Test",
+        "surname": "User",
+        "location_id": 1
+    }
+    response = client.post('/user/register', json=payload)
+    assert response.status_code == 409
+
 def test_register_failed_wrong_format(client):
     payload = {
         "email": "test@example",
@@ -71,6 +90,18 @@ def test_register_failed_missing_fields(client):
     response = client.post('/user/register', json=payload)
 
     assert response.status_code == 422
+
+def test_register_integrity_error(client):
+    payload = {
+        "email": "testtttt@example.com",
+        "password": "password123",
+        "name": "Test",
+        "surname": "User",
+        "location_id": 1111
+    }
+    response = client.post('/user/register', json=payload)
+
+    assert response.status_code == 400
 
 def test_user_login(client):
     payload = {

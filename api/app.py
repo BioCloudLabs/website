@@ -54,22 +54,13 @@ with app.app_context():
     new_location2 = models.LocationModel(
         name="Portugal"
     )
-    
-    new_user = models.UserModel(
-        email='ejemplo@example.com',
-        password='contraseña',
-        name='Nombre',
-        surname='Apellido',
-        created_at=datetime.now(),
-        location_id=1
-    )
 
+    # Uncomment these lines to add the default and test roles and locations
 
-    db.session.add(new_role)
-    db.session.add(new_role2)
-    db.session.add(new_role3)
-    # db.session.add(new_user)
-    db.session.add(new_location)
-    db.session.add(new_location2)
+    # db.session.add(new_role)
+    # db.session.add(new_role2)
+    # db.session.add(new_role3)
+    # db.session.add(new_location)
+    # db.session.add(new_location2)
 
-    db.session.commit()
+    # db.session.commit()

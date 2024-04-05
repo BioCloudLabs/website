@@ -13,6 +13,9 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     host: true,
-    // Removed the proxy setting since I will be directly calling an external API now
+    proxy: {
+      // Proxying requests from /api to your Flask backend
+      '/user': 'http://127.0.0.1:5000',
+    }
   }
 })

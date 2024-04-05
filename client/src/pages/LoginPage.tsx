@@ -3,9 +3,10 @@ import './../css/LoginPage.css';
 
 interface LoginPageProps {
   onLogin: () => void;
+  onForgotPassword: () => void;
 }
 
-function LoginPage({ onLogin }: LoginPageProps) {
+function LoginPage({ onLogin, onForgotPassword }: LoginPageProps & { onForgotPassword: () => void }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
@@ -52,7 +53,7 @@ function LoginPage({ onLogin }: LoginPageProps) {
             name="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
+            requiredlogin-page-container
           />
         </div>
         <div>
@@ -71,6 +72,10 @@ function LoginPage({ onLogin }: LoginPageProps) {
 
         <button type="submit" className="login-button">Log In</button>
       </form>
+      <button onClick={onForgotPassword} className="forgot-password-link">
+        Forgot Password?
+      </button>
+      {loginError && <p className="login-error-message">{loginError}</p>}
     </div>
   );
 }

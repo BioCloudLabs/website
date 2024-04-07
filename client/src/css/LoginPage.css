@@ -12,15 +12,19 @@
     /* Makes sure padding doesn't affect the overall width */
 }
 
+/* Align the form contents to center */
+.login-form div,
+.forgot-password-link {
+    align-self: center;
+}
+
 .login-form {
     background-color: #ffffff;
     padding: 2rem;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 400px;
-    /* Adjust width as necessary to fit your design */
-    margin: auto;
+    margin-bottom: 0; /* The margin on auto is too greedy, */
     /* This will center the form in the available space */
     text-align: center;
 }
@@ -51,7 +55,7 @@
     width: 100%;
     /* Full width of the form */
     padding: 0.75rem;
-    margin-top: 1rem;
+    margin-top: auto;
     /* Space between the last input and the button */
     background-color: #2b6cb0;
     /* A professional shade of blue */
@@ -100,7 +104,7 @@
 /* Style for the forgot password link */
 .forgot-password-link {
     margin-bottom: 0; /* Remove any bottom margin to reduce space under the link */
-
+    margin-top: 0.5rem; /* Reduced space to bring it closer to the button */
     /* Reduced space to bring it closer to the button */
     color: #2b6cb0;
     /* Color to match your theme */
@@ -110,27 +114,25 @@
 
 }
 
-/* Add styles for success message if you need one */
 .success-message {
-    color: #38a169;
-    /* A shade of green for success messages */
-    /* Rest of your success message styles */
+    background-color: #d4edda; /* Light green background */
+    color: #155724; /* Dark green text */
+    border-color: #c3e6cb;
 }
 
 /* Error message styles */
 .login-error-message {
     /* Existing error message styles */
     margin-top: 0.5rem;
-    /* Adjust if necessary */
-    /* Rest of your error message styles */
+    margin-bottom: 0.5rem; /* Adjust bottom margin to control space under the message */
+
 }
 
-/* Additional styles to ensure input fields and buttons are properly aligned */
-.login-form input,
 .login-form button {
-    margin-left: auto;
-    margin-right: auto;
-    /* These ensure input and button are centered */
+    border-radius: 20px; /* Make the button more rounded */
+    font-size: 1rem;
+    font-weight: bold;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Add a subtle shadow for depth */
 }
 
 /* Add this if you don't have it already, to remove the blue outline on focus for inputs and buttons */
@@ -138,7 +140,6 @@ input:focus,
 button:focus {
     outline: none;
     /* Removes the default focus outline */
-    /* Optionally, add a subtle box-shadow or border if you want a custom focus indicator */
 }
 
 /* Add transitions to input fields for a smoother interaction */

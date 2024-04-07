@@ -23,7 +23,6 @@ function LoginPage({ onLogin, onForgotPassword }: LoginPageProps & { onForgotPas
 
         if (!response.ok) {
             const errorData = await response.json();
-            setLoginError(errorData.message || 'Login failed. Please check your email and password.'); // Assuming your Flask app returns a message in case of error
             return;
         }
 
@@ -44,6 +43,7 @@ function LoginPage({ onLogin, onForgotPassword }: LoginPageProps & { onForgotPas
 
   return (
     <div className="login-page-container">
+      <h1 className="text-3xl font-bold mb-6">Log in</h1>
       <form onSubmit={handleSubmit} className="login-form">
         <div>
           <label htmlFor="email">Email</label>
@@ -68,7 +68,6 @@ function LoginPage({ onLogin, onForgotPassword }: LoginPageProps & { onForgotPas
           />
         </div>
 
-        {loginError && <p className="login-error-message">{loginError}</p>}
 
         <button type="submit" className="login-button">Log In</button>
       </form>

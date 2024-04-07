@@ -40,6 +40,7 @@ def cleanup_db():
         db.session.query(models.UserModel).delete()
         db.session.commit()
 
+# Test register endpoint when everything it's correct
 def test_register_correct(client):
     payload = {
         "email": "test@example.com",
@@ -51,6 +52,7 @@ def test_register_correct(client):
     response = client.post('/user/register', json=payload)
     assert response.status_code == 201
 
+# Test register endpoint when there's alredy an user registered with that email in the database
 def test_register_alredy_exists(client):
     payload = {
         "email": "test@example.com",
@@ -70,6 +72,7 @@ def test_register_alredy_exists(client):
     response = client.post('/user/register', json=payload)
     assert response.status_code == 409
 
+# Test register endpoint when there are fields with incorrect format in the POST request
 def test_register_failed_wrong_format(client):
     payload = {
         "email": "test@example",
@@ -82,6 +85,7 @@ def test_register_failed_wrong_format(client):
 
     assert response.status_code == 422
 
+# Test register endpoint when there are missing fields in the POST request
 def test_register_failed_missing_fields(client):
     payload = {
         "name": "Test",
@@ -91,6 +95,8 @@ def test_register_failed_missing_fields(client):
 
     assert response.status_code == 422
 
+# Test register endpoint when there are a integrity error  in the POST request. 
+# Example: Location ID doesn't exists
 def test_register_integrity_error(client):
     payload = {
         "email": "testtttt@example.com",
@@ -103,8 +109,7 @@ def test_register_integrity_error(client):
 
     assert response.status_code == 400
 
-
-
+# Test login endpoint when everything it's correct
 def test_login_correct(client):
     payload = {
         "email": "test@example.com",
@@ -124,6 +129,7 @@ def test_login_correct(client):
     assert response.status_code == 200
     assert 'access_token' in response.json
 
+# Test login endpoint when there are missing fields in the POST request
 def test_login_missing_fields(client):
 
     payload = {
@@ -133,6 +139,7 @@ def test_login_missing_fields(client):
     response = client.post('/user/login', json=payload)
     assert response.status_code == 422
 
+# Test login endpoint when there are no matching email and password on the database
 def test_login_user_not_exist(client):
 
     payload = {
@@ -142,3 +149,13 @@ def test_login_user_not_exist(client):
 
     response = client.post('/user/login', json=payload)
     assert response.status_code == 401
+
+# Test profile endpoint when there are missing fields in the POST request
+def test_profile_failed_missing_fields(client):
+    payload = {
+        "name": "Test",
+        "surname": "User"
+    }
+    response = client.post('/user/profile', json=payload)
+
+    assert response.status_code == 422

@@ -77,7 +77,7 @@ class UserProfile(MethodView):
         """
         user_by_jwt = get_jwt_identity()
 
-        user = models.UserModel.query.get(user_by_jwt)
+        user = db.session.get(models.UserModel, user_by_jwt)
 
         if user is None:
             abort(404, message="User not found")

@@ -51,7 +51,7 @@ def auth_token(client):
         "location_id": 1
     }
     client.post('/user/register', json=payload)  # Register the test user
-    response = client.post('/user/login', json={"email": "test@example.com", "password": "password123"})
+    response = client.post('/user/login', json={"email": "test@example.com", "password": "password"})
     return response.json['access_token']
 
 # Test register endpoint when everything it's correct
@@ -164,12 +164,41 @@ def test_login_user_not_exist(client):
     response = client.post('/user/login', json=payload)
     assert response.status_code == 401
 
-# Test profile endpoint when there are missing fields in the POST request
+# Test profile endpoint when there are missing fields in the PUT request
 def test_profile_failed_missing_fields(client):
     payload = {
         "name": "Test",
         "surname": "User"
     }
-    response = client.post('/user/profile', json=payload)
+    response = client.put('/user/profile', json=payload)
 
     assert response.status_code == 422
+
+# Test profile endpoint when there are missing fields in the PUT request
+def test_profile_failed_missing_token(client):
+    payload = {
+        "name": "Test",
+        "surname": "User",
+        "password": "test",
+        "location_id": 1
+    }
+    response = client.put('/user/profile', json=payload)
+
+    assert response.status_code == 401
+    assert response.json['msg'] == "Missing Authorization Header"
+
+# Test profile endpoint when there are missing fields in the PUT request
+def test_profile_failed_integrity_error(client, auth_token):
+    payload = {
+        "name": "Test",
+        "surname": "User",
+        "password": "test",
+        "location_id": 1111
+    }
+
+    headers = {'Authorization': f'Bearer {auth_token}'}
+    response = client.put('/user/profile', json=payload, headers=headers)
+
+    print(response.json)
+
+    assert response.status_code == 400

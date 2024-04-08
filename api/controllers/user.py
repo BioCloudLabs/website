@@ -6,7 +6,7 @@ from flask_smorest import Blueprint, abort
 from passlib.hash import pbkdf2_sha256
 from database import db
 from sqlalchemy.exc import IntegrityError
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
 blp = Blueprint("users", __name__, description="Users endpoint", url_prefix="/user")
 
@@ -43,7 +43,7 @@ class UserRegister(MethodView):
         """
         
         if models.UserModel.query.filter(models.UserModel.email == payload["email"]).first():
-            abort(409, message="Username already exists.")
+            abort(409, message="User with that email already exists.")
 
         try:
             user = models.UserModel(
@@ -58,11 +58,40 @@ class UserRegister(MethodView):
             db.session.commit()
 
         except IntegrityError:
+            db.session.rollback()
             abort(400, message=f"An integrity error has ocurred.")
 
         return {"message": "User created successfully."}, 201
 
 @blp.route("/profile")
 class UserProfile(MethodView):
-    def get(self):
-        pass
+    @blp.arguments(schemas.UserProfileSchema)
+
+    @jwt_required()
+    def put(self, payload):
+        """
+        API Endpoint to edit an existing user profile.
+
+        :param payload: User data from the json to register.
+        :return: HTTP response with the registration result.
+        """
+        user_by_jwt = get_jwt_identity()
+
+        user = db.session.get(models.UserModel, user_by_jwt)
+
+        if user is None:
+            abort(404, message="User not found")
+
+        try:
+            user.password=pbkdf2_sha256.hash(clean(payload["password"])),
+            user.name=clean(payload["name"]),
+            user.surname=clean(payload["surname"]),
+            user.location_id=payload["location_id"]
+
+            db.session.commit()
+
+        except IntegrityError:
+            db.session.rollback()
+            abort(400, message=f"An integrity error has ocurred.")
+
+        return {"message": "User profile edited successfully."}, 201

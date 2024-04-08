@@ -5,10 +5,10 @@ function DashboardPage() {
 
     useEffect(() => {
         // Retrieve user information from LocalStorage
-        const user = localStorage.getItem('user');
+        const user = localStorage.getItem('userProfile');
         if (user) {
             const userData = JSON.parse(user);
-            setUserName(`${userData.first_name} ${userData.last_name}`);
+            setUserName(`${userData.name}`);
         }
     }, []);
 

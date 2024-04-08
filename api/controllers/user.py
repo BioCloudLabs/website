@@ -68,7 +68,7 @@ class UserProfile(MethodView):
     @blp.arguments(schemas.UserProfileSchema)
 
     @jwt_required()
-    def post(self, payload):
+    def put(self, payload):
         """
         API Endpoint to edit an existing user profile.
 

@@ -40,6 +40,20 @@ def cleanup_db():
         db.session.query(models.UserModel).delete()
         db.session.commit()
 
+# Create a fixture to get an auth token, used to test
+@pytest.fixture
+def auth_token(client):
+    payload = {
+        "email": "test@example.com",
+        "password": "password",
+        "name": "Test",
+        "surname": "User",
+        "location_id": 1
+    }
+    client.post('/user/register', json=payload)  # Register the test user
+    response = client.post('/user/login', json={"email": "test@example.com", "password": "password123"})
+    return response.json['access_token']
+
 # Test register endpoint when everything it's correct
 def test_register_correct(client):
     payload = {

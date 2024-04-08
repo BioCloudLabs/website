@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import LogoutButton from './components/LogoutButton';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import  ProfilePage from './pages/ProfilePage';
 
 
 
@@ -40,8 +41,10 @@ function App() {
         return <LoginPage onLogin={handleLogin} onForgotPassword={() => setCurrentPage('forgotPassword')} />;
       case 'register':
         return <RegisterPage />;
-      case 'forgotPassword': // Make sure this case is exactly matching the string you use to set the current page
+      case 'forgotPassword': 
         return <ForgotPasswordPage />;
+      case 'profile': 
+        return <ProfilePage />;
       default:
         return <Homepage />;
     }
@@ -54,8 +57,10 @@ function App() {
         <div className="nav-left">
           <button onClick={() => setCurrentPage('home')}>Home</button>
           <button onClick={() => setCurrentPage('blast')}>BLAST</button>
+          <button onClick={() => setCurrentPage('dashboard')}>Dashboard</button>
+
           {isAuthenticated && (
-            <button onClick={() => setCurrentPage('dashboard')}>Dashboard</button>
+            <button onClick={() => setCurrentPage('profile')}>Profile</button>
           )}
         </div>
         <div className="nav-right">

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import './../css/LoginPage.css';
+import { loginUser } from './../services/userService'; // Adjust the import path as necessary
 
 interface LoginPageProps {
   onLogin: () => void;
   onForgotPassword: () => void;
 }
 
-function LoginPage({ onLogin, onForgotPassword }: LoginPageProps & { onForgotPassword: () => void }) {
+function LoginPage({ onLogin, onForgotPassword }: LoginPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
@@ -14,30 +15,13 @@ function LoginPage({ onLogin, onForgotPassword }: LoginPageProps & { onForgotPas
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    try {
-        const response = await fetch('/user/login', { // Updated to match your Flask backend endpoint
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            return;
-        }
-
-        const data = await response.json();
-        console.log('Login successful:', data);
-
-        // Save the token to LocalStorage
-        localStorage.setItem('token', data.access_token); // Adjusted for your Flask backend response
-
-        // Here, instead of fetching user data again (since it might not be needed right away),
-        // you can directly invoke the onLogin callback to update the application state.
-        onLogin();
-    } catch (error) {
-        console.error('Login error:', error);
-        setLoginError('An unexpected error occurred. Please try again later.');
+    const loginResult = await loginUser(email, password);
+    if (loginResult) {
+      console.log('Login successful:', loginResult);
+      onLogin(); // Assuming this triggers a re-render or redirection in your app
+    } else {
+      // Update the error message based on your userService or specific error handling
+      setLoginError('Failed to log in. Please check your credentials and try again.');
     }
   };
 
@@ -53,7 +37,7 @@ function LoginPage({ onLogin, onForgotPassword }: LoginPageProps & { onForgotPas
             name="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            requiredlogin-page-container
+            required
           />
         </div>
         <div>
@@ -67,8 +51,6 @@ function LoginPage({ onLogin, onForgotPassword }: LoginPageProps & { onForgotPas
             required
           />
         </div>
-
-
         <button type="submit" className="login-button">Log In</button>
       </form>
       <button onClick={onForgotPassword} className="forgot-password-link">

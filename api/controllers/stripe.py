@@ -24,14 +24,14 @@ class GetProducts(MethodView):
             return str(e)
 
 
-@blp.route("/create-checkout-session")
+@blp.route("/create-checkout-session/<data>")
 class PaymentIntent(MethodView):
-    def post(self, data):
+    def get(self, data):
         try:
             checkout_session = stripe.checkout.Session.create(
                 line_items=[
                     {
-                        'price': data['price_id'],
+                        'price': data,
                         'quantity': 1,
                     },
                 ],
@@ -43,5 +43,4 @@ class PaymentIntent(MethodView):
         except Exception as e:
             return str(e)
 
-        # return 204
         return {"url": checkout_session.url}, 201

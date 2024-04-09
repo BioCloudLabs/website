@@ -38,6 +38,8 @@ body, html {
   display: flex;
 }
 
+.nav-left a,
+.nav-right a,
 .nav-left button,
 .nav-right button {
   background: none;
@@ -46,29 +48,18 @@ body, html {
   padding: 0.5rem 1rem;
   margin: 0 0.25rem; /* Adjust margin as needed */
   font-size: 1rem;
+  text-decoration: none; /* Remove underline from links */
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+.nav-left a:hover,
+.nav-right a:hover,
 .nav-left button:hover,
 .nav-right button:hover {
   background-color: #2c5282;
 }
 
-
-.navigation button {
-  background: none;
-  border: none;
-  color: white;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.navigation button:hover {
-  background-color: #2c5282;
-}
 
 
 /************* END NAVBAR SECTION **************/

@@ -89,7 +89,7 @@ const ProfilePage = () => {
         </div>
         <div>
           <label>Credits:</label>
-          <span>{user.credits} <a href="/add-credits">Add More Credits</a></span>
+          <span>{user.credits} <a href="/creditsOffers">Add More Credits</a></span>
         </div>
         <div>
           <label>Location:</label>

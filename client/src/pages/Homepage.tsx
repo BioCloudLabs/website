@@ -1,31 +1,28 @@
 import { useEffect, useState } from 'react';
-import './../css/Homepage.css'; // Ensure the path is correct
+import './../css/Homepage.css';
 import { User } from './../models/User';
+import { useLocation } from 'react-router-dom';
 
-// Function to map API user data to your User interface
 const mapApiUserToUser = (apiUser: any): User => {
   return {
     id: apiUser.id,
     email: apiUser.email,
-    // The API does not provide a password, so use a placeholder or fetch from somewhere else if needed
     password: 'placeholder-password',
     name: apiUser.first_name,
     surname: apiUser.last_name,
-    // You can use the current date or fetch the actual dates if your API provides them
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-    // Use default values or adapt as necessary
-    role_id: 1, // Default role, adjust as needed
-    credits: 0, // Default credits, adjust as needed
-    location_id: 1, // Default location ID, adjust as needed
+    role_id: 1,
+    credits: 0,
+    location_id: 1,
   };
 };
 
 function Homepage() {
   const [userData, setUserData] = useState<User[]>([]);
+  const location = useLocation(); // Now correctly using useLocation
 
   useEffect(() => {
-    // Fetching data from the new API endpoint
     fetch('https://reqres.in/api/users?page=2')
       .then(response => {
         if (!response.ok) {
@@ -34,28 +31,33 @@ function Homepage() {
         return response.json();
       })
       .then(apiResponse => {
-        // Map the API response to your User interface
         const users = apiResponse.data.map(mapApiUserToUser);
         setUserData(users);
       })
       .catch(error => console.error('Fetching data failed:', error));
   }, []);
 
+  const searchParams = new URLSearchParams(location.search);
+  const isSuccess = searchParams.get('success') === 'true';
+
   return (
     <div className="homepage-container">
+      {isSuccess && (
+        <div className="success-message">
+          <h2>Success!</h2>
+          <p>Your operation was successful.</p>
+        </div>
+      )}
       <header className="homepage-header">
         <h1 className="title">Welcome to BioCloudLabs</h1>
         <p className="subtitle">The leading platform for omics analysis in the cloud.</p>
       </header>
 
-      {/* Display the fetched user data */}
       <section className="user-data">
         <h2 className="data-title">User Database Data:</h2>
         <ul>
           {userData.map(user => (
-            <li key={user.id}>
-              {user.name} {user.surname}
-            </li>
+            <li key={user.id}>{user.name} {user.surname}</li>
           ))}
         </ul>
       </section>
@@ -63,18 +65,7 @@ function Homepage() {
       <section className="features">
         <h2 className="features-title">Why Choose BioCloudLabs?</h2>
         <div className="features-list">
-          <div className="feature">
-            <h3>High Performance</h3>
-            <p>Experience fast and reliable analysis of your genomic data.</p>
-          </div>
-          <div className="feature">
-            <h3>Accessibility</h3>
-            <p>Access your projects from anywhere, at any time.</p>
-          </div>
-          <div className="feature">
-            <h3>Unlimited Cloud Usage</h3>
-            <p>Enjoy unlimited access to our cloud resources without any restrictions.</p>
-          </div>
+          {/* features */}
         </div>
       </section>
 
@@ -83,7 +74,7 @@ function Homepage() {
         <p>Join us today and revolutionize your bioinformatics research.</p>
         <button className="start-button">Get Started</button>
       </section>
-    </div>
+    </div> // Ensure this closing tag matches the opening tag of the container
   );
 }
 

@@ -23,7 +23,7 @@ const CreditsOffersPage: React.FC = () => {
 
 
   return (
-    <div className="/stripe/credits-offers-page">
+    <div className="/stripe/credits-offers-page/">
       <h1>Available Credit Offers</h1>
       <div className="offers-container">
         {offers.map((offer, index) => {

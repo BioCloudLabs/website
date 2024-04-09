@@ -16,7 +16,7 @@ export default defineConfig({
     proxy: {
       // Proxying requests from /stripe to your Stripe backend
       '/stripe': {
-        target: 'http://172.27.0.1:5000',
+        target: 'http://127.0.0.1:5000',
         changeOrigin: true,
       },
       // Existing proxy for /user requests

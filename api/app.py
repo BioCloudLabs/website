@@ -34,6 +34,38 @@ api.register_blueprint(StripeBlueprint)
 
 # This section adds test data for integrity checking
 
+
+import stripe
+# This is your test secret API key.
+stripe.api_key = 'sk_test_51P1tyaKxx03CCQEhBDasgTLkXHXaajJeS4253ej2FQvFB1YohuSGgykNEyVeQMWV09QhJk3cxHfJDl1AmKZWCAFK00UdYx6MnN'
+
+app = Flask(__name__,
+            static_url_path='',
+            static_folder='public')
+
+YOUR_DOMAIN = 'http://localhost:5173'
+
+@app.route('/stripe/create-checkout-sessionn', methods=['POST'])
+def createe_checkout_session():
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            line_items=[
+                {
+                    # Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+                    'price': 'price_1P3K8zKxx03CCQEhdO1g0mBB',
+                    'quantity': 1,
+                },
+            ],
+            mode='payment',
+            success_url=YOUR_DOMAIN + '?success=true',
+            cancel_url=YOUR_DOMAIN + '?canceled=true',
+            automatic_tax={'enabled': True},
+        )
+    except Exception as e:
+        return str(e)
+
+    return redirect(checkout_session.url, code=303)
+
 with app.app_context():
     new_role = models.RoleModel(
         name="registered"

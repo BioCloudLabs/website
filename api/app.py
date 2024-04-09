@@ -8,6 +8,7 @@ from database import db
 from flask_migrate import Migrate
 from datetime import datetime
 from controllers.user import blp as UserBlueprint
+from controllers.stripe import blp as StripeBlueprint
 from dotenv import load_dotenv
 
 app: Flask = Flask(__name__)
@@ -29,6 +30,7 @@ Migrate(app, db)
 api: Api = Api(app)
 
 api.register_blueprint(UserBlueprint)
+api.register_blueprint(StripeBlueprint)
 
 # This section adds test data for integrity checking
 

@@ -43,4 +43,5 @@ class PaymentIntent(MethodView):
         except Exception as e:
             return str(e)
 
-        return redirect(checkout_session.url, code=303)
+        # return 204
+        return {"url": checkout_session.url}, 201

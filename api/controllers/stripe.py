@@ -24,14 +24,14 @@ class GetProducts(MethodView):
             return str(e)
 
 
-@blp.route("/create-checkout-session/<string:data>")
+@blp.route("/create-checkout-session/<data>")
 class PaymentIntent(MethodView):
     def get(self, data):
         try:
             checkout_session = stripe.checkout.Session.create(
                 line_items=[
                     {
-                        'price': data['price_id'],
+                        'price': data,
                         'quantity': 1,
                     },
                 ],

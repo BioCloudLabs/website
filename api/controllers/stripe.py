@@ -1,8 +1,8 @@
 from flask.views import MethodView
 import stripe
-from flask import redirect
 from flask_smorest import Blueprint
 import os
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 blp = Blueprint("stripe", __name__, description="Stripe endpoint", url_prefix="/stripe")
 
@@ -26,6 +26,7 @@ class GetProducts(MethodView):
 
 @blp.route("/create-checkout-session/<data>")
 class PaymentIntent(MethodView):
+    @jwt_required()
     def get(self, data):
         try:
             checkout_session = stripe.checkout.Session.create(

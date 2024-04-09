@@ -8,6 +8,9 @@ import RegisterPage from './pages/RegisterPage';
 import LogoutButton from './components/LogoutButton';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import  ProfilePage from './pages/ProfilePage';
+import  CreditsOfferrsPage from './pages/CreditsOffersPage';
+
+
 
 
 
@@ -45,6 +48,8 @@ function App() {
         return <ForgotPasswordPage />;
       case 'profile': 
         return <ProfilePage />;
+      case 'creditsOffers':
+        return <CreditsOfferrsPage />;
       default:
         return <Homepage />;
     }
@@ -58,6 +63,7 @@ function App() {
           <button onClick={() => setCurrentPage('home')}>Home</button>
           <button onClick={() => setCurrentPage('blast')}>BLAST</button>
           <button onClick={() => setCurrentPage('dashboard')}>Dashboard</button>
+          <button onClick={() => setCurrentPage('creditsOffers')}>Credits Offers</button>
 
           {isAuthenticated && (
             <button onClick={() => setCurrentPage('profile')}>Profile</button>

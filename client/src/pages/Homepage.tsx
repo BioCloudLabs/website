@@ -15,7 +15,7 @@ const mapApiUserToUser = (apiUser: any): User => {
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     // Use default values or adapt as necessary
-    role: 'user', // Default role, adjust as needed
+    role_id: 1, // Default role, adjust as needed
     credits: 0, // Default credits, adjust as needed
     location_id: 1, // Default location ID, adjust as needed
   };

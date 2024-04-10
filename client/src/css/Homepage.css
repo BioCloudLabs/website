@@ -50,3 +50,8 @@
     background-color: #0056b3;
   }
   
+  .cancelled-container {
+    background-color: red;
+    text-align: center;
+    padding: 20px;
+  }

@@ -1,3 +1,6 @@
+import { Offer } from '../models/Offer'; // Exported model for 
+
+
 // Function to handle the checkout process
 export const checkout = async (priceId: string): Promise<void> => {
   try {
@@ -21,5 +24,44 @@ export const checkout = async (priceId: string): Promise<void> => {
     }
   } catch (error) {
     console.error('Error during checkout:', error);
+  }
+};
+
+
+// Function to fetch products from the backend
+export const fetchProducts = async (): Promise<Offer[]> => {
+  try {
+    const response = await fetch('/stripe/products', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Create a mapping between product names and image file names
+    const imageMapping: { [key: string]: string } = {
+      '20 Credits': '/images/20_credits.webp',
+      '50 Credits': '/images/50_credits.webp',
+      '100 Credits': '/images/100_credits.webp',
+      '500 Credits': '/images/500_credits.webp',
+      '1.000 Credits': '/images/1000_credits.webp',
+    };
+
+    // Adjust the mapping to match the server response
+    return data.products.map((product: any) => ({
+      name: product.name,
+      price: product.price,
+      image: imageMapping[product.name], // Use the image mapping to assign the correct image
+      priceId: product.price_id, // Use underscore to match server response
+    }));
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    throw error; // Re-throw the error if you want to handle it in the component (e.g., to show a message)
   }
 };

@@ -10,6 +10,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ProfilePage from './pages/ProfilePage';
 import CreditsOffersPage from './pages/CreditsOffersPage';
 import SuccessPage from './pages/SuccesPage';
+import CancelledPage from './pages/CancelledPage';
 
 
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
@@ -70,7 +71,8 @@ function App() {
           <Route path="/forgotPassword" element={<ForgotPasswordPage />} />
           <Route path="/profile" element={isAuthenticated ? <ProfilePage /> : <Navigate replace to="/login" />} />
           <Route path="/creditsOffers" element={<CreditsOffersPage />} />
-          <Route path="/?success=true" element={<SuccessPage />} />
+          <Route path="/success" element={<SuccessPage />} />
+          <Route path="/cancelled" element={<CancelledPage />} />
           {/* Redirects or private routes can be handled with conditional rendering */}
         </Routes>
       </div>

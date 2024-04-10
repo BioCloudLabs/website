@@ -1,16 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './../css/LoginPage.css';
-import { loginUser } from './../services/userService'; // Adjust the import path as necessary
+import { loginUser } from './../services/userService'; 
+import { useNavigate } from 'react-router-dom';
+import { LoginPageProps } from './../models/LoginProps'; // Import the interface
 
-interface LoginPageProps {
-  onLogin: () => void;
-  onForgotPassword: () => void;
-}
 
-function LoginPage({ onLogin, onForgotPassword }: LoginPageProps) {
+function LoginPage({ onLoginSuccess, onForgotPassword }: LoginPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
+
+  // Get the navigate function
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if the user is already logged in
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/dashboard'); 
+    }
+  }, [navigate]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -18,8 +27,14 @@ function LoginPage({ onLogin, onForgotPassword }: LoginPageProps) {
     const loginResult = await loginUser(email, password);
     if (loginResult) {
       console.log('Login successful:', loginResult);
-      onLogin(); // Assuming this triggers a re-render or redirection in your app
-    } else {
+
+      // Call onLogin to perform state updates
+      onLoginSuccess(); // Correctly calling onLoginSuccess now
+    
+      // Navigate to the dashboard page
+      navigate('/dashboard');
+
+      } else {
       // Update the error message based on your userService or specific error handling
       setLoginError('Failed to log in. Please check your credentials and try again.');
     }

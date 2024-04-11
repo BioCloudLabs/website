@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { getCurrentUser, updateUser } from './../services/userService';
-import { User } from './../models/User';
-import './../css/ProfilePage.css';
+import { getCurrentUser, updateUser } from '../../services/userService';
+import { User } from '../../models/User';
+import './../../css/ProfilePage.css';
 
 const ProfilePage = () => {
   const [user, setUser] = useState<User | null>(null);

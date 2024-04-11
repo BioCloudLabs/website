@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './../css/ ForgotPasswordPage.css';
+import './../../css/ ForgotPasswordPage.css';
 
 
 function ForgotPasswordPage() {

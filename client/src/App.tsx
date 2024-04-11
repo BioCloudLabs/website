@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import './App.css';
-import Homepage from './pages/Homepage';
-import BlastPage from './pages/BlastPage';
-import DashboardPage from './pages/DashboardPage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import LogoutButton from './components/LogoutButton';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import ProfilePage from './pages/ProfilePage';
-import CreditsOffersPage from './pages/CreditsOffersPage';
-import SuccessPage from './pages/SuccesPage';
-import CancelledPage from './pages/CancelledPage';
+import Homepage from './components/common/Homepage';
+import BlastPage from './components/common/BlastPage';
+import DashboardPage from './components/common/DashboardPage';
+import LoginPage from './components/auth/LoginPage';
+import RegisterPage from './components/auth/RegisterPage';
+import LogoutButton from './components/auth/LogoutButton';
+import ForgotPasswordPage from './components/auth/ForgotPasswordPage';
+import ProfilePage from './components/profile/ProfilePage';
+import CreditsOffersPage from './components/payment/CreditsOffersPage';
+import SuccessPage from './components/payment/SuccessPage';
+import CancelledPage from './components/payment/CancelledPage';
 
 
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './../css/RegisterPage.css'; // Ensure the path is correct and you have the corresponding CSS
+import './../../css/RegisterPage.css'; // Ensure the path is correct and you have the corresponding CSS
 
 function RegisterPage() {
   const [email, setEmail] = useState('');

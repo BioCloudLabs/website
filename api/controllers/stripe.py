@@ -2,6 +2,9 @@ from flask.views import MethodView
 import stripe
 from flask_smorest import Blueprint
 import os
+import models
+import schemas
+from database import db
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 blp = Blueprint("stripe", __name__, description="Stripe endpoint", url_prefix="/stripe")
@@ -24,15 +27,28 @@ class GetProducts(MethodView):
             return str(e)
 
 
-@blp.route("/create-checkout-session/<data>")
+@blp.route("/create-checkout-session")
 class PaymentIntent(MethodView):
     @jwt_required()
-    def get(self, data):
+    @blp.arguments(schemas.InvoiceSchema)
+    def post(self, payload):
+
         try:
+            invoice = models.InvoiceModel(
+                price=payload['price'],
+                status="pending",
+                user_id=get_jwt_identity()
+            )
+
+            db.session.add(invoice)
+
+            db.session.commit()
+
             checkout_session = stripe.checkout.Session.create(
+                metadata={"order_id": "6735"},
                 line_items=[
                     {
-                        'price': data,
+                        'price': payload['price_id'],
                         'quantity': 1,
                     },
                 ],
@@ -41,7 +57,9 @@ class PaymentIntent(MethodView):
                 cancel_url=YOUR_DOMAIN + '?canceled=true',
                 automatic_tax={'enabled': True},
             )
-        except Exception as e:
-            return str(e)
 
+        except Exception as e:
+            db.session.rollback()
+            return str(e)
+        
         return {"url": checkout_session.url}, 201

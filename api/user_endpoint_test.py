@@ -83,6 +83,13 @@ def test_register_alredy_exists(client, payload):
 
 # Test register endpoint when there are fields with incorrect format in the POST request
 def test_register_failed_wrong_format(client, payload):
+    payload = {
+        "email": "test@example",
+        "password": "password",
+        "name": "Test",
+        "surname": "User",
+        "location_id": 1
+    }
     response = client.post('/user/register', json=payload)
 
     assert response.status_code == 422

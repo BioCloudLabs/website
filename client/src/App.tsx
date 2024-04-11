@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 import Homepage from './pages/Homepage';
 import BlastPage from './pages/BlastPage';
@@ -10,6 +10,8 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ProfilePage from './pages/ProfilePage';
 import CreditsOffersPage from './pages/CreditsOffersPage';
 import SuccessPage from './pages/SuccesPage';
+import CancelledPage from './pages/CancelledPage';
+
 
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 function App() {
@@ -29,6 +31,11 @@ function App() {
     localStorage.removeItem('token'); // Assuming you're storing the token in localStorage
     setIsAuthenticated(false);
   };
+
+  const handleForgotPassword = () => {
+    console.log("Forgot password handler invoked");
+  };
+  
 
   return (
     <Router>
@@ -57,12 +64,13 @@ function App() {
           <Route path="/" element={<Homepage />} />
           <Route path="/blast" element={<BlastPage />} />
           <Route path="/dashboard" element={isAuthenticated ? <DashboardPage /> : <Navigate replace to="/login" />} />
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={<LoginPage onLoginSuccess={() => setIsAuthenticated(true)} onForgotPassword={handleForgotPassword} />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgotPassword" element={<ForgotPasswordPage />} />
           <Route path="/profile" element={isAuthenticated ? <ProfilePage /> : <Navigate replace to="/login" />} />
           <Route path="/creditsOffers" element={<CreditsOffersPage />} />
-          <Route path="/?success=true" element={<SuccessPage />} />
+          <Route path="/success" element={<SuccessPage />} />
+          <Route path="/cancelled" element={<CancelledPage />} />
           {/* Redirects or private routes can be handled with conditional rendering */}
         </Routes>
       </div>

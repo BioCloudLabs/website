@@ -1,14 +1,20 @@
 import { Offer } from '../models/Offer'; // Exported model for 
 
 
-// Function to handle the checkout process
-export const checkout = async (priceId: string): Promise<void> => {
+export const checkout = async (price_id: string, price: string): Promise<void> => {
   try {
-    const response = await fetch('/stripe/create-checkout-session/' + priceId, {
-      method: 'GET', // Your current method is GET; ensure this aligns with your server setup
+    const parsedPrice = parseFloat(price.replace(' €', ''));
+    if (isNaN(parsedPrice)) {
+      throw new Error('Invalid price');
+    }
+
+    const response = await fetch('/stripe/create-checkout-session', {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
+      body: JSON.stringify({ price_id, price: parsedPrice }),
     });
 
     if (!response.ok) {
@@ -16,7 +22,6 @@ export const checkout = async (priceId: string): Promise<void> => {
     }
 
     const data = await response.json();
-    // Redirect to the Stripe checkout URL if available
     if (data.url) {
       window.location.href = data.url;
     } else {
@@ -44,24 +49,12 @@ export const fetchProducts = async (): Promise<Offer[]> => {
 
     const data = await response.json();
 
-    // Create a mapping between product names and image file names
-    // const imageMapping: { [key: string]: string } = {
-    //   '20 Credits': '/images/Credits/20_credits.webp',
-    //   '50 Credits': '/images/Credits/50_credits.webp',
-    //   '100 Credits': 'images/Credits/100_credits.webp',
-    //   '500 Credits': '/images/Credits/500_credits.webp',
-    //   '1.000 Credits': '/images/Credits/1000_credits.webp',
-    // };
-
-
-
-
     // Adjust the mapping to match the server response
     return data.products.map((product: any) => ({
       name: product.name,
       price: product.price,
       image: '/images/Credits/' + product.name + '.webp', // Use the image mapping to assign the correct image
-      priceId: product.price_id, // Use underscore to match server response
+      priceId: product.price_id,
     }));
   } catch (error) {
     console.error('Error fetching products:', error);

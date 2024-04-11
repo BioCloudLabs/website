@@ -45,19 +45,22 @@ export const fetchProducts = async (): Promise<Offer[]> => {
     const data = await response.json();
 
     // Create a mapping between product names and image file names
-    const imageMapping: { [key: string]: string } = {
-      '20 Credits': '/images/Credits/20_credits.webp',
-      '50 Credits': '/images/Credits/50_credits.webp',
-      '100 Credits': 'images/Credits/100_credits.webp',
-      '500 Credits': '/images/Credits/500_credits.webp',
-      '1.000 Credits': '/images/Credits/1000_credits.webp',
-    };
+    // const imageMapping: { [key: string]: string } = {
+    //   '20 Credits': '/images/Credits/20_credits.webp',
+    //   '50 Credits': '/images/Credits/50_credits.webp',
+    //   '100 Credits': 'images/Credits/100_credits.webp',
+    //   '500 Credits': '/images/Credits/500_credits.webp',
+    //   '1.000 Credits': '/images/Credits/1000_credits.webp',
+    // };
+
+
+
 
     // Adjust the mapping to match the server response
     return data.products.map((product: any) => ({
       name: product.name,
       price: product.price,
-      image: imageMapping[product.name], // Use the image mapping to assign the correct image
+      image: '/images/Credits/' + product.name + '.webp', // Use the image mapping to assign the correct image
       priceId: product.price_id, // Use underscore to match server response
     }));
   } catch (error) {

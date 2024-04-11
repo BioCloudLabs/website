@@ -58,15 +58,15 @@ with app.app_context():
     )
 
     
-    # Uncomment these lines to add the default and test roles and locations
-    db.session.add(new_role)
-    db.session.add(new_role2)
-    db.session.add(new_role3)
-    db.session.add(new_location)
-    db.session.add(new_location2)
+    # # Uncomment these lines to add the default and test roles and locations
+    # db.session.add(new_role)
+    # db.session.add(new_role2)
+    # db.session.add(new_role3)
+    # db.session.add(new_location)
+    # db.session.add(new_location2)
     
-    # Commit the changes to persist them in the database
-    db.session.commit()
+    # # Commit the changes to persist them in the database
+    # db.session.commit()
 
 
 

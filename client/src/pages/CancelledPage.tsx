@@ -1,40 +1,35 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import './../css/CancelledPage.css'; // import the CSS file
+import './../css/CancelledPage.css';
 
 const CancelledPage: React.FC = () => {
-  console.log('Rendering CancelledPage'); // Log when the component renders
-
-  const location = useLocation();
+  const [countdown, setCountdown] = useState(3); // Initialize countdown state with 3
   const navigate = useNavigate();
-  const queryParams = new URLSearchParams(location.search);
-  const cancelled = queryParams.get('canceled');
-
-  console.log('Cancelled:', cancelled); // Log the 'cancelled' variable
 
   useEffect(() => {
-    if (cancelled === 'true') {
-      const timer = setTimeout(() => {
-        console.log('Navigating to /test'); // Log before navigating
-        navigate('/test'); // Try navigating to a different route
-      }, 3000);
-      return () => clearTimeout(timer); // cleanup on unmount
-    }
-  }, [cancelled, navigate]);
+    console.log('Operation cancelled, redirecting in 3 seconds...');
+    
+    // Update the countdown every second
+    const interval = setInterval(() => {
+      setCountdown((currentCountdown) => currentCountdown - 1);
+    }, 1000);
+    
+    // Redirect when countdown reaches 0
+    const timer = setTimeout(() => {
+      navigate('/'); // Use navigate('/') to navigate to homepage
+    }, 3000);
+    
+    // Cleanup on unmount
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
+  }, [navigate]);
 
   return (
-    <div className={cancelled === 'true' ? 'cancelled-container' : 'homepage-container'}>
-      {cancelled === 'true' ? (
-        <div>
-          <h1>Operation Cancelled</h1>
-          <p>Your operation was cancelled. Redirecting to homepage in 3 seconds...</p>
-        </div>
-      ) : (
-        <div>
-          <h1>Oops!</h1>
-          <p>It looks like you've reached this page by mistake.</p>
-        </div>
-      )}
+    <div className='cancelled-container'>
+      <h1>Operation Cancelled</h1>
+      <p>Your operation was cancelled. Redirecting to homepage in {countdown} seconds...</p>
     </div>
   );
 };

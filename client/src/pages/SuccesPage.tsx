@@ -1,36 +1,35 @@
-import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import './../css/SuccessPage.css';
 
 const SuccessPage: React.FC = () => {
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const success = queryParams.get('success');
-
-  console.log('Success:', success); // Log the 'success' variable
+  const [countdown, setCountdown] = useState(3); // Initialize countdown state with 3
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (success === 'true') {
-      console.log('Operation successful, redirecting in 3 seconds...'); // Log before redirecting
-      const timer = setTimeout(() => {
-        window.location.href = '/';
-      }, 3000);
-      return () => clearTimeout(timer); // cleanup on unmount
-    }
-  }, [success]);
+    console.log('Operation successful, redirecting in 3 seconds...');
+    
+    // Update the countdown every second
+    const interval = setInterval(() => {
+      setCountdown((currentCountdown) => currentCountdown - 1);
+    }, 1000);
+    
+    // Redirect when countdown reaches 0
+    const timer = setTimeout(() => {
+      navigate('/'); // Use navigate('/') to navigate to homepage
+    }, 3000);
+    
+    // Cleanup on unmount
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
+  }, [navigate]);
 
   return (
-    <div>
-      {success === 'true' ? (
-        <div>
-          <h1>Success!</h1>
-          <p>Your operation was successful. Redirecting to homepage in 3 seconds...</p>
-        </div>
-      ) : (
-        <div>
-          <h1>Oops!</h1>
-          <p>It looks like you've reached this page by mistake.</p>
-        </div>
-      )}
+    <div className='success-container '>
+      <h1>Success!</h1>
+      <p>Your operation was successful. Redirecting to homepage in {countdown} seconds...</p>
     </div>
   );
 };

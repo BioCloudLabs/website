@@ -34,8 +34,6 @@ function App() {
 
   const handleForgotPassword = () => {
     console.log("Forgot password handler invoked");
-    // For example, navigate to a forgot password page:
-    // navigate('/forgotPassword'); // Assuming you've set up `useNavigate()` in `App.tsx`
   };
   
 

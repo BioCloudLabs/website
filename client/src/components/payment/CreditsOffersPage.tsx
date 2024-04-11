@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Offer } from '../models/Offer';
-import './../css/CreditsOffersPage.css';
-import { fetchProducts } from '../services/creditsService';
-import { checkout } from '../services/creditsService';
+import { Offer } from '../../models/Offer';
+import './../../css/CreditsOffersPage.css';
+import { fetchProducts } from '../../services/creditsService';
+import { checkout } from '../../services/creditsService';
 
 
 const CreditsOffersPage: React.FC = () => {

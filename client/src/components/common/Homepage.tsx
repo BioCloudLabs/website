@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import './../css/Homepage.css';
+import './../../css/Homepage.css';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 function Homepage() {

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import './../css/LoginPage.css';
-import { loginUser } from './../services/userService'; 
+import './../../css/LoginPage.css';
+import { loginUser } from '../../services/userService'; 
 import { useNavigate } from 'react-router-dom';
-import { LoginPageProps } from './../models/LoginProps'; // Import the interface
+import { LoginPageProps } from '../../models/LoginProps'; // Import the interface
 
 
 function LoginPage({ onLoginSuccess, onForgotPassword }: LoginPageProps) {

@@ -1,51 +1,78 @@
 .homepage-container {
-    text-align: center;
-    padding: 20px;
-  }
-  
-  .title {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  .subtitle {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-  }
-  
-  .features {
-    margin: 2rem 0;
-  }
-  
-  .features-title {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .features-list {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-  }
-  
-  .feature h3 {
-    font-size: 1.5rem;
-  }
-  
-  .get-started {
-    margin-top: 3rem;
-  }
-  
-  .start-button {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-  }
-  
-  .start-button:hover {
-    background-color: #0056b3;
-  }
+  text-align: center;
+  padding: 0; /* Reduced overall padding */
+}
+
+.title-font {
+  margin-bottom: 1rem; /* Reduced spacing after title */
+}
+
+.lead {
+  margin-bottom: 1rem; /* Reduced spacing after subtitle paragraph */
+}
+
+.container {
+  padding: 0 1rem; /* Reduced horizontal padding */
+}
+
+.flex {
+  gap: 0; /* Remove gap if needed */
+}
+
+/* Reduce the top and bottom padding within each section */
+.py-24 {
+  padding-top: 2rem; /* Reduced from 6rem (24px * 6) */
+  padding-bottom: 2rem; /* Reduced from 6rem (24px * 6) */
+}
+
+.mb-16 {
+  margin-bottom: 2rem; /* Reduced from 4rem (16px * 16) */
+}
+
+.mb-20 {
+  margin-bottom: 2rem; /* Reduced from 5rem (20px * 20) */
+}
+
+.mb-4 {
+  margin-bottom: 1rem; /* Reduced from 1rem (4px * 4) */
+}
+
+.mb-8 {
+  margin-bottom: 1rem; /* Reduced from 2rem (8px * 8) */
+}
+
+/* Reduce padding around the feature cards */
+.p-4 {
+  padding: 1rem; /* Reduced from 1rem (4px * 4) */
+}
+
+/* Reduce margin between icon and feature title */
+.flex.items-center.mb-3 {
+  margin-bottom: 0.5rem; /* Reduced from 0.75rem (3px * 3) */
+}
+
+/* Reduce the vertical padding inside feature cards */
+.p-8 {
+  padding: 1rem; /* Reduced from 2rem (8px * 8) */
+}
+
+/* Additional fine-tuning */
+.w-8.h-8 {
+  width: 2rem; /* Ensure the icons are not too large */
+  height: 2rem; /* Ensure the icons are not too large */
+}
+
+.custom-image-style {
+  border-radius: 50%; /* Fully round the image; use a smaller percentage for less rounding */
+  border: 4px solid #007bff; /* Match this color with your brand blue */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); /* This adds a shadow similar to Tailwind's `shadow-lg` */
+  border-radius: 20px; /* Rounded corners */
+
+}
+
+.circular-shadow-border {
+  border-radius: 50%;
+  border: 5px solid #007bff; /* A blue border */
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+}
+

@@ -1,8 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
 /* App.css */
-body, html {
-  height: 100%;
+html {
+  height: 100%; /* Set to 100% */
+  overflow-y: auto; /* Show scrollbar only when needed */
+}
+
+body {
   margin: 0;
-  padding-top: 50px; /* Account for fixed navbar height */
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   background-color: #edf2f7; /* Light grey background */
   color: #333; /* Dark text for readability */
@@ -12,9 +20,11 @@ body, html {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start; /* Align content to start at the top of the page */
-  min-height: calc(100vh - 50px); /* Subtract navbar height */
+  justify-content: flex-start;
+  min-height: calc(100vh - 50px); /* Ensure root element is at least as tall as the viewport minus navbar height */
   width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scrollbar */
+  padding-top: 50px; /* This should match the navbar height if the navbar is part of the layout inside #root */
 }
 
 /************* START NAVBAR SECTION **************/
@@ -28,7 +38,7 @@ body, html {
   display: flex;
   justify-content: space-between; /* Align nav-left to the start and nav-right to the end */
   align-items: center;
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 1rem; /* Slightly reduced the side padding */
   background-color: #2b6cb0;
   z-index: 1000;
 }

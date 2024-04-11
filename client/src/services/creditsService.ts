@@ -46,11 +46,11 @@ export const fetchProducts = async (): Promise<Offer[]> => {
 
     // Create a mapping between product names and image file names
     const imageMapping: { [key: string]: string } = {
-      '20 Credits': '/images/20_credits.webp',
-      '50 Credits': '/images/50_credits.webp',
-      '100 Credits': '/images/100_credits.webp',
-      '500 Credits': '/images/500_credits.webp',
-      '1.000 Credits': '/images/1000_credits.webp',
+      '20 Credits': '/images/Credits/20_credits.webp',
+      '50 Credits': '/images/Credits/50_credits.webp',
+      '100 Credits': 'images/Credits/100_credits.webp',
+      '500 Credits': '/images/Credits/500_credits.webp',
+      '1.000 Credits': '/images/Credits/1000_credits.webp',
     };
 
     // Adjust the mapping to match the server response

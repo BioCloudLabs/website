@@ -43,7 +43,7 @@ const CreditsOffersPage: React.FC = () => {
               <img src={offer.image} alt={offer.name} className="offer-image" />
               <h2 className="offer-title">{offer.name}</h2>
               <p className="offer-price">{offer.price}</p>
-              <button onClick={() => checkout(offer.priceId)} className="checkout-button">Checkout</button>
+              <button onClick={() => checkout(offer.priceId, offer.price)} className="checkout-button">Checkout</button>
             </div>
           ))
         ) : (

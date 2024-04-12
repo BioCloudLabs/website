@@ -1,12 +1,11 @@
 from flask import Flask, jsonify
 from flask_smorest import Api
 import models
-import base64
+import stripe
 import os 
 from flask_jwt_extended import JWTManager
 from database import db
 from flask_migrate import Migrate
-from datetime import datetime
 from controllers.user import blp as UserBlueprint
 from controllers.stripe import blp as StripeBlueprint
 from dotenv import load_dotenv

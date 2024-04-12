@@ -1,3 +1,5 @@
+/****************** CREDITS OFFERS SECTION START ******************/
+
 .credits-offers-page {
     max-width: 1200px;
     margin: 0 auto;
@@ -15,15 +17,32 @@
     flex-direction: column;
 }
 
-.loader {
-    /* Placeholder for your loading animation */
-    border: 4px solid rgba(0, 0, 0, 0.1);
-    border-radius: 50%;
-    border-top: 4px solid blue;
-    width: 50px;
-    height: 50px;
-    animation: spin 2s linear infinite;
+/****************** CREDITS OFFERS SECTION END ******************/
+
+
+/****************** LOADER SECTION START ******************/
+
+@keyframes move { /* Animation to move the gradient right to left */
+    0%, 100% {
+        background-position: 100% 50%;
+    }
+    50% {
+        background-position: 0% 50%;
+    }
 }
+
+.loader {
+    width: 100%; /* Full width of the container */
+    height: 4px; /* Height of the loader bar */
+    background: linear-gradient(to left, #ffffff 50%, #4fd1c5 50%); /* Adjusted gradient direction */
+    background-size: 200% 100%; /* Ensures the gradient spans enough area to slide */
+    animation: move 3s ease-in-out infinite; /* Smooth transition with ease-in-out and slightly longer duration */
+}
+
+/****************** LOADER SECTION END ******************/
+
+/****************** CREDITS OFFERS CARD SECTION START ******************/
+
 
 .offers-container {
     display: flex;
@@ -71,10 +90,18 @@
     background-color: #03a;
 }
 
+/****************** CREDITS OFFERS CARD SECTION END ******************/
+
+/****************** CHECKOUT SECTION START ******************/
+
+
 .checkout-message {
     color: green;
     margin-bottom: 20px;
 }
+
+/****************** CHECKOUT SECTION END ******************/
+
 
 .offer-image {
     max-width: 100%;

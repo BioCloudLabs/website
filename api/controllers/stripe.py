@@ -41,16 +41,14 @@ class PaymentIntent(MethodView):
                 user_id=get_jwt_identity()
             )
 
-            invoice_id = invoice.id
-
             db.session.add(invoice)
 
             db.session.commit()
+            
+            invoice_id = invoice.id
 
             checkout_session = stripe.checkout.Session.create(
-                metadata={
-                    "invoice_id": invoice_id
-                    },
+                metadata={"invoice_id": invoice_id},
                 line_items=[
                     {
                         'price': payload['price_id'],
@@ -88,20 +86,18 @@ class StripeWebhook(MethodView):
             raise e
 
         # Handle the event
-        if event['type'] == 'checkout.session.completed':
-            session = event['data']['object']
-            print('completed')
-            print(session['metadata'])
-        elif event['type'] == 'checkout.session.expired':
-            session = event['data']['object']
-            print('expired')
-            print(session['metadata'])
-        elif event['type'] == 'checkout.session.cancelled':
-            session = event['data']['object']
-            print('expired')
-            print(session['metadata'])
-        else:
-            print('Unhandled event type {}'.format(event['type']))
+        metadata = event['data']['object']['metadata']
+        match event['type']:
+            case 'checkout.session.completed':
+                invoice = db.session.get(models.InvoiceModel, metadata['invoice_id'])
+                invoice.status = "completed"
+                db.session.commit()
+            case 'checkout.session.expired':
+                invoice = db.session.get(models.InvoiceModel, metadata['invoice_id'])
+                invoice.status = "expired"
+                db.session.commit()
+            case _:
+                print(f"Error no: {event['type']}")
 
         return {"success": True}, 200
     

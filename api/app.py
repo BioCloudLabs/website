@@ -18,7 +18,7 @@ load_dotenv()
 app.config["API_TITLE"] = os.getenv("API_TITLE")
 app.config["API_VERSION"] = os.getenv("API_VERSION")
 app.config["OPENAPI_VERSION"] = os.getenv("OPENAPI_VERSION")
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("TEST_SQLALCHEMY_DATABASE_URI")
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 
 jwt = JWTManager(app)
@@ -58,7 +58,7 @@ with app.app_context():
     )
 
     
-    # # Uncomment these lines to add the default and test roles and locations
+    # Uncomment these lines to add the default and test roles and locations
     # db.session.add(new_role)
     # db.session.add(new_role2)
     # db.session.add(new_role3)

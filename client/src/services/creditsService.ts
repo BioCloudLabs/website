@@ -1,30 +1,24 @@
-import { Offer } from '../models/Offer'; // Exported model for representing an offer
-import { getCurrentUser } from './userService'; // Imported to check if the user has logged or not
+import { Offer } from '../models/Offer';
+import { getCurrentUserToken } from './userService';
 
-
-
-/**
- * Handles the checkout process, including user authentication.
- * @param priceId The ID of the price or product.
- * @param price The price of the product.
- * @param onNotAuthenticated Callback to execute if the user is not authenticated.
- * @param onSuccess Callback to execute after successful checkout process.
- */
-export const handleCheckout = async (priceId: string, price: number, onNotAuthenticated: () => void, onSuccess: () => void) => {
-  const user = await getCurrentUser();
+export const handleUserCheckout = async (priceId: string, price: number, onNotAuthenticated: () => void, onSuccess: () => void, onError: (error: string) => void) => {
+  const user = await getCurrentUserToken();
   if (!user) {
-    onNotAuthenticated();
+    onNotAuthenticated(); // Call the onNotAuthenticated callback if the user is not authenticated
   } else {
-    checkout(priceId, price.toString()); // Convert price to string here
-    onSuccess();
+    try {
+      await checkout(priceId, price.toString());
+      onSuccess(); // Call the onSuccess callback when checkout is successful
+    } catch (error) {
+      console.error('Checkout error:', error);
+      onError('Checkout error'); // Call the onError callback when there is an error during checkout
+    }
   }
 };
 
-
-
 export const checkout = async (price_id: string, price: string): Promise<void> => {
   try {
-    const parsedPrice = parseFloat(price.replace(' €', ''));
+    const parsedPrice = parseFloat(price.replace('€', '').trim());
     if (isNaN(parsedPrice)) {
       throw new Error('Invalid price');
     }
@@ -44,17 +38,20 @@ export const checkout = async (price_id: string, price: string): Promise<void> =
 
     const data = await response.json();
     if (data.url) {
-      window.location.href = data.url;
+      window.location.href = data.url;  // Redirect to the payment URL
     } else {
-      console.error('Checkout URL not found in the response');
+      throw new Error('Checkout URL not found in the response');
     }
   } catch (error) {
     console.error('Error during checkout:', error);
+    throw error;
   }
 };
 
 
-// Function to fetch products from the backend
+/**
+ * Function to fetch products from the backend.
+ */
 export const fetchProducts = async (): Promise<Offer[]> => {
   try {
     const response = await fetch('/stripe/products', {
@@ -69,16 +66,14 @@ export const fetchProducts = async (): Promise<Offer[]> => {
     }
 
     const data = await response.json();
-
-    // Adjust the mapping to match the server response
     return data.products.map((product: any) => ({
       name: product.name,
       price: product.price,
-      image: '/images/Credits/' + product.name + '.webp', // Use the image mapping to assign the correct image
+      image: '/images/Credits/' + product.name + '.webp',
       priceId: product.price_id,
     }));
   } catch (error) {
     console.error('Error fetching products:', error);
-    throw error; // Re-throw the error if you want to handle it in the component (e.g., to show a message)
+    throw error;  // Re-throw the error if you want to handle it in the component (e.g., to show a message)
   }
 };

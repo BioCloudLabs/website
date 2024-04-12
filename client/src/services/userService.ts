@@ -52,15 +52,55 @@ export const getCurrentUser = async (): Promise<User | null> => {
 };
 
 /**
- * Updates a user's data.
- * 
- * @param userData - The updated user data, excluding the password, created_at, and updated_at fields.
- * @returns A Promise that resolves to the updated User object, or null if the update fails.
+ * Retrieves the current user token from the local storage.
+ * @returns A Promise that resolves to the current user object, or null if no user profile is found in the local storage.
  */
-export const updateUser = async (userData: Omit<User, 'password' | 'created_at' | 'updated_at'>): Promise<User | null> => {
+export const getCurrentUserToken = async (): Promise<User | null> => {
+  try {
+    const userProfileString = localStorage.getItem('token');
+    if (!userProfileString) {
+      return null; // No user profile found in localStorage
+    }
+    const userProfile = JSON.parse(userProfileString);
+    return userProfile as User;
+  } catch (error) {
+    console.error('Error fetching user token from localStorage:', error);
+    return null;
+  }
+};
 
-  console.log(userData); // To avoid the unused variable warning
-  return null; // Temporarily return null to resolve the error
+
+/**
+ * Updates the user profile.
+ * @param user - The user data to be updated.
+ * @returns A Promise that resolves to the updated user object or null if the update fails.
+ */
+export const updateUser = async (user: User): Promise<User | null> => {
+  try {
+    const response = await fetch('/user/profile', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,  // Ensure the token is sent correctly
+      },
+      body: JSON.stringify({
+        name: user.name,
+        surname: user.surname,
+        password: user.password,  // Ensure this is included if needed or remove if not
+        location_id: user.location_id,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update user profile.');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    return null;
+  }
 };
 
 

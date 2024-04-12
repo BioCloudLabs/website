@@ -102,6 +102,8 @@
 
 /****************** CHECKOUT SECTION END ******************/
 
+/****************** IMAGE SECTION START ******************/
+
 
 .offer-image {
     max-width: 100%;
@@ -113,3 +115,19 @@
     margin-bottom: 10px;
     /* Adds some space between the image and the text below it */
 }
+
+/****************** IMAGE SECTION END ******************/
+
+/****************** FEEDBACK SECTION START ******************/
+
+
+.feedback-message {
+    color: #d32f2f; /* Red color for errors */
+    background-color: #ffcdd2; /* Light red background */
+    text-align: center;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 20px;
+}
+
+/****************** FEEDBACK SECTION END ******************/

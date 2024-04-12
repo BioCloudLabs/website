@@ -22,9 +22,6 @@
 
 /****************** LOADER SECTION START ******************/
 
-
-/****************** LOADER SECTION START ******************/
-
 @keyframes move { /* Animation to move the gradient right to left */
     0%, 100% {
         background-position: 100% 50%;
@@ -41,9 +38,6 @@
     background-size: 200% 100%; /* Ensures the gradient spans enough area to slide */
     animation: move 3s ease-in-out infinite; /* Smooth transition with ease-in-out and slightly longer duration */
 }
-
-/****************** LOADER SECTION END ******************/
-
 
 /****************** LOADER SECTION END ******************/
 

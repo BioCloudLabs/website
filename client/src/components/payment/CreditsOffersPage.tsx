@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Offer } from '../../models/Offer';
+import { fetchProducts, checkout } from '../../services/creditsService';
 import './../../css/CreditsOffersPage.css';
-import { fetchProducts } from '../../services/creditsService';
-import { checkout } from '../../services/creditsService';
 
 const CreditsOffersPage: React.FC = () => {
   const [offers, setOffers] = useState<Offer[]>([]);
@@ -27,7 +26,6 @@ const CreditsOffersPage: React.FC = () => {
     return (
       <div className="credits-offers-page-loading">
         <h1>Loading Offers...</h1>
-        {/* Add your loading spinner or animation here */}
         <div className="loader"></div>
       </div>
     );
@@ -41,8 +39,8 @@ const CreditsOffersPage: React.FC = () => {
           offers.map((offer, index) => (
             <div key={index} className="offer-card">
               <img src={offer.image} alt={offer.name} className="offer-image" />
-              <h2 className="offer-title">{offer.name}</h2>
-              <p className="offer-price">{offer.price}</p>
+              <h2>{offer.name}</h2>
+              <p>{offer.price}</p>
               <button onClick={() => checkout(offer.priceId, offer.price)} className="checkout-button">Checkout</button>
             </div>
           ))

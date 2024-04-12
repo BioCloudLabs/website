@@ -1,4 +1,25 @@
-import { Offer } from '../models/Offer'; // Exported model for 
+import { Offer } from '../models/Offer'; // Exported model for representing an offer
+import { getCurrentUser } from './userService'; // Imported to check if the user has logged or not
+
+
+
+/**
+ * Handles the checkout process, including user authentication.
+ * @param priceId The ID of the price or product.
+ * @param price The price of the product.
+ * @param onNotAuthenticated Callback to execute if the user is not authenticated.
+ * @param onSuccess Callback to execute after successful checkout process.
+ */
+export const handleCheckout = async (priceId: string, price: number, onNotAuthenticated: () => void, onSuccess: () => void) => {
+  const user = await getCurrentUser();
+  if (!user) {
+    onNotAuthenticated();
+  } else {
+    checkout(priceId, price.toString()); // Convert price to string here
+    onSuccess();
+  }
+};
+
 
 
 export const checkout = async (price_id: string, price: string): Promise<void> => {

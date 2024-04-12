@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';  
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
 import Homepage from './components/common/Homepage';
 import BlastPage from './components/common/BlastPage';
@@ -11,14 +12,12 @@ import ProfilePage from './components/profile/ProfilePage';
 import CreditsOffersPage from './components/payment/CreditsOffersPage';
 import SuccessPage from './components/payment/SuccessPage';
 import CancelledPage from './components/payment/CancelledPage';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
-
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!localStorage.getItem('token'));
 
   useEffect(() => {
-    // Update isAuthenticated when the app mounts or localStorage changes
     const handleStorageChange = () => {
       setIsAuthenticated(!!localStorage.getItem('token'));
     };
@@ -27,30 +26,24 @@ function App() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token'); // Assuming you're storing the token in localStorage
-    setIsAuthenticated(false);
-  };
-
-  const handleForgotPassword = () => {
-    console.log("Forgot password handler invoked");
-  };
-  
-
   return (
     <Router>
       <div className="App">
         <nav className="navigation">
           <div className="nav-left">
             <Link to="/">Home</Link>
-            <Link to="/blast">BLAST</Link>
-            <Link to="/dashboard">Dashboard</Link>
-            <Link to="/creditsOffers">Credits Offers</Link>
-            {isAuthenticated && <Link to="/profile">Profile</Link>}
+            <Link to="/credits-offers">Credits Offers</Link>
+            {isAuthenticated && (
+              <>
+                <Link to="/profile">Profile</Link>
+                <Link to="/dashboard">Dashboard</Link>
+                <Link to="/blast">BLAST</Link>
+              </>
+            )}
           </div>
           <div className="nav-right">
             {isAuthenticated ? (
-              <LogoutButton onLogout={handleLogout} />
+              <LogoutButton onLogout={() => { localStorage.removeItem('token'); setIsAuthenticated(false); }} />
             ) : (
               <>
                 <Link to="/login">Login</Link>
@@ -62,16 +55,15 @@ function App() {
 
         <Routes>
           <Route path="/" element={<Homepage />} />
-          <Route path="/blast" element={<BlastPage />} />
-          <Route path="/dashboard" element={isAuthenticated ? <DashboardPage /> : <Navigate replace to="/login" />} />
-          <Route path="/login" element={<LoginPage onLoginSuccess={() => setIsAuthenticated(true)} onForgotPassword={handleForgotPassword} />} />
+          <Route path="/blast" element={<ProtectedRoute isAuthenticated={isAuthenticated}><BlastPage /></ProtectedRoute>} />
+          <Route path="/dashboard" element={<ProtectedRoute isAuthenticated={isAuthenticated}><DashboardPage /></ProtectedRoute>} />
+          <Route path="/login" element={<LoginPage onLoginSuccess={() => setIsAuthenticated(true)} setIsAuthenticated={setIsAuthenticated} />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/forgotPassword" element={<ForgotPasswordPage />} />
-          <Route path="/profile" element={isAuthenticated ? <ProfilePage /> : <Navigate replace to="/login" />} />
-          <Route path="/creditsOffers" element={<CreditsOffersPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/profile" element={<ProtectedRoute isAuthenticated={isAuthenticated}><ProfilePage /></ProtectedRoute>} />
+          <Route path="/credits-offers" element={<CreditsOffersPage />} />
           <Route path="/success" element={<SuccessPage />} />
           <Route path="/cancelled" element={<CancelledPage />} />
-          {/* Redirects or private routes can be handled with conditional rendering */}
         </Routes>
       </div>
     </Router>

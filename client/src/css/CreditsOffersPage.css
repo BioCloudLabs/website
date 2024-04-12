@@ -1,0 +1,121 @@
+/****************** CREDITS OFFERS SECTION START ******************/
+
+.credits-offers-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+    text-align: center;
+    /* Center text */
+}
+
+.credits-offers-page-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    /* Make loader take full page height */
+    flex-direction: column;
+}
+
+/****************** CREDITS OFFERS SECTION END ******************/
+
+
+/****************** LOADER SECTION START ******************/
+
+
+/****************** LOADER SECTION START ******************/
+
+@keyframes move { /* Animation to move the gradient right to left */
+    0%, 100% {
+        background-position: 100% 50%;
+    }
+    50% {
+        background-position: 0% 50%;
+    }
+}
+
+.loader {
+    width: 100%; /* Full width of the container */
+    height: 4px; /* Height of the loader bar */
+    background: linear-gradient(to left, #ffffff 50%, #4fd1c5 50%); /* Adjusted gradient direction */
+    background-size: 200% 100%; /* Ensures the gradient spans enough area to slide */
+    animation: move 3s ease-in-out infinite; /* Smooth transition with ease-in-out and slightly longer duration */
+}
+
+/****************** LOADER SECTION END ******************/
+
+
+/****************** LOADER SECTION END ******************/
+
+/****************** CREDITS OFFERS CARD SECTION START ******************/
+
+
+.offers-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 20px;
+}
+
+.offer-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 250px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.offer-card h2 {
+    margin: 0;
+    color: #333;
+    font-size: 1.5em;
+}
+
+.offer-card p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.offer-card button.checkout-button {
+    background-color: #04c;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.offer-card button.checkout-button:hover {
+    background-color: #03a;
+}
+
+/****************** CREDITS OFFERS CARD SECTION END ******************/
+
+/****************** CHECKOUT SECTION START ******************/
+
+
+.checkout-message {
+    color: green;
+    margin-bottom: 20px;
+}
+
+/****************** CHECKOUT SECTION END ******************/
+
+
+.offer-image {
+    max-width: 100%;
+    /* Makes sure the image does not exceed the card size */
+    height: auto;
+    /* Keeps the aspect ratio of the image */
+    border-radius: 8px;
+    /* Rounded corners on your images */
+    margin-bottom: 10px;
+    /* Adds some space between the image and the text below it */
+}

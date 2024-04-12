@@ -7,7 +7,7 @@ const SuccessPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('Operation successful, redirecting in 3 seconds...');
+    // console.log('Operation successful, redirecting in 3 seconds...');
     
     // Update the countdown every second
     const interval = setInterval(() => {

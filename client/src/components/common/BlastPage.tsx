@@ -25,7 +25,7 @@ function BlastPage() {
         })
         .then(response => {
             if (response.ok) {
-                console.log('Sequence submitted successfully');
+                // console.log('Sequence submitted successfully');
                 setSequence(''); // Clear the textarea after submission
             } else {
                 console.error('Submission failed');

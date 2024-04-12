@@ -8,7 +8,7 @@ function ForgotPasswordPage() {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    console.log('Password reset request for:', email);
+    // console.log('Password reset request for:', email);
     setMessage('If your account exists, a reset link is on its way. Please check your email inbox.');
   };
 

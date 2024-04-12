@@ -32,7 +32,18 @@ function DashboardPage() {
                         <p>Sequences: 20</p>
                         <p>Last Updated: 22/03/2024</p>
                     </div>
-                    {/* Additional projects would be fetched and displayed dynamically in a real application */}
+                    <div className="p-4 border rounded-lg shadow">
+                        <h3 className="font-semibold">Project A</h3>
+                        <p>Status: In Progress</p>
+                        <p>Sequences: 20</p>
+                        <p>Last Updated: 22/03/2024</p>
+                    </div>
+                    <div className="p-4 border rounded-lg shadow">
+                        <h3 className="font-semibold">Project A</h3>
+                        <p>Status: In Progress</p>
+                        <p>Sequences: 20</p>
+                        <p>Last Updated: 22/03/2024</p>
+                    </div>
                 </div>
             </div>
 
@@ -72,7 +83,34 @@ function DashboardPage() {
                                 <a href="#" className="text-indigo-600 hover:text-indigo-900">View Results</a>
                             </td>
                         </tr>
-                        {/* Additional analyses would be fetched and displayed dynamically in a real application */}
+                        <tr>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                BLAST Analysis 2
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                Cancelled
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                05/04/2024
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="#" className="text-indigo-600 hover:text-indigo-900">View Results</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                BLAST Analysis 3
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                Pending
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                12/04/2024
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="#" className="text-indigo-600 hover:text-indigo-900">View Results</a>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

@@ -2,12 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './../../css/CancelledPage.css';
 
+/**
+ * Represents the CancelledPage component.
+ * This component displays a message indicating that the operation was cancelled and redirects to the homepage after a countdown.
+ */
 const CancelledPage: React.FC = () => {
   const [countdown, setCountdown] = useState(3); // Initialize countdown state with 3
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('Operation cancelled, redirecting in 3 seconds...');
+    // // console.log('Operation cancelled, redirecting in 3 seconds...');
     
     // Update the countdown every second
     const interval = setInterval(() => {

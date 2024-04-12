@@ -28,7 +28,7 @@ function RegisterPage() {
       });
 
       console.error(location_id);
-      console.log(typeof(location_id));
+      // console.log(typeof(location_id));
 
       if (!response.ok) {
         const errorData = await response.json();

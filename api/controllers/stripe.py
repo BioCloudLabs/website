@@ -51,6 +51,7 @@ class PaymentIntent(MethodView):
 
         for i in PRODUCTS["products"]:
             print(i)
+            print(payload['price'])
             if i["price"] == f"{payload['price']} €":
                 credits += i["credits"]
 

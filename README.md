@@ -27,13 +27,22 @@ cd BioCloudLabs
 # Install dependencies 
 npm install -r requirements.txt
 
+# Make sure .env is setup correctly as specified at the backend
+nano .env
 
-# Start the development server
+# Start the backend server
+flask run
+
+# Move to the client folder to setup the Frontend:
+cd ../client
+
+# Install the dependencies:
+npm install
+
+# Start the development server:
 npm run dev
-
 ```
 
 ## Acknowledgments
 
-- Thanks to all the contributors who invest their time into making BioCloudLabs better every day.
 - Special thanks to our teachers for their guidance and knowledge have been instrumental in shaping this project.

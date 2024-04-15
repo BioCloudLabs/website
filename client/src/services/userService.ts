@@ -33,6 +33,39 @@ export const loginUser = async (email: string, password: string): Promise<LoginR
   }
 };
 
+
+/**
+ * Registers a new user with the provided details.
+ * @param userDetails - An object containing user details like email, password, name, etc.
+ * @returns A Promise that resolves to a boolean indicating whether the registration was successful.
+ */
+export const registerUser = async (userDetails: {
+  email: string,
+  password: string,
+  name: string,
+  surname: string,
+  location_id: number
+}): Promise<boolean> => {
+  try {
+    const response = await fetch('/user/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userDetails),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Registration failed. Please try again.');
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Registration error:', error);
+    return false;
+  }
+};
+
+
 /**
  * Retrieves the current user from the local storage.
  * @returns A Promise that resolves to the current user object, or null if no user profile is found in the local storage.
@@ -105,31 +138,17 @@ export const updateUser = async (user: User): Promise<User | null> => {
 
 
 /**
- * Retrieves the locations based on the user's location_id.
- *
- * This is a placeholder for actual logic that would be used with a /locations endpoint.
- * 
+ * Retrieves a list of location options for user registration.
  * @returns A promise that resolves to an array of objects containing the location id and name.
  */
-export const getLocations = async (): Promise<{ id: number; name: string }[]> => {
-
-  // Simulated locations data
-  const simulatedLocations = [
-    { id: 1, name: "Headquarters" },
-    { id: 2, name: "Remote Office" },
-
+export const getLocationOptions = async (): Promise<{ id: number; name: string }[]> => {
+  // Static data for example purposes
+  return [
+      { id: 1, name: "Spain" },
+      { id: 2, name: "Portugal" }
   ];
-
-  // Attempt to get the current user's location_id from localStorage
-  const currentUserProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-  const userLocationId = currentUserProfile.location_id;
-
-  // Find the location that matches the user's location_id
-  const userLocation = simulatedLocations.find(location => location.id === userLocationId);
-
-  // Return an array with only the user's location or an empty array if not found
-  return userLocation ? [userLocation] : [];
 };
+
 
 
 /**

@@ -25,8 +25,7 @@ class UserLogin(MethodView):
 
         if user and pbkdf2_sha256.verify(clean(data["password"]), user.password):
             access_token = create_access_token(identity=user.id)
-            return {"access_token": access_token, "email": user.email, "name": user.name, "surname": user.surname, 
-                    "location_id": user.location_id, "credits": user.credits, "role_id": user.role_id}, 200
+            return {"access_token": access_token}, 200
 
         abort(401, message="Invalid credentials.")
 
@@ -65,9 +64,22 @@ class UserRegister(MethodView):
 
 @blp.route("/profile")
 class UserProfile(MethodView):
-    @blp.arguments(schemas.UserProfileSchema)
+    @jwt_required()
+    def get(self):
+
+        user_by_jwt = get_jwt_identity()
+
+        user = db.session.get(models.UserModel, user_by_jwt)
+
+        if user is None:
+            abort(404, message="User not found")
+
+        return {"email": user.email, "name": user.name, "surname": user.surname, 
+                    "location_id": user.location_id, "credits": user.credits}, 200
+    
 
     @jwt_required()
+    @blp.arguments(schemas.UserProfileSchema)
     def put(self, payload):
         """
         API Endpoint to edit an existing user profile.

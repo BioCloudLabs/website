@@ -45,25 +45,27 @@ export const registerUser = async (userDetails: {
   name: string,
   surname: string,
   location_id: number
-}): Promise<boolean> => {
+}): Promise<void> => {
   try {
-    const response = await fetch('/user/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userDetails),
-    });
+      const response = await fetch('/user/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(userDetails),
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Registration failed. Please try again.');
-    }
+      if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Registration failed. Please try again.');
+      }
 
-    return true;
+      const data = await response.json();
+      console.log('Registration successful:', data.message); // Optional: handle success message
   } catch (error) {
-    console.error('Registration error:', error);
-    return false;
+      console.error('Registration error:', error);
+      throw error; // Re-throw to handle it in the component
   }
 };
+
 
 
 /**

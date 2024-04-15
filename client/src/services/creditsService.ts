@@ -10,7 +10,7 @@ export const handleUserCheckout = async (priceId: string, price: number, onNotAu
       await checkout(priceId, price.toString());
       onSuccess(); // Call the onSuccess callback when checkout is successful
     } catch (error) {
-      console.error('Checkout error:', error);
+      // console.error('Checkout error:', error);
       onError('Checkout error'); // Call the onError callback when there is an error during checkout
     }
   }

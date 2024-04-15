@@ -1,30 +1,46 @@
-# React + TypeScript + Vite
+# BioCloudLabs
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Note:** _BioCloudLabs is a conceptual mock-up designed for illustrative purposes. The features, services, and interfaces mentioned in this document are intended to showcase the potential capabilities of a cloud-based bioinformatics platform and do not currently exist._
 
-Currently, two official plugins are available:
+Welcome to BioCloudLabs, the leading platform for omics analysis in the cloud. BioCloudLabs offers a comprehensive suite of tools for bioinformatics research, enabling scientists and researchers to perform high-performance BLAST analyses and manage their projects efficiently in a cloud-based environment.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+BioCloudLabs provides a range of features designed to enhance your bioinformatics research:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **High-Performance Computing**: Experience fast and reliable analysis of your genomic data with our scalable cloud infrastructure.
+- **Unlimited Cloud Usage**: Enjoy unrestricted access to our cloud resources, facilitating extensive data analysis without limitations.
+- **User-Friendly Interface**: Navigate our platform with ease, thanks to our intuitive user interface designed for scientists of all technical levels.
 
-- Configure the top-level `parserOptions` property like this:
+## Getting Started
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+
+This project is built using React for the frontend a backend API service for handling BLAST analyses. To run this project locally, follow these instructions:
+
+```bash
+# Clone the repository
+git clone https://github.com/BioCloudLabs/web.git
+
+# Navigate to the project directory
+cd BioCloudLabs
+
+# Install dependencies 
+npm install -r requirements.txt
+
+
+# Start the backend server
+flask run
+
+# Move to the client folder to setup the Frontend:
+cd ../client
+
+# Install the dependencies:
+npm install
+
+# Start the development server:
+npm run dev
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Acknowledgments
+
+- Special thanks to our teachers for their guidance and knowledge have been instrumental in shaping this project.

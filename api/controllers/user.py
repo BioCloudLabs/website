@@ -65,9 +65,22 @@ class UserRegister(MethodView):
 
 @blp.route("/profile")
 class UserProfile(MethodView):
-    @blp.arguments(schemas.UserProfileSchema)
+    @jwt_required()
+    def get(self):
+
+        user_by_jwt = get_jwt_identity()
+
+        user = db.session.get(models.UserModel, user_by_jwt)
+
+        if user is None:
+            abort(404, message="User not found")
+
+        return {"email": user.email, "name": user.name, "surname": user.surname, 
+                    "location_id": user.location_id, "credits": user.credits}, 200
+    
 
     @jwt_required()
+    @blp.arguments(schemas.UserProfileSchema)
     def put(self, payload):
         """
         API Endpoint to edit an existing user profile.

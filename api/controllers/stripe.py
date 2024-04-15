@@ -10,9 +10,9 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 blp = Blueprint("stripe", __name__, description="Stripe endpoint", url_prefix="/stripe")
 
-YOUR_DOMAIN = 'http://localhost:5173'
+DOMAIN = os.getenv("DOMAIN")
 stripe.api_key = os.getenv("STRIPE_KEY")
-endpoint_secret = 'whsec_904e9073d0659942b0df7cce3efa2c65d6d3dfb3e5073ff021666a2e66a9b7f3'
+ENDPOINT_SECRET = os.getenv("ENDPOINT_SECRET")
 
 def getProducts():
     """
@@ -37,16 +37,7 @@ PRODUCTS = getProducts()
 @blp.route("/products")
 class GetProducts(MethodView):
     def get(self):
-        data = {"products": []}
-        try:
-            products = stripe.Product.list(limit=10)
-            for product in products["data"]:
-                price = stripe.Price.retrieve(product["default_price"])
-                data["products"].append({"name": product["name"], "price_id": product["default_price"], 
-                                         "price": "{:.2f}".format(price["unit_amount"]/100) + " €"})
-            return data
-        except Exception as e:
-            return str(e)
+        return PRODUCTS
 
 @blp.route("/create-checkout-session")
 class PaymentIntent(MethodView):
@@ -54,11 +45,12 @@ class PaymentIntent(MethodView):
     @blp.arguments(schemas.InvoiceSchema)
     def post(self, payload):
 
-        user_id = get_jwt_identity()
+        user_id = get_jwt_identity() # Get the user id from the jwt
 
         credits = 0
 
         for i in PRODUCTS["products"]:
+            print(i)
             if i["price"] == f"{payload['price']} €":
                 credits += i["credits"]
 
@@ -72,7 +64,7 @@ class PaymentIntent(MethodView):
 
             db.session.add(invoice)
 
-            db.session.commit()
+            db.session.commit() # Commit the invoice to the database
             
             invoice_id = invoice.id
 
@@ -85,8 +77,8 @@ class PaymentIntent(MethodView):
                     },
                 ],
                 mode='payment',
-                success_url=YOUR_DOMAIN + '?success=true',
-                cancel_url=YOUR_DOMAIN + '?canceled=true',
+                success_url=DOMAIN + '?success=true',
+                cancel_url=DOMAIN + '?canceled=true',
                 automatic_tax={'enabled': True},
             )
 
@@ -105,7 +97,7 @@ class StripeWebhook(MethodView):
 
         try:
             event = stripe.Webhook.construct_event(
-                payload, sig_header, endpoint_secret
+                payload, sig_header, ENDPOINT_SECRET
             )
         except ValueError as e:
             # Invalid payload

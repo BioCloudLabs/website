@@ -8,8 +8,8 @@ function RegisterPage() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
-  const [location_id, setLocationId] = useState<string>('1'); // Initialize with '1' or an empty string if no default
-  const [locations, setLocations] = useState<Location[]>([]); // Use Location[] type here
+  const [location_id, setLocationId] = useState<string>('1');
+  const [locations, setLocations] = useState<Location[]>([]);
   const [registrationError, setRegistrationError] = useState('');
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
@@ -17,7 +17,7 @@ function RegisterPage() {
     const fetchLocations = async () => {
       const locationData = await getLocationOptions();
       setLocations(locationData);
-      setLocationId(locationData[0].id.toString()); // Set default to first location's ID
+      setLocationId(locationData[0].id.toString());
     };
 
     fetchLocations();
@@ -26,19 +26,19 @@ function RegisterPage() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const registrationResult = await registerUser({
-      email, password, name, surname, location_id: parseInt(location_id)
-    });
-
-    if (registrationResult) {
+    try {
+      await registerUser({
+        email, password, name, surname, location_id: parseInt(location_id)
+      });
       setRegistrationSuccess(true);
       setEmail('');
       setPassword('');
       setName('');
       setSurname('');
-      setLocationId('1'); // Reset to default or maintain consistency
-    } else {
-      setRegistrationError('Registration failed. Please try again.');
+      setLocationId('1');
+    } catch (error) {
+      setRegistrationError((error as Error).message); // Display the error message
+      setRegistrationSuccess(false); // Ensure UI reflects the error state
     }
   };
 

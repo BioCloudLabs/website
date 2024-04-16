@@ -95,7 +95,7 @@ class UserProfile(MethodView):
             abort(404, message="User not found")
 
         try:
-            user.password=pbkdf2_sha256.hash(clean(payload["password"])),
+            # user.password=pbkdf2_sha256.hash(clean(payload["password"])), Change password?
             user.name=clean(payload["name"]),
             user.surname=clean(payload["surname"]),
             user.location_id=payload["location_id"]

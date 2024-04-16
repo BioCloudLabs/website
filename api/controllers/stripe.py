@@ -1,6 +1,6 @@
 from flask.views import MethodView
 import stripe
-from flask_smorest import Blueprint
+from flask_smorest import Blueprint, abort
 import os
 import models
 import schemas
@@ -50,10 +50,10 @@ class PaymentIntent(MethodView):
         credits = 0
 
         for i in PRODUCTS["products"]:
-            print(i)
+            print(i["credits"])
             print(payload['price'])
             if i["price"] == f"{payload['price']} €":
-                credits += i["credits"]
+                credits += int(i["credits"])
 
         try:
             invoice = models.InvoiceModel(
@@ -70,7 +70,7 @@ class PaymentIntent(MethodView):
             invoice_id = invoice.id
 
             checkout_session = stripe.checkout.Session.create(
-                metadata={"invoice_id": invoice_id, "user_id": user_id},
+                metadata={"invoice_id": invoice_id, "user_id": user_id, "credits": credits},
                 line_items=[
                     {
                         'price': payload['price_id'],
@@ -85,7 +85,7 @@ class PaymentIntent(MethodView):
 
         except Exception as e:
             db.session.rollback()
-            return str(e)
+            abort(500, message=str(e))
         
         return {"url": checkout_session.url}, 201
     
@@ -112,7 +112,8 @@ class StripeWebhook(MethodView):
         match event['type']:
             case 'checkout.session.completed':
                 user = db.session.get(models.UserModel, metadata['user_id'])
-                user.credits += metadata["credits"]
+                print(f"METADATOS WEY: {metadata}")
+                user.credits += int(metadata["credits"])
 
                 invoice = db.session.get(models.InvoiceModel, metadata['invoice_id'])
                 invoice.status = "completed"

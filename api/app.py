@@ -7,7 +7,7 @@ from database import db
 from flask_migrate import Migrate
 from controllers.user import blp as UserBlueprint
 from controllers.stripe import blp as StripeBlueprint
-from controllers.azuredata import blp as StripeBlueprint
+from controllers.azuredata import blp as AzuredataBlueprint
 from dotenv import load_dotenv
 
 app: Flask = Flask(__name__)
@@ -30,6 +30,7 @@ api: Api = Api(app)
 
 api.register_blueprint(UserBlueprint)
 api.register_blueprint(StripeBlueprint)
+api.register_blueprint(AzuredataBlueprint)
 
 # This section adds test data for integrity checking
 

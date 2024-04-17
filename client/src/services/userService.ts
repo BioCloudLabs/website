@@ -85,7 +85,8 @@ export const getCurrentUser = async (): Promise<User | null> => {
 };
 
 /** 
-
+ * User Retrieval Explanation:
+ * 
  * Note that I have two different functions for getting the user token and the user profile.
  * This is because the user token is used for authentication, while the user profile contains additional user information.
  * Also, their format is different, the token is not a JSON object, while the user profile is a JSON object.
@@ -96,20 +97,9 @@ export const getCurrentUser = async (): Promise<User | null> => {
  * Retrieves the current user token from the local storage.
  * @returns A Promise that resolves to the current user object, or null if no user profile is found in the local storage.
  */
-export const getCurrentUserToken = async (): Promise<User | null> => {
-  try {
-    const userProfileString = localStorage.getItem('token');
-    if (!userProfileString) {
-      return null; // No user profile found in localStorage
-    }
-    const userProfile = JSON.parse(userProfileString);
-    return userProfile as User;
-  } catch (error) {
-    console.error('Error fetching user token from localStorage:', error);
-    return null;
-  }
+export const getCurrentUserToken = (): string | null => {
+  return localStorage.getItem('token');
 };
-
 
 /**
  * Updates the user profile.

@@ -18,5 +18,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   // This is useful for catching issues early, but it also can lead to confusing behavior during development,
   // such as double API calls which do not occur in production. In this case, it is safe to remove React.StrictMode
 
+  // Reference: https://legacy.reactjs.org/docs/strict-mode.html
+  
   <App />,
 );

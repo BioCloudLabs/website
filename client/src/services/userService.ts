@@ -45,27 +45,25 @@ export const registerUser = async (userDetails: {
   name: string,
   surname: string,
   location_id: number
-}): Promise<void> => {
+}): Promise<boolean> => {
   try {
-      const response = await fetch('/user/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(userDetails),
-      });
+    const response = await fetch('/user/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userDetails),
+    });
 
-      if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Registration failed. Please try again.');
-      }
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Registration failed. Please try again.');
+    }
 
-      const data = await response.json();
-      console.log('Registration successful:', data.message); // Optional: handle success message
+    return true;
   } catch (error) {
-      console.error('Registration error:', error);
-      throw error; // Re-throw to handle it in the component
+    console.error('Registration error:', error);
+    return false;
   }
 };
-
 
 
 /**
@@ -85,6 +83,14 @@ export const getCurrentUser = async (): Promise<User | null> => {
     return null;
   }
 };
+
+/** 
+
+ * Note that I have two different functions for getting the user token and the user profile.
+ * This is because the user token is used for authentication, while the user profile contains additional user information.
+ * Also, their format is different, the token is not a JSON object, while the user profile is a JSON object.
+ * 
+*/
 
 /**
  * Retrieves the current user token from the local storage.

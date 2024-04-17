@@ -30,7 +30,7 @@ def getProducts():
                                      "credits": int(product["name"].replace(' Credits', ''))})
         return data
     except Exception as e:
-        return str(e)
+        return {"error": str(e)}, 503
 
 PRODUCTS = getProducts()
 
@@ -50,8 +50,6 @@ class PaymentIntent(MethodView):
         credits = 0
 
         for i in PRODUCTS["products"]:
-            print(i["credits"])
-            print(payload['price'])
             if i["price"] == f"{payload['price']} €":
                 credits += int(i["credits"])
 
@@ -112,7 +110,6 @@ class StripeWebhook(MethodView):
         match event['type']:
             case 'checkout.session.completed':
                 user = db.session.get(models.UserModel, metadata['user_id'])
-                print(f"METADATOS WEY: {metadata}")
                 user.credits += int(metadata["credits"])
 
                 invoice = db.session.get(models.InvoiceModel, metadata['invoice_id'])
@@ -122,8 +119,6 @@ class StripeWebhook(MethodView):
                 invoice = db.session.get(models.InvoiceModel, metadata['invoice_id'])
                 invoice.status = "expired"
                 db.session.commit()
-            case _:
-                print(f"Error no: {event['type']}")
 
         return {"success": True}, 200
     

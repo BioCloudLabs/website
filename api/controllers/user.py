@@ -95,7 +95,7 @@ class UserProfile(MethodView):
             abort(404, message="User not found")
 
         try:
-            user.password=pbkdf2_sha256.hash(clean(payload["password"])),
+            # user.password=pbkdf2_sha256.hash(clean(payload["password"])), Change password?
             user.name=clean(payload["name"]),
             user.surname=clean(payload["surname"]),
             user.location_id=payload["location_id"]
@@ -107,3 +107,17 @@ class UserProfile(MethodView):
             abort(400, message=f"An integrity error has ocurred.")
 
         return {"message": "User profile edited successfully."}, 201
+    
+@blp.route("/credits")
+class UserCredits(MethodView):
+    @jwt_required()
+    def get(self):
+
+        user_id = get_jwt_identity() # Get the user id from the jwt
+
+        user = db.session.get(models.UserModel, user_id)
+
+        if user is None:
+            abort(404, message="User not found")
+        
+        return {"credits": user.credits}, 200

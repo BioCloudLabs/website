@@ -7,6 +7,7 @@ class InvoiceModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     price = db.Column(db.Float)
     status = db.Column(db.String(20))
+    credits = db.Column(db.Integer)
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now(), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 

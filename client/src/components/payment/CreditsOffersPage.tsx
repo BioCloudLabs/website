@@ -10,21 +10,21 @@ const CreditsOffersPage: React.FC = () => {
   const navigate = useNavigate(); // Use navigate for redirection
 
   useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        const products = await fetchProducts();
-        setOffers(products);
-      } catch (error) {
-        console.error('Failed to load products:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+;
     loadProducts();
   }, []);
 
-  // Define callbacks for checkout
+  const loadProducts = async () => {
+    try {
+      const products = await fetchProducts();
+      setOffers(products);
+    } catch (error) {
+      console.error('Failed to load products:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const onNotAuthenticated = () => {
     navigate('/login'); // Redirect to login if not authenticated
   };

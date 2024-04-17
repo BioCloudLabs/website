@@ -45,27 +45,25 @@ export const registerUser = async (userDetails: {
   name: string,
   surname: string,
   location_id: number
-}): Promise<void> => {
+}): Promise<boolean> => {
   try {
-      const response = await fetch('/user/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(userDetails),
-      });
+    const response = await fetch('/user/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userDetails),
+    });
 
-      if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Registration failed. Please try again.');
-      }
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Registration failed. Please try again.');
+    }
 
-      const data = await response.json();
-      console.log('Registration successful:', data.message); // Optional: handle success message
+    return true;
   } catch (error) {
-      console.error('Registration error:', error);
-      throw error; // Re-throw to handle it in the component
+    console.error('Registration error:', error);
+    return false;
   }
 };
-
 
 
 /**
@@ -88,22 +86,11 @@ export const getCurrentUser = async (): Promise<User | null> => {
 
 /**
  * Retrieves the current user token from the local storage.
- * @returns A Promise that resolves to the current user object, or null if no user profile is found in the local storage.
+ * @returns The current user token, or null if no token is found in the local storage.
  */
-export const getCurrentUserToken = async (): Promise<User | null> => {
-  try {
-    const userProfileString = localStorage.getItem('token');
-    if (!userProfileString) {
-      return null; // No user profile found in localStorage
-    }
-    const userProfile = JSON.parse(userProfileString);
-    return userProfile as User;
-  } catch (error) {
-    console.error('Error fetching user token from localStorage:', error);
-    return null;
-  }
+export const getCurrentUserToken = (): string | null => {
+  return localStorage.getItem('token');
 };
-
 
 /**
  * Updates the user profile.

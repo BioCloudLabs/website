@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { Offer } from '../../models/Offer';
-import { fetchProducts, checkout } from '../../services/creditsService';
+import { fetchProducts, handleUserCheckout } from '../../services/creditsService'; // Update the import
 import './../../css/CreditsOffersPage.css';
 
 const CreditsOffersPage: React.FC = () => {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate(); // Use navigate for redirection
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -21,6 +23,21 @@ const CreditsOffersPage: React.FC = () => {
 
     loadProducts();
   }, []);
+
+  // Define callbacks for checkout
+  const onNotAuthenticated = () => {
+    navigate('/login'); // Redirect to login if not authenticated
+  };
+
+  const onSuccess = () => {
+    console.log('Checkout successful!');
+    // Optionally handle successful checkout, such as redirecting to a success page
+  };
+
+  const onError = (error: string) => {
+    console.error('Checkout error:', error);
+    // Optionally handle errors, such as displaying an error message to the user
+  };
 
   if (loading) {
     return (
@@ -41,7 +58,8 @@ const CreditsOffersPage: React.FC = () => {
               <img src={offer.image} alt={offer.name} className="offer-image" />
               <h2>{offer.name}</h2>
               <p>{offer.price}</p>
-              <button onClick={() => checkout(offer.priceId, offer.price)} className="checkout-button">Checkout</button>
+              <button onClick={() => handleUserCheckout(offer.priceId, parseFloat(offer.price.replace('€', '').trim()), onNotAuthenticated, onSuccess, onError)}
+                      className="checkout-button">Checkout</button>
             </div>
           ))
         ) : (

@@ -25,7 +25,7 @@ git clone https://github.com/BioCloudLabs/web.git
 cd BioCloudLabs
 
 # Install dependencies 
-npm install -r requirements.txt
+pip install  -r requirements.txt
 
 # Make sure .env is setup correctly as specified at the backend
 nano .env

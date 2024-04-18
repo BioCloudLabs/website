@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { Offer } from '../../models/Offer';
-import { fetchProducts, handleUserCheckout } from '../../services/creditsService'; // Update the import
+import { fetchProducts, handleUserCheckout } from '../../services/creditsService';
 import './../../css/CreditsOffersPage.css';
 
 const CreditsOffersPage: React.FC = () => {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate(); // Use navigate for redirection
+  const navigate = useNavigate();
 
   useEffect(() => {
-;
     loadProducts();
   }, []);
 
@@ -25,18 +26,31 @@ const CreditsOffersPage: React.FC = () => {
     }
   }
 
+  const notify = (message: string) => {  // Specify type as string
+    toast(message, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
+
   const onNotAuthenticated = () => {
-    navigate('/login'); // Redirect to login if not authenticated
+    notify("You are not authenticated. Redirecting to login."); // Show notification
+    setTimeout(() => navigate('/login'), 5000); // Delay the redirection for 5 seconds to allow the user to read the message
   };
 
   const onSuccess = () => {
     console.log('Checkout successful!');
-    // Optionally handle successful checkout, such as redirecting to a success page
+    notify("Checkout successful!"); // Show success message
   };
 
   const onError = (error: string) => {
     console.error('Checkout error:', error);
-    // Optionally handle errors, such as displaying an error message to the user
+    notify(error); // Show error message
   };
 
   if (loading) {
@@ -50,6 +64,7 @@ const CreditsOffersPage: React.FC = () => {
 
   return (
     <div className="credits-offers-page">
+      <ToastContainer /> {/* Add the ToastContainer component */}
       <h1 className="text-center text-3xl font-bold">Available Credit Offers</h1>
       <div className="offers-container">
         {offers.length > 0 ? (
@@ -58,7 +73,7 @@ const CreditsOffersPage: React.FC = () => {
               <img src={offer.image} alt={offer.name} className="offer-image" />
               <h2>{offer.name}</h2>
               <p>{offer.price}</p>
-              <button onClick={() => handleUserCheckout(offer.priceId, parseFloat(offer.price.replace('€', '').trim()), onNotAuthenticated, onSuccess, onError)}
+              <button onClick={() => handleUserCheckout(offer.priceId, parseFloat(offer.price.replace('€', '').trim()), navigate, onNotAuthenticated, onSuccess, onError)}
                       className="checkout-button">Checkout</button>
             </div>
           ))

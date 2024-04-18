@@ -2,27 +2,61 @@ import { User } from './../models/User'; // Adjust the import path as necessary
 import { LoginResponse } from './../models/LoginResponse'; // Adjust the import path as necessary
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 
-/****************** USER UTILITY SERVICES SECTION START ******************/
+/****************** TOKEN SERVICES SECTION START ******************/
+
+/**
+ * BACKEND ENDPOINT TO DO:
+ * 
+ * This function requires a backend endpoint to validate the token.
+ * @returns 
+ */
+export const isTokenValid = async (): Promise<boolean> => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    return false;
+  }
+  
+  try {
+    const response = await fetch('/validate-token', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    
+    return response.ok;
+  } catch (error) {
+    console.error('Error validating token:', error);
+    return false;
+  }
+};
 
 
-export const redirectToLogin = () => {
-  const navigate = useNavigate();
-  navigate('/login');
-}
+// Add check for token expiration with a cookie to request if the token is valid
 
-const handleApiResponse = async (response: Response) => {
+export const handleApiResponse = async (response: Response, navigate: (path: string) => void) => {
   if (!response.ok) {
     const errorData = await response.json();
     if (response.status === 401 && errorData.msg.includes("Token has expired")) {
-      // Logout the user, remove the token, and redirect to login
-      logoutUser();  // This will clear the token and user info
-      redirectToLogin();  // Redirect user to the login page
+      redirectToLogin(navigate);  // Pass the navigate function
       throw new Error("Session has expired. Please log in again.");
     }
     throw new Error(errorData.msg || 'There was a problem processing your request.');
   }
-  return response.json();  // Return the response JSON if no errors
-}
+  return response.json();
+};
+
+
+/****************** TOKEN SERVICES SECTION END ******************/
+
+/****************** USER UTILITY SERVICES SECTION START ******************/
+
+
+export const redirectToLogin = (navigate: (path: string) => void) => {
+  logoutUser();  // This will clear the token and user info
+  navigate('/login');  // Use the passed navigate function
+};
+
+
 
 /**
  * Retrieves the current user from the local storage.
@@ -109,9 +143,13 @@ export const loginUser = async (email: string, password: string): Promise<LoginR
 
     const data: LoginResponse = await response.json();
 
-    // Store the token and user profile in localStorage
+    // Store the token and user profile in localStorage // Adjust to use cookies
     localStorage.setItem('token', data.access_token);
     localStorage.setItem('userProfile', JSON.stringify(data));
+
+    // Send to /validate-token
+
+    // Send to home
 
     return data;
   } catch (error) {
@@ -156,15 +194,21 @@ export const registerUser = async (userDetails: {
 /**
  * Updates the user profile.
  * @param user - The user data to be updated.
+ * @param navigate - Function to navigate to another route (pass from React component using useNavigate).
  * @returns A Promise that resolves to the updated user object or null if the update fails.
  */
-export const updateUser = async (user: User): Promise<User | null> => {
+export const updateUser = async (user: User, navigate: (path: string) => void): Promise<User | null> => {
   try {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error('Authentication token not found. Please log in again.');
+    // First check if the token is valid
+    const isValidToken = await isTokenValid();
+    if (!isValidToken) {
+      // If token is not valid, navigate to login
+      redirectToLogin(navigate);
+      throw new Error('Authentication token is invalid or expired. Redirecting to login.');
     }
 
+    // Proceed with updating the user profile if the token is valid
+    const token = localStorage.getItem('token');
     const response = await fetch('/user/profile', {
       method: 'PUT',
       headers: {
@@ -179,14 +223,13 @@ export const updateUser = async (user: User): Promise<User | null> => {
       }),
     });
 
-    const data = await handleApiResponse(response);  // Use the handleApiResponse function
+    const data = await handleApiResponse(response, navigate);  // Use the handleApiResponse function
     return data;
   } catch (error: any) {
     console.error('Error updating user profile:', error.message);
     return null;
   }
 };
-
 
 
 
@@ -200,20 +243,20 @@ export const forgotPassword = async (email: string): Promise<boolean> => {
   try {
     const response = await fetch('/user/forgot-password', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,  // If required
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),
     });
 
-    await handleApiResponse(response);  // Handle potential token expiration
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to send password reset link');
+    }
+
     return true; // Successfully sent password reset link
-  } catch (error: any) {
-    console.error('Forgot password error:', error.message);
+  } catch (error) {
+    console.error('Forgot password error:', error);
     return false; // Failed to send password reset link
   }
 };
-
 
 /****************** API CALLS SECTION END ******************/

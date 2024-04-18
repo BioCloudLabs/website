@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from blocklist import BLOCKLIST
 from flask_smorest import Api
 import models
 import os 
@@ -31,6 +32,16 @@ api: Api = Api(app)
 api.register_blueprint(UserBlueprint)
 api.register_blueprint(StripeBlueprint)
 api.register_blueprint(AzuredataBlueprint)
+
+
+@jwt.token_in_blocklist_loader
+def check_if_token_in_blocklist(jwt_header, jwt_payload):
+    return jwt_payload["jti"] in BLOCKLIST
+
+
+@jwt.revoked_token_loader
+def revoked_token_callback(jwt_header, jwt_payload):
+    return {"message": "The token has been revoked.", "error": "token_revoked"}, 401
 
 # This section adds test data for integrity checking
 

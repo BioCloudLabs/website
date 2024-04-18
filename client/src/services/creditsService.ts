@@ -1,22 +1,30 @@
 import { Offer } from '../models/Offer';
-import { getCurrentUserToken } from './userService';
+import { getCurrentUserToken, handleApiResponse } from './userService';
 
-export const handleUserCheckout = async (priceId: string, price: number, onNotAuthenticated: () => void, onSuccess: () => void, onError: (error: string) => void) => {
-  const user = await getCurrentUserToken();
-  if (!user) {
+export const handleUserCheckout = async (
+  priceId: string, price: number, navigate: (path: string) => void, 
+  onNotAuthenticated: () => void, onSuccess: () => void, onError: (error: string) => void
+) => {
+  const token = await getCurrentUserToken();
+  if (!token) {
     onNotAuthenticated(); // Call the onNotAuthenticated callback if the user is not authenticated
   } else {
     try {
-      await checkout(priceId, price.toString());
+      await checkout(priceId, price.toString(), navigate);
       onSuccess(); // Call the onSuccess callback when checkout is successful
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Checkout error:', error);
-      onError('Checkout error'); // Call the onError callback when there is an error during checkout
+      if (error instanceof Error) {
+        onError(error.message); // Now TypeScript knows error is an instance of Error and thus has a message property
+      } else {
+        onError('Checkout error'); // Default error message if it's not an instance of Error
+      }
     }
   }
 };
 
-export const checkout = async (price_id: string, price: string): Promise<void> => {
+
+export const checkout = async (price_id: string, price: string, navigate: (path: string) => void): Promise<void> => {
   try {
     const parsedPrice = parseFloat(price.replace('€', '').trim());
     if (isNaN(parsedPrice)) {
@@ -27,7 +35,7 @@ export const checkout = async (price_id: string, price: string): Promise<void> =
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Authorization': `Bearer ${localStorage.getItem('token')}`, // Instead of Authoriation it would be Cookie : 
       },
       body: JSON.stringify({ price_id, price: parsedPrice }),
     });

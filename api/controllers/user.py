@@ -95,16 +95,15 @@ class UserProfile(MethodView):
             abort(404, message="User not found")
 
         try:
-            # user.password=pbkdf2_sha256.hash(clean(payload["password"])), Change password?
             user.name=clean(payload["name"]),
             user.surname=clean(payload["surname"]),
             user.location_id=payload["location_id"]
 
             db.session.commit()
 
-        except IntegrityError:
+        except IntegrityError as e:
             db.session.rollback()
-            abort(400, message=f"An integrity error has ocurred.")
+            abort(400, message=f"An integrity error has ocurred. {str(e)}")
 
         return {"message": "User profile edited successfully."}, 201
     
@@ -121,3 +120,39 @@ class UserCredits(MethodView):
             abort(404, message="User not found")
         
         return {"credits": user.credits}, 200
+    
+@blp.route("/change-password")
+class UserPassword(MethodView):
+
+    @jwt_required()
+    @blp.arguments(schemas.UserPasswordSchema)
+    def put(self, payload):
+        """
+        API Endpoint to edit an existing user profile.
+
+        :param payload: User data from the json to register.
+        :return: HTTP response with the registration result.
+        """
+        user_by_jwt = get_jwt_identity()
+
+        user = db.session.get(models.UserModel, user_by_jwt)
+
+        if user is None:
+            abort(404, message="User not found")
+
+        if not pbkdf2_sha256.verify(clean(payload["password"]), user.password):
+            abort(401, message="Invalid credentials.")
+
+        if pbkdf2_sha256.verify(clean(payload["new_password"]), user.password):
+            abort(409, message="New password is the same as the old one.")
+
+        try:
+            user.password=pbkdf2_sha256.hash(clean(payload["new_password"]))
+
+            db.session.commit()
+
+        except IntegrityError:
+            db.session.rollback()
+            abort(400, message=f"An integrity error has ocurred.")
+
+        return {"message": "User profile edited successfully."}, 201

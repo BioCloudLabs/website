@@ -43,8 +43,10 @@ const CreditsOffersPage: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        Loading.. 
-        <div className="loader animate-spin rounded-full border-t-4 border-b-4 border-green-400 w-16 h-16"></div>
+        <div>
+          <h1>Loading..</h1>
+          <div className="loader animate-spin rounded-full border-t-4 border-b-4 border-green-400 w-16 h-16"></div>
+        </div>
       </div>
     );
   }
@@ -64,8 +66,6 @@ const CreditsOffersPage: React.FC = () => {
               <button onClick={() => handleUserCheckout(offer.priceId, parseFloat(offer.price.replace('€', '').trim()), navigate, onNotAuthenticated, onSuccess, onError)}
                       className="checkout-button">Checkout</button>
             </div>
-
-            
           ))
         ) : (
           <p className="text-center">No offers available at this time.</p>

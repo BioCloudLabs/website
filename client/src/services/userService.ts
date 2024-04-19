@@ -1,5 +1,7 @@
-import { User } from './../models/User'; // Adjust the import path as necessary
-import { LoginResponse } from './../models/LoginResponse'; // Adjust the import path as necessary
+import { User } from './../models/User'; 
+import { LoginResponse } from './../models/LoginResponse'; 
+import { notify } from './../utils/notificationUtils';  // Added for error handling
+
 
 /****************** TOKEN SERVICES SECTION START ******************/
 
@@ -118,6 +120,52 @@ export const logoutUser = (): void => {
 
 /****************** USER UTILITY SERVICES SECTION END ******************/
 
+/****************** REGISTER SECTION START ******************/
+
+/**
+ * Registers a new user with the provided details.
+ * @param userDetails - An object containing user details like email, password, name, etc.
+ * @returns A Promise that resolves to a boolean indicating whether the registration was successful.
+ * If registration fails, throws an error with the backend message.
+ */
+export const registerUser = async (userDetails: {
+  email: string,
+  password: string,
+  name: string,
+  surname: string,
+  location_id: number
+}): Promise<boolean> => {
+  try {
+    const response = await fetch('/user/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userDetails),
+    });
+
+    const data = await response.json(); // Parse JSON regardless of the response status
+
+    if (!response.ok) {
+      // Handle specific error message structure
+      if (data.errors && data.errors.json) {
+        const fieldErrors = Object.entries(data.errors.json).map(([key, val]) => `${key}: ${(val as string[]).join(', ')}`).join('\n');
+        throw new Error(fieldErrors || 'Registration failed. Please try again.');
+      } else {
+        throw new Error(data.message || 'Registration failed. Please try again.');
+      }
+    }
+
+    return true; // Indicate success
+  } catch (error: any) {
+    console.error('Registration error:', error.message);
+    notify(error.message, 'error');  
+    throw error; // Re-throw the error with the message from the server
+  }
+};
+
+
+/****************** REGISTER SECTION END ******************/
+
+
 /****************** API CALLS SECTION START ******************/
 
 
@@ -156,40 +204,6 @@ export const loginUser = async (email: string, password: string): Promise<LoginR
     throw error; // Re-throw the error with the message from the server
   }
 };
-
-
-/**
- * Registers a new user with the provided details.
- * @param userDetails - An object containing user details like email, password, name, etc.
- * @returns A Promise that resolves to a boolean indicating whether the registration was successful.
- * If registration fails, throws an error with the backend message.
- */
-export const registerUser = async (userDetails: {
-  email: string,
-  password: string,
-  name: string,
-  surname: string,
-  location_id: number
-}): Promise<boolean> => {
-  try {
-    const response = await fetch('/user/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userDetails),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Registration failed. Please try again.');
-    }
-
-    return true;
-  } catch (error: any) {
-    console.error('Registration error:', error.message);
-    throw error; // Re-throw the error with the message from the server
-  }
-};
-
 
 
 /**

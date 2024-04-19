@@ -1,5 +1,5 @@
 import { Offer } from '../models/Offer';
-import { getCurrentUserToken, handleApiResponse } from './userService';
+import { getCurrentUserToken } from './userService';
 
 export const handleUserCheckout = async (
   priceId: string, price: number, navigate: (path: string) => void, 
@@ -52,7 +52,7 @@ export const checkout = async (price_id: string, price: string, navigate: (path:
     }
   } catch (error) {
     console.error('Error during checkout:', error);
-    throw error;
+    throw error;  // Re-throw the error to handle it in the component (e.g., to show a message)
   }
 };
 
@@ -82,6 +82,6 @@ export const fetchProducts = async (): Promise<Offer[]> => {
     }));
   } catch (error) {
     console.error('Error fetching products:', error);
-    throw error;  // Re-throw the error if you want to handle it in the component (e.g., to show a message)
+    throw error;  // Re-throw the error to handle it in the component (e.g., to show a message)
   }
 };

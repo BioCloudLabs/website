@@ -68,7 +68,6 @@ def payload():
 def auth_token(client, payload):
     client.post('/user/register', json=payload)  # Register the test user
     response = client.post('/user/login', json={"email": "test@example.com", "password": "Password123!"})
-    print(response.json)
     return response.json['access_token']
 
 # Test register endpoint when everything it's correct
@@ -192,7 +191,6 @@ def test_profile_failed_integrity_error(client, auth_token):
 
     headers = {'Authorization': f'Bearer {auth_token}'}
     response = client.put('/user/profile', json=payload, headers=headers)
-    print(response.json)
     assert response.status_code == 400
 
 # Test profile endpoint when the user token in the PUT request it's expired
@@ -269,3 +267,16 @@ def test_credits_failed_token_missing(client):
     response = client.get('/user/credits')
     assert response.status_code == 401
     assert response.json['msg'] == "Missing Authorization Header"
+
+# Test logout endpoint when the user token in the POST request is missing
+def test_logout_failed_token_missing(client):
+    response = client.post('/user/logout')
+    assert response.status_code == 401
+    assert response.json['msg'] == "Missing Authorization Header"
+
+# Test logout endpoint when the user token in the POST request is alredy logged out
+def test_logout_correct(client, auth_token):
+    headers = {'Authorization': f'Bearer {auth_token}'}
+    response = client.post('/user/logout', headers=headers)
+    assert response.status_code == 200
+    assert response.json['message'] == "Successfully logged out"

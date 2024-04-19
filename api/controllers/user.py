@@ -7,6 +7,7 @@ from flask_smorest import Blueprint, abort
 from passlib.hash import pbkdf2_sha256
 from database import db
 from sqlalchemy.exc import IntegrityError
+from datetime import timedelta
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 
 blp = Blueprint("users", __name__, description="Users endpoint", url_prefix="/user")
@@ -25,10 +26,22 @@ class UserLogin(MethodView):
         user = models.UserModel.query.filter(models.UserModel.email == clean(data["email"])).first()
 
         if user and pbkdf2_sha256.verify(clean(data["password"]), user.password):
-            access_token = create_access_token(identity=user.id)
+            access_token = create_access_token(identity=user.id, expires_delta=timedelta(hours=6))
             return {"access_token": access_token}, 200
 
         abort(401, message="Invalid credentials.")
+
+@blp.route("/validate-token")
+class UserValidateToken(MethodView):  
+    @jwt_required()
+    def post(self):
+        """
+        API Endpoint to validate a token.
+
+        :return: HTTP response with the validation result.
+        """
+
+        return {"message": "Token is valid."}, 200
 
 @blp.route("/logout")
 class UserLogout(MethodView):

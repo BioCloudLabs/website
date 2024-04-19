@@ -1,7 +1,6 @@
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 import models
-from flask_jwt_extended import jwt_required, get_jwt_identity
 
 blp = Blueprint("azuredata", __name__, description="Azure data endpoint", url_prefix="/azuredata")
     

@@ -269,3 +269,23 @@ def test_credits_failed_token_missing(client):
     response = client.get('/user/credits')
     assert response.status_code == 401
     assert response.json['msg'] == "Missing Authorization Header"
+
+# Test verify token endpoint when the user token in the GET request is expired
+def test_verify_token_failed_token_expired(client, expired_token):
+    headers = {'Authorization': f'Bearer {expired_token}'}
+    response = client.post('/user/validate-token', headers=headers)
+    assert response.status_code == 401
+    assert response.json['msg'] == "Token has expired"
+
+# Test verify token endpoint when the user token in the GET request is missing
+def test_verify_token_failed_token_missing(client):
+    response = client.post('/user/validate-token')
+    assert response.status_code == 401
+    assert response.json['msg'] == "Missing Authorization Header"
+
+# Test verify token endpoint when everything is correct
+def test_verify_token_correct(client, auth_token):
+    headers = {'Authorization': f'Bearer {auth_token}'}
+    response = client.post('/user/validate-token', headers=headers)
+    assert response.status_code == 200
+    assert response.json['message'] == "Token is valid."

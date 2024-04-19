@@ -191,10 +191,10 @@ export const loginUser = async (email: string, password: string): Promise<LoginR
 
 
 /**
- * Updates the user profile.
- * @param user - The user data to be updated.
- * @param navigate - Function to navigate to another route (pass from React component using useNavigate).
- * @returns A Promise that resolves to the updated user object or null if the update fails.
+ * Updates the user profile information on the server.
+ * @param user - The user information to update.
+ * @param navigate - Function to navigate to different routes.
+ * @returns A Promise resolving to the updated User object or null if an error occurs.
  */
 export const updateUser = async (user: User, navigate: (path: string) => void): Promise<User | null> => {
   try {
@@ -217,13 +217,16 @@ export const updateUser = async (user: User, navigate: (path: string) => void): 
       body: JSON.stringify({
         name: user.name,
         surname: user.surname,
-        password: user.password,  // Ensure this is included if needed or remove if not
         location_id: user.location_id,
+        // password: user.password, // Uncomment if the backend is setup to handle password updates
       }),
     });
 
     const data = await handleApiResponse(response, navigate);  // Use the handleApiResponse function
-    return data;
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to update profile');
+    }
+    return data; // Assuming data is the updated User object
   } catch (error: any) {
     console.error('Error updating user profile:', error.message);
     throw error; // Re-throw the error with the message from the server

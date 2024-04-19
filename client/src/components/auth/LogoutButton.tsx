@@ -1,5 +1,3 @@
-// src/components/LogoutButton.tsx
-
 import React from 'react';
 
 const LogoutButton: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
@@ -12,7 +10,8 @@ const LogoutButton: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     onLogout();
   };
 
-  return( <button onClick={handleLogout}>Logout</button>);
+
+  return( <button className="text-white px-3 py-2 rounded-md text-sm font-medium" onClick={handleLogout}>Logout</button>);
 };
 
 export default LogoutButton;

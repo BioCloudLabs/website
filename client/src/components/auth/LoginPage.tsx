@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../../services/userService';
-import { notify } from '../../utils/notificationUtils';
 import { LoginPageProps } from '../../models/LoginProps';
 
 function LoginPage({ onLoginSuccess, setIsAuthenticated }: LoginPageProps) {
@@ -26,16 +25,13 @@ function LoginPage({ onLoginSuccess, setIsAuthenticated }: LoginPageProps) {
                 onLoginSuccess();
                 navigate('/dashboard');
             } else {
-                notify('Failed to log in. Please check your credentials and try again.', "error");
                 setLoginError('Failed to log in. Please check your credentials and try again.');
             }
         } catch (error: unknown) {
             console.error('Login error:', error);
             if (error instanceof Error) {
-                notify(error.message, "error");
                 setLoginError(error.message);
             } else {
-                notify('Login failed due to an unexpected error.', "error");
                 setLoginError('Login failed due to an unexpected error.');
             }
         }

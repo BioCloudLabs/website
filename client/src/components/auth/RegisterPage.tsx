@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { registerUser, getLocationOptions } from './../../services/userService';
 import { Location } from '../../models/Locations';
 import './../../css/RegisterPage.css';
+import { notify } from '../../utils/notificationUtils'; // Make sure this is correctly imported
+import { ToastContainer } from 'react-toastify';
 
 function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -17,13 +19,13 @@ function RegisterPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchLocations(); // Fetch locations when the component mounts
+    fetchLocations();
   }, []);
 
   const fetchLocations = async () => {
     const locationData = await getLocationOptions();
     setLocations(locationData);
-    setLocationId(locationData[0].id.toString());
+    setLocationId(locationData[0].id.toString()); // Ensure there's at least one location to avoid errors
   };
 
   useEffect(() => {
@@ -51,26 +53,27 @@ function RegisterPage() {
         email, password, name, surname, location_id: parseInt(location_id)
       });
 
-      // Check the response to ensure it indicates a successful registration
       if (response) {
         setRegistrationSuccess(true);
         setEmail('');
         setPassword('');
         setName('');
         setSurname('');
-        setLocationId('1');
-        setRegistrationError(''); // Clear any existing error message
+        setLocationId(locations[0].id.toString()); // Reset or handle as needed
+        notify('Registration successful! Redirecting to login page.'); // Success notification
       } else {
-        throw new Error('Registration failed. Please try again.'); // You can adjust the error message based on actual response
+        throw new Error('Registration failed. Please try again.'); // Should not normally reach here if the server is handling errors
       }
-    } catch (error) {
-      setRegistrationError((error as Error).message);
+    } catch (error: any) {
+      setRegistrationError(error.message);
       setRegistrationSuccess(false);
+      notify(error.message); // Display the error message from the backend
     }
   };
 
   return (
     <div className="container mx-auto px-4">
+      <ToastContainer />  {/* Add the ToastContainer component */}
       <h1 className="text-3xl font-bold text-center my-6">Register</h1>
       {registrationSuccess ? (
         <div className="bg-green-100 text-green-800 p-3 rounded-md text-center">

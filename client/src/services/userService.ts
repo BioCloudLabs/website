@@ -1,6 +1,5 @@
 import { User } from './../models/User'; // Adjust the import path as necessary
 import { LoginResponse } from './../models/LoginResponse'; // Adjust the import path as necessary
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 
 /****************** TOKEN SERVICES SECTION START ******************/
 
@@ -26,7 +25,7 @@ export const isTokenValid = async (): Promise<boolean> => {
     return response.ok;
   } catch (error) {
     console.error('Error validating token:', error);
-    return false;
+    throw error; // Re-throw the error with the message from the server
   }
 };
 
@@ -154,7 +153,7 @@ export const loginUser = async (email: string, password: string): Promise<LoginR
     return data;
   } catch (error) {
     console.error('Login error:', error);
-    return null;
+    throw error; // Re-throw the error with the message from the server
   }
 };
 
@@ -163,6 +162,7 @@ export const loginUser = async (email: string, password: string): Promise<LoginR
  * Registers a new user with the provided details.
  * @param userDetails - An object containing user details like email, password, name, etc.
  * @returns A Promise that resolves to a boolean indicating whether the registration was successful.
+ * If registration fails, throws an error with the backend message.
  */
 export const registerUser = async (userDetails: {
   email: string,
@@ -184,11 +184,12 @@ export const registerUser = async (userDetails: {
     }
 
     return true;
-  } catch (error) {
-    console.error('Registration error:', error);
-    return false;
+  } catch (error: any) {
+    console.error('Registration error:', error.message);
+    throw error; // Re-throw the error with the message from the server
   }
 };
+
 
 
 /**
@@ -227,7 +228,7 @@ export const updateUser = async (user: User, navigate: (path: string) => void): 
     return data;
   } catch (error: any) {
     console.error('Error updating user profile:', error.message);
-    return null;
+    throw error; // Re-throw the error with the message from the server
   }
 };
 
@@ -255,7 +256,7 @@ export const forgotPassword = async (email: string): Promise<boolean> => {
     return true; // Successfully sent password reset link
   } catch (error) {
     console.error('Forgot password error:', error);
-    return false; // Failed to send password reset link
+    throw error; // Re-throw the error with the message from the server
   }
 };
 

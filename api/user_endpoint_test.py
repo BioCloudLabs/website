@@ -265,7 +265,7 @@ def test_credits_failed_token_expired(client, expired_token):
     assert response.json['msg'] == "Token has expired"
 
 # Test credits endpoint when the user token in the GET request is missing
-def test_credits_failed_token_missing(client, expired_token):
+def test_credits_failed_token_missing(client):
     response = client.get('/user/credits')
     assert response.status_code == 401
     assert response.json['msg'] == "Missing Authorization Header"

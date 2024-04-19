@@ -1,6 +1,8 @@
 import { User } from './../models/User'; 
 import { LoginResponse } from './../models/LoginResponse'; 
-import { notify } from './../utils/notificationUtils';  // Added for error handling
+import { RegistrationForm } from '../models/RegistrationForm';
+import { Location } from '../models/Locations';
+
 
 
 /****************** TOKEN SERVICES SECTION START ******************/
@@ -94,17 +96,7 @@ export const getCurrentUserToken = (): string | null => {
   return localStorage.getItem('token');
 };
 
-/**
- * Retrieves a list of location options for user registration.
- * @returns A promise that resolves to an array of objects containing the location id and name.
- */
-export const getLocationOptions = async (): Promise<{ id: number; name: string }[]> => {
-  // Static data for example purposes
-  return [
-      { id: 1, name: "Spain" },
-      { id: 2, name: "Portugal" }
-  ];
-};
+
 
 /**
  * Removes the login authentication from the localStorage.
@@ -128,13 +120,7 @@ export const logoutUser = (): void => {
  * @returns A Promise that resolves to a boolean indicating whether the registration was successful.
  * If registration fails, throws an error with the backend message.
  */
-export const registerUser = async (userDetails: {
-  email: string,
-  password: string,
-  name: string,
-  surname: string,
-  location_id: number
-}): Promise<boolean> => {
+export const registerUser = async (userDetails: RegistrationForm): Promise<boolean> => {
   try {
     const response = await fetch('/user/register', {
       method: 'POST',
@@ -145,20 +131,18 @@ export const registerUser = async (userDetails: {
     const data = await response.json(); // Parse JSON regardless of the response status
 
     if (!response.ok) {
-      // Handle specific error message structure
+      // Check if there are detailed field errors to be displayed
       if (data.errors && data.errors.json) {
         const fieldErrors = Object.entries(data.errors.json).map(([key, val]) => `${key}: ${(val as string[]).join(', ')}`).join('\n');
         throw new Error(fieldErrors || 'Registration failed. Please try again.');
-      } else {
-        throw new Error(data.message || 'Registration failed. Please try again.');
       }
+      throw new Error(data.message || 'Registration failed. Please try again.');
     }
 
     return true; // Indicate success
   } catch (error: any) {
     console.error('Registration error:', error.message);
-    notify(error.message, 'error');  
-    throw error; // Re-throw the error with the message from the server
+    throw new Error(error.message); // Re-throwing to be handled by the calling component
   }
 };
 
@@ -273,5 +257,39 @@ export const forgotPassword = async (email: string): Promise<boolean> => {
     throw error; // Re-throw the error with the message from the server
   }
 };
+
+/**
+ * Fetches location options from the server and transforms them into the format required by the frontend.
+ * @returns A Promise that resolves to an array of location objects containing id and display_name.
+ */
+export const getLocationOptions = async (): Promise<{ id: number; display_name: string, name: string }[]> => {
+  try {
+    const response = await fetch('/azuredata/locations', {
+      method: 'GET', // Method is GET by default, but explicitly defined for clarity
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch locations');
+    }
+
+    const data = await response.json(); // The backend returns JSON
+
+    // Mapping the response to the expected format
+    return data.locations.map((location: Location) => ({
+      display_name: location.display_name,
+      id: location.id,
+      name: location.name,
+
+    }));
+
+  } catch (error) {
+    console.error('Error fetching locations:', error);
+    throw error; // Rethrow or handle as needed
+  }
+};
+
 
 /****************** API CALLS SECTION END ******************/

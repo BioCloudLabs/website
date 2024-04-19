@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 // Common toast options that will be used for all types of toasts
 const commonOptions = {
   position: 'top-center' as ToastPosition,
-  autoClose: 5000,
+  autoClose: 2000,
   hideProgressBar: false,
   closeOnClick: true,
   pauseOnHover: true,

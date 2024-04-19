@@ -29,7 +29,7 @@ const CreditsOffersPage: React.FC = () => {
 
   const onNotAuthenticated = () => {
     notify("You are not authenticated. Redirecting to login.", "info");
-    setTimeout(() => navigate('/login'), 5000);
+    setTimeout(() => navigate('/login'), 3500);
   };
 
   const onSuccess = () => {

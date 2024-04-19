@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 import { Offer } from '../../models/Offer';
 import { fetchProducts, handleUserCheckout } from '../../services/creditsService';
+import { notify } from '../../utils/notificationUtils'; 
 import './../../css/CreditsOffersPage.css';
 
 const CreditsOffersPage: React.FC = () => {
@@ -21,46 +21,36 @@ const CreditsOffersPage: React.FC = () => {
       setOffers(products);
     } catch (error) {
       console.error('Failed to load products:', error);
+      notify('Failed to load products.'); // Use notify from utility
     } finally {
       setLoading(false);
     }
-  }
-
-  const notify = (message: string) => {  // Specify type as string
-    toast(message, {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
   };
 
   const onNotAuthenticated = () => {
-    notify("You are not authenticated. Redirecting to login."); // Show notification
-    setTimeout(() => navigate('/login'), 5000); // Delay the redirection for 5 seconds to allow the user to read the message
+    notify("You are not authenticated. Redirecting to login.");
+    setTimeout(() => navigate('/login'), 5000);
   };
 
   const onSuccess = () => {
-    console.log('Checkout successful!');
-    notify("Checkout successful!"); // Show success message
+    notify("Checkout successful!"); 
   };
 
   const onError = (error: string) => {
-    console.error('Checkout error:', error);
-    notify(error); // Show error message
+    notify(error); 
   };
 
   if (loading) {
     return (
-      <div className="credits-offers-page-loading">
-        <h1>Loading Offers...</h1>
-        <div className="loader"></div>
+      <div className="flex justify-center items-center h-screen">
+        <div>
+          <h1>Loading..</h1>
+          <div className="loader animate-spin rounded-full border-t-4 border-b-4 border-green-400 w-16 h-16"></div>
+        </div>
       </div>
     );
   }
+  
 
   return (
     <div className="credits-offers-page">

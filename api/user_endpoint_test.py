@@ -39,7 +39,7 @@ def client():
 @pytest.fixture(autouse=True)
 def cleanup_db():
     with app.app_context():
-        user_to_delete = models.UserModel.query.filter_by(email="test@example.com").first()
+        user_to_delete = models.UserModel.query.filter_by(email="test2@example.com").first()
         if user_to_delete:
             db.session.delete(user_to_delete)
             db.session.commit()
@@ -56,8 +56,8 @@ def expired_token():
 @pytest.fixture
 def payload():
     return {
-        "email": "test@example.com",
-        "password": "password",
+        "email": "test2@example.com",
+        "password": "Password123!",
         "name": "Test",
         "surname": "User",
         "location_id": 1
@@ -67,7 +67,8 @@ def payload():
 @pytest.fixture
 def auth_token(client, payload):
     client.post('/user/register', json=payload)  # Register the test user
-    response = client.post('/user/login', json={"email": "test@example.com", "password": "password"})
+    response = client.post('/user/login', json={"email": "test@example.com", "password": "Password123!"})
+    print(response.json)
     return response.json['access_token']
 
 # Test register endpoint when everything it's correct
@@ -109,7 +110,7 @@ def test_register_failed_missing_fields(client):
 def test_register_integrity_error(client):
     payload = {
         "email": "testtttt@example.com",
-        "password": "password123",
+        "password": "Password123!",
         "name": "Test",
         "surname": "User",
         "location_id": 1111
@@ -121,7 +122,7 @@ def test_register_integrity_error(client):
 # Test login endpoint when everything it's correct
 def test_login_correct(client):
     payload = {
-        "email": "test@example.com",
+        "email": "test2@example.com",
         "password": "password123",
         "name": "Test",
         "surname": "User",
@@ -131,7 +132,7 @@ def test_login_correct(client):
 
     payload = {
         "email": "test@example.com",
-        "password": "password123"
+        "password": "Password123!"
     }
 
     response = client.post('/user/login', json=payload)
@@ -142,7 +143,7 @@ def test_login_correct(client):
 def test_login_missing_fields(client):
 
     payload = {
-        "email": "test@example.com"
+        "email": "test2@example.com"
     }
 
     response = client.post('/user/login', json=payload)
@@ -152,29 +153,28 @@ def test_login_missing_fields(client):
 def test_login_user_not_exist(client):
 
     payload = {
-        "email": "test@example.com",
-        "password": "test@example.com"
+        "email": "test2@example.com",
+        "password": "Password123!"
     }
 
     response = client.post('/user/login', json=payload)
     assert response.status_code == 401
 
 # Test profile endpoint when there are missing fields in the PUT request
-def test_profile_failed_missing_fields(client):
+def test_profile_failed_missing_fields(client, auth_token):
     payload = {
         "name": "Test",
         "surname": "User"
     }
-    response = client.put('/user/profile', json=payload)
-
+    headers = {'Authorization': f'Bearer {auth_token}'}
+    response = client.put('/user/profile', json=payload, headers=headers)
     assert response.status_code == 422
 
 # Test profile endpoint when there are missing fields in the PUT request
-def test_profile_failed_missing_token(client):
+def test_profile_failed_missing_token(client, auth_token):
     payload = {
         "name": "Test",
         "surname": "User",
-        "password": "test",
         "location_id": 1
     }
     response = client.put('/user/profile', json=payload)
@@ -187,13 +187,12 @@ def test_profile_failed_integrity_error(client, auth_token):
     payload = {
         "name": "Test",
         "surname": "User",
-        "password": "test",
         "location_id": 1111
     }
 
     headers = {'Authorization': f'Bearer {auth_token}'}
     response = client.put('/user/profile', json=payload, headers=headers)
-
+    print(response.json)
     assert response.status_code == 400
 
 # Test profile endpoint when the user token in the PUT request it's expired
@@ -207,7 +206,6 @@ def test_profile_failed_token_expired(client, expired_token):
 
     headers = {'Authorization': f'Bearer {expired_token}'}
     response = client.put('/user/profile', json=payload, headers=headers)
-    print(response.json)
     assert response.status_code == 401
     assert response.json['msg'] == "Token has expired"
 
@@ -222,7 +220,6 @@ def test_profile_failed_token_wrong_format(client, auth_token):
 
     headers = {'Authorization': f'Bearer {auth_token[2:]}'}
     response = client.put('/user/profile', json=payload, headers=headers)
-    print(response.json)
     assert response.status_code == 422
     assert response.json['msg'] == "Invalid header string: 'utf-8' codec can't decode byte 0xc6 in position 2: invalid continuation byte"
 
@@ -237,7 +234,6 @@ def test_profile_failed_invalid_token(client, auth_token):
 
     headers = {'Authorization': f'Bearer a{auth_token[1:]}'}
     response = client.put('/user/profile', json=payload, headers=headers)
-    print(response.json)
     assert response.status_code == 422
     assert response.json['msg'] == "Invalid header string: Expecting value: line 1 column 1 (char 0)"
 
@@ -246,7 +242,6 @@ def test_profile_correct(client, auth_token):
     payload = {
         "name": "Test",
         "surname": "User",
-        "password": "test",
         "location_id": 1
     }
 
@@ -254,3 +249,23 @@ def test_profile_correct(client, auth_token):
     response = client.put('/user/profile', json=payload, headers=headers)
     assert response.status_code == 201
     assert response.json['message'] == "User profile edited successfully."
+
+# Test credits endpoint when everything is correct
+def test_credits_correct(client, auth_token):
+    headers = {'Authorization': f'Bearer {auth_token}'}
+    response = client.get('/user/credits', headers=headers)
+    assert response.status_code == 200
+    assert 'credits' in response.json
+
+# Test credits endpoint when the user token in the GET request is expired
+def test_credits_failed_token_expired(client, expired_token):
+    headers = {'Authorization': f'Bearer {expired_token}'}
+    response = client.get('/user/credits', headers=headers)
+    assert response.status_code == 401
+    assert response.json['msg'] == "Token has expired"
+
+# Test credits endpoint when the user token in the GET request is missing
+def test_credits_failed_token_missing(client, expired_token):
+    response = client.get('/user/credits')
+    assert response.status_code == 401
+    assert response.json['msg'] == "Missing Authorization Header"

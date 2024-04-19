@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { registerUser, getLocationOptions } from './../../services/userService';
 import { Location } from '../../models/Locations';
 import './../../css/RegisterPage.css';
@@ -12,33 +13,59 @@ function RegisterPage() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [registrationError, setRegistrationError] = useState('');
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  const [countdown, setCountdown] = useState(3);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchLocations = async () => {
-      const locationData = await getLocationOptions();
-      setLocations(locationData);
-      setLocationId(locationData[0].id.toString());
-    };
-
-    fetchLocations();
+    fetchLocations(); // Fetch locations when the component mounts
   }, []);
+
+  const fetchLocations = async () => {
+    const locationData = await getLocationOptions();
+    setLocations(locationData);
+    setLocationId(locationData[0].id.toString());
+  };
+
+  useEffect(() => {
+    if (registrationSuccess) {
+      const interval = setInterval(() => {
+        setCountdown((currentCountdown) => currentCountdown - 1);
+      }, 1000);
+
+      const timer = setTimeout(() => {
+        navigate('/login');
+      }, 3000);
+
+      return () => {
+        clearInterval(interval);
+        clearTimeout(timer);
+      };
+    }
+  }, [registrationSuccess, navigate]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     try {
-      await registerUser({
+      const response = await registerUser({
         email, password, name, surname, location_id: parseInt(location_id)
       });
-      setRegistrationSuccess(true);
-      setEmail('');
-      setPassword('');
-      setName('');
-      setSurname('');
-      setLocationId('1');
+
+      // Check the response to ensure it indicates a successful registration
+      if (response) {
+        setRegistrationSuccess(true);
+        setEmail('');
+        setPassword('');
+        setName('');
+        setSurname('');
+        setLocationId('1');
+        setRegistrationError(''); // Clear any existing error message
+      } else {
+        throw new Error('Registration failed. Please try again.'); // You can adjust the error message based on actual response
+      }
     } catch (error) {
-      setRegistrationError((error as Error).message); // Display the error message
-      setRegistrationSuccess(false); // Ensure UI reflects the error state
+      setRegistrationError((error as Error).message);
+      setRegistrationSuccess(false);
     }
   };
 
@@ -46,7 +73,9 @@ function RegisterPage() {
     <div className="container mx-auto px-4">
       <h1 className="text-3xl font-bold text-center my-6">Register</h1>
       {registrationSuccess ? (
-        <p className="bg-green-100 text-green-800 p-3 rounded-md text-center">Registration successful! You can now log in.</p>
+        <div className="bg-green-100 text-green-800 p-3 rounded-md text-center">
+          <p>Registration successful! Redirecting to login page in {countdown} seconds...</p>
+        </div>
       ) : (
         <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
           <div className="mb-4">

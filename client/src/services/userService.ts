@@ -1,5 +1,5 @@
-import { User } from './../models/User'; // Adjust the import path as necessary
-import { LoginResponse } from './../models/LoginResponse'; // Adjust the import path as necessary
+import { User } from './../models/User'; 
+import { LoginResponse } from './../models/LoginResponse'; 
 
 /****************** TOKEN SERVICES SECTION START ******************/
 

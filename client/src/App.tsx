@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';  
+import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import './App.css'; // You can keep this if there are styles that you're not overriding with Tailwind
+import './App.css';
 import Homepage from './components/common/Homepage';
 import BlastPage from './components/common/BlastPage';
 import DashboardPage from './components/common/DashboardPage';
@@ -13,6 +13,8 @@ import CreditsOffersPage from './components/payment/CreditsOffersPage';
 import SuccessPage from './components/payment/SuccessPage';
 import CancelledPage from './components/payment/CancelledPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import { ToastContainer } from './utils/notificationUtils'; 
+
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!localStorage.getItem('token'));
@@ -28,8 +30,8 @@ function App() {
 
   return (
     <Router>
-      <div className="App min-h-screen flex flex-col">
-        <nav className="flex justify-between items-center px-4 py-2 bg-blue-700 fixed w-full z-10">
+      <div className="min-h-screen bg-gray-100 flex flex-col">
+        <nav className="flex justify-between items-center px-4 py-2 bg-blue-700 fixed top-0 w-full z-10">
           <div className="flex space-x-4">
             <Link to="/" className="text-white px-3 py-2 rounded-md text-sm font-medium">Home</Link>
             <Link to="/credits-offers" className="text-white px-3 py-2 rounded-md text-sm font-medium">Credits Offers</Link>
@@ -53,22 +55,24 @@ function App() {
           </div>
         </nav>
 
-        {/* Offset mt-16 to account for the fixed header size */}
-        <div className="flex flex-grow mt-16">
-          <Routes>
-            <Route path="/" element={<Homepage />} />
-            <Route path="/blast" element={<ProtectedRoute isAuthenticated={isAuthenticated}><BlastPage /></ProtectedRoute>} />
-            <Route path="/dashboard" element={<ProtectedRoute isAuthenticated={isAuthenticated}><DashboardPage /></ProtectedRoute>} />
-            <Route path="/login" element={<LoginPage onLoginSuccess={() => setIsAuthenticated(true)} setIsAuthenticated={setIsAuthenticated} />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/profile" element={<ProtectedRoute isAuthenticated={isAuthenticated}><ProfilePage /></ProtectedRoute>} />
-            <Route path="/credits-offers" element={<CreditsOffersPage />} />
-            <Route path="/success" element={<SuccessPage />} />
-            <Route path="/cancelled" element={<CancelledPage />} />
-          </Routes>
+        <div className="pt-16 min-h-screen w-full flex flex-col items-center">
+          <div className="w-full max-w-4xl px-4">
+            <Routes>
+              <Route path="/" element={<Homepage />} />
+              <Route path="/blast" element={<ProtectedRoute isAuthenticated={isAuthenticated}><BlastPage /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute isAuthenticated={isAuthenticated}><DashboardPage /></ProtectedRoute>} />
+              <Route path="/login" element={<LoginPage onLoginSuccess={() => setIsAuthenticated(true)} setIsAuthenticated={setIsAuthenticated} />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/profile" element={<ProtectedRoute isAuthenticated={isAuthenticated}><ProfilePage /></ProtectedRoute>} />
+              <Route path="/credits-offers" element={<CreditsOffersPage />} />
+              <Route path="/success" element={<SuccessPage />} />
+              <Route path="/cancelled" element={<CancelledPage />} />
+            </Routes>
+          </div>
         </div>
       </div>
+      <ToastContainer />
     </Router>
   );
 }

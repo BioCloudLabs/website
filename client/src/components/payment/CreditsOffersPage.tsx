@@ -21,23 +21,23 @@ const CreditsOffersPage: React.FC = () => {
       setOffers(products);
     } catch (error) {
       console.error('Failed to load products:', error);
-      notify('Failed to load products.'); // Use notify from utility
+      notify('Failed to load products.', "error"); // Use notify from utility
     } finally {
       setLoading(false);
     }
   };
 
   const onNotAuthenticated = () => {
-    notify("You are not authenticated. Redirecting to login.");
+    notify("You are not authenticated. Redirecting to login.", "info");
     setTimeout(() => navigate('/login'), 5000);
   };
 
   const onSuccess = () => {
-    notify("Checkout successful!"); 
+    notify("Checkout successful!", "success"); 
   };
 
   const onError = (error: string) => {
-    notify(error); 
+    notify(error, "error"); 
   };
 
   if (loading) {

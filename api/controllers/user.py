@@ -2,11 +2,12 @@ from flask.views import MethodView
 from bleach import clean
 import schemas
 import models
+from blocklist import BLOCKLIST
 from flask_smorest import Blueprint, abort
 from passlib.hash import pbkdf2_sha256
 from database import db
 from sqlalchemy.exc import IntegrityError
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 
 blp = Blueprint("users", __name__, description="Users endpoint", url_prefix="/user")
 
@@ -28,6 +29,19 @@ class UserLogin(MethodView):
             return {"access_token": access_token}, 200
 
         abort(401, message="Invalid credentials.")
+
+@blp.route("/logout")
+class UserLogout(MethodView):
+    @jwt_required()
+    def post(self):
+        """
+        API Endpoint to log out an user.
+
+        :return: HTTP response with the logout result.
+        """
+        jti = get_jwt()["jti"]
+        BLOCKLIST.add(jti)
+        return {"message": "Successfully logged out"}, 200
 
 @blp.route("/register")
 class UserRegister(MethodView):
@@ -66,6 +80,11 @@ class UserRegister(MethodView):
 class UserProfile(MethodView):
     @jwt_required()
     def get(self):
+        """
+        API Endpoint to get an user profile.
+
+        :return: HTTP response with the user profile.
+        """
 
         user_by_jwt = get_jwt_identity()
 
@@ -95,16 +114,15 @@ class UserProfile(MethodView):
             abort(404, message="User not found")
 
         try:
-            # user.password=pbkdf2_sha256.hash(clean(payload["password"])), Change password?
             user.name=clean(payload["name"]),
             user.surname=clean(payload["surname"]),
             user.location_id=payload["location_id"]
 
             db.session.commit()
 
-        except IntegrityError:
+        except IntegrityError as e:
             db.session.rollback()
-            abort(400, message=f"An integrity error has ocurred.")
+            abort(400, message=f"An integrity error has ocurred. {str(e)}")
 
         return {"message": "User profile edited successfully."}, 201
     
@@ -112,6 +130,11 @@ class UserProfile(MethodView):
 class UserCredits(MethodView):
     @jwt_required()
     def get(self):
+        """
+        API Endpoint to get an user credits.
+
+        :return: HTTP response with the user credits.
+        """
 
         user_id = get_jwt_identity() # Get the user id from the jwt
 
@@ -121,3 +144,39 @@ class UserCredits(MethodView):
             abort(404, message="User not found")
         
         return {"credits": user.credits}, 200
+    
+@blp.route("/change-password")
+class UserPassword(MethodView):
+
+    @jwt_required()
+    @blp.arguments(schemas.UserPasswordSchema)
+    def put(self, payload):
+        """
+        API Endpoint to edit an existing user profile.
+
+        :param payload: User data from the json to register.
+        :return: HTTP response with the registration result.
+        """
+        user_by_jwt = get_jwt_identity()
+
+        user = db.session.get(models.UserModel, user_by_jwt)
+
+        if user is None:
+            abort(404, message="User not found")
+
+        if not pbkdf2_sha256.verify(clean(payload["old_password"]), user.password):
+            abort(401, message="Invalid credentials.")
+
+        if pbkdf2_sha256.verify(clean(payload["new_password"]), user.password):
+            abort(409, message="New password is the same as the old one.")
+
+        try:
+            user.password=pbkdf2_sha256.hash(clean(payload["new_password"]))
+
+            db.session.commit()
+
+        except IntegrityError:
+            db.session.rollback()
+            abort(400, message=f"An integrity error has ocurred.")
+
+        return {"message": "User password changed successfully."}, 201

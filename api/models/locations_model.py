@@ -8,3 +8,10 @@ class LocationModel(db.Model):
     display_name = db.Column(db.String, nullable=False)
 
     users = relationship("UserModel", back_populates="location", cascade="all, delete-orphan")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'display_name': self.display_name,
+        }

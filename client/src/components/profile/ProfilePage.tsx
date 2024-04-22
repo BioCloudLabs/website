@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCurrentUser, updateUser, logoutUser, getLocationOptions } from '../../services/userService';
-import { User } from '../../models/User'; 
+import { logoutUser, fetchUserCredits, updateUserProfile, fetchUserProfile, getLocationOptions } from '../../services/userService';
+import { User } from '../../models/User';
 import { Location } from '../../models/Locations';
-
-
 
 const ProfilePage = () => {
   const [user, setUser] = useState<User | null>(null);
   const [locations, setLocations] = useState<Location[]>([]);
+  const [credits, setCredits] = useState<number | null>(null);
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -17,13 +16,16 @@ const ProfilePage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUserAndLocations = async () => {
+    const fetchUserData = async () => {
       try {
-        const userData = await getCurrentUser();
+        const userData = await fetchUserProfile();
         const locationData = await getLocationOptions();
+        const userCredits = await fetchUserCredits();
+        console.log("Credits fetched:", userCredits); // Log the fetched credits
         if (!userData) throw new Error('User not found');
         setUser(userData);
         setLocations(locationData);
+        setCredits(userCredits);
       } catch (error) {
         setErrorMessage('Failed to fetch data. Please refresh the page.');
       } finally {
@@ -31,13 +33,16 @@ const ProfilePage = () => {
       }
     };
 
-    fetchUserAndLocations();
+    fetchUserData();
   }, []);
+
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = event.target;
     if (name === 'password') {
       setPassword(value);
+    } else if (name === 'credits') {
+      setCredits(Number(value)); 
     } else {
       setUser(prevUser => ({
         ...prevUser,
@@ -57,13 +62,12 @@ const ProfilePage = () => {
 
     setIsUpdating(true);
     try {
-      const updatedUser = await updateUser(updateData, navigate);
-      if (!updatedUser) throw new Error('Failed to update user');
+      await updateUserProfile(updateData);
       setSuccessMessage('Profile updated successfully!');
       setTimeout(() => {
         logoutUser();
-        navigate('/login'); // Redirect to login after logout
-      }, 1500); // Delay to display message before logging out
+        navigate('/login');
+      }, 1500);
     } catch (error) {
       setErrorMessage('Failed to update profile. Please try again.');
     } finally {
@@ -78,42 +82,49 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
-      <h2 className="text-2xl font-bold mb-6">Edit Profile</h2>
-      {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-      {successMessage && <p className="text-green-500">{successMessage}</p>}
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6">
-        <label className="block">
-          <span className="text-gray-700">Email</span>
-          <input type="email" name="email" value={user?.email || ''} onChange={handleChange}
-                 required className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none" readOnly />
-        </label>
-        <label className="block">
-          <span className="text-gray-700">Name</span>
-          <input type="text" name="name" value={user?.name || ''} onChange={handleChange}
-                 required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
-        </label>
-        <label className="block">
-          <span className="text-gray-700">Surname</span>
-          <input type="text" name="surname" value={user?.surname || ''} onChange={handleChange}
-                 required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
-        </label>
-        <label className="block">
-          <span className="text-gray-700">Location</span>
-          <select name="location_id" value={user?.location_id || ''} onChange={handleChange}
-                  required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-            {locations.map(location => (
-              <option key={location.id} value={location.id}>{location.display_name}</option>
-            ))}
-          </select>
-        </label>
-        <label className="block">
-          <span className="text-gray-700">Password</span>
-          <input type="password" name="password" value={password} onChange={handleChange}
-                 className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
-        </label>
-        <button type="submit" disabled={isUpdating} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Update Profile</button>
-      </form>
+    <div className="flex flex-col items-center justify-center bg-gray-100 px-4">
+      <div className="w-full max-w-md">
+        <h2 className="text-2xl font-bold text-center mb-4">Edit Profile</h2>
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <input type="email" name="email" autoComplete="email" value={user?.email || ''} readOnly className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none" />
+            <label className="block text-sm font-medium text-gray-700">Name</label>
+            <input type="text" name="name" autoComplete='name' value={user?.name || ''} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+            <label className="block text-sm font-medium text-gray-700">Surname</label>
+            <input type="text" name="surname" autoComplete="surname" value={user?.surname || ''} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+            <label className="block text-sm font-medium text-gray-700">Location</label>
+            <select name="location_id" value={user?.location_id || ''} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+              {locations.map(location => (
+                <option key={location.id} value={location.id}>{location.display_name}</option>
+              ))}
+            </select>
+            <label className="block text-sm font-medium text-gray-700">Credits</label>
+            <input
+              type="text"
+              name="credits"
+              value={credits !== null ? credits : ''}
+              readOnly
+              className="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none"
+            />
+            <button type="submit" disabled={isUpdating} className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-500 hover:bg-green-700 focus:outline-none focus:shadow-outline">
+              Update Profile
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate('/change-password')}
+              className="mt-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Change Password
+            </button>
+
+          </form>
+
+        </div>
+        {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+        {successMessage && <p className="text-green-500">{successMessage}</p>}
+      </div>
     </div>
   );
 };

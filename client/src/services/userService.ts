@@ -60,7 +60,6 @@ export const redirectToLogin = (navigate: (path: string) => void) => {
 };
 
 
-
 /**
  * Retrieves the current user from the local storage.
  * @returns A Promise that resolves to the current user object, or null if no user profile is found in the local storage.
@@ -107,6 +106,8 @@ export const getCurrentUserToken = (): string | null => {
 export const logoutUser = (): void => {
   localStorage.removeItem('token');
   localStorage.removeItem('userProfile');
+  localStorage.removeItem('userCredits');
+
 };
 
 
@@ -149,16 +150,9 @@ export const registerUser = async (userDetails: RegistrationForm): Promise<boole
 
 /****************** REGISTER SECTION END ******************/
 
+/****************** LOGIN SECTION START ******************/
 
-/****************** API CALLS SECTION START ******************/
 
-
-/**
- * Logs in a user with the provided email and password.
- * @param email - The email of the user.
- * @param password - The password of the user.
- * @returns A Promise that resolves to a LoginResponse object if the login is successful, or null if there is an error.
- */
 export const loginUser = async (email: string, password: string): Promise<LoginResponse | null> => {
   try {
     const response = await fetch('/user/login', {
@@ -174,13 +168,23 @@ export const loginUser = async (email: string, password: string): Promise<LoginR
 
     const data: LoginResponse = await response.json();
 
-    // Store the token and user profile in localStorage // Adjust to use cookies
+    // Store the token in localStorage
     localStorage.setItem('token', data.access_token);
-    localStorage.setItem('userProfile', JSON.stringify(data));
 
-    // Send to /validate-token
+    // Fetch user credits and profile
+    const credits = await fetchUserCredits();
+    const userProfile = await fetchUserProfile();
 
-    // Send to home
+    if (credits !== null && userProfile !== null) {
+      // Store the user credits and profile in localStorage
+      localStorage.setItem('userCredits', credits.toString());
+      localStorage.setItem('userProfile', JSON.stringify(userProfile));
+    } else {
+      console.error('Failed to fetch user credits or profile');
+    }
+
+    // Redirect to home or wherever you need to go after login
+    // You can use React Router's history object to navigate programmatically
 
     return data;
   } catch (error) {
@@ -190,76 +194,78 @@ export const loginUser = async (email: string, password: string): Promise<LoginR
 };
 
 
-/**
- * Updates the user profile information on the server.
- * @param user - The user information to update.
- * @param navigate - Function to navigate to different routes.
- * @returns A Promise resolving to the updated User object or null if an error occurs.
- */
-export const updateUser = async (user: User, navigate: (path: string) => void): Promise<User | null> => {
-  try {
-    // First check if the token is valid
-    const isValidToken = await isTokenValid();
-    if (!isValidToken) {
-      // If token is not valid, navigate to login
-      redirectToLogin(navigate);
-      throw new Error('Authentication token is invalid or expired. Redirecting to login.');
-    }
+/****************** LOGIN SECTION END ******************/
 
-    // Proceed with updating the user profile if the token is valid
-    const token = localStorage.getItem('token');
-    const response = await fetch('/user/profile', {
-      method: 'PUT',
+
+
+/****************** PROFILE SECTION START ******************/
+
+
+/**
+ * Fetches the current user profile from the server using the /profile endpoint.
+ * @returns A Promise that resolves to the user object if successful.
+ */
+export const fetchUserProfile = async (): Promise<User | null> => {
+  const url = '/user/profile'; // Assuming proxy is setup correctly in Vite
+  console.log(`Making API request to: ${url}`);
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
       headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({
-        name: user.name,
-        surname: user.surname,
-        location_id: user.location_id,
-        // password: user.password, // Uncomment if the backend is setup to handle password updates
-      }),
     });
 
-    const data = await handleApiResponse(response, navigate);  // Use the handleApiResponse function
+    console.log('Response status:', response.status);
     if (!response.ok) {
-      throw new Error(data.message || 'Failed to update profile');
+      const errorData = await response.json();
+      console.error('Failed to fetch profile:', errorData);
+      throw new Error(`Failed to fetch user profile with status: ${response.status}`);
     }
-    return data; // Assuming data is the updated User object
-  } catch (error: any) {
-    console.error('Error updating user profile:', error.message);
-    throw error; // Re-throw the error with the message from the server
+
+    const user = await response.json();
+    return user;
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    return null;
   }
 };
 
 
-
 /**
- * Sends a request to the server to reset the user's password.
- *
- * @param email - The email address of the user to reset the password for.
- * @returns A promise that resolves to a boolean indicating success or failure.
+ * Updates the current user profile on the server.
+ * @param user - The user data to update.
+ * @returns A Promise that resolves if the update is successful.
  */
-export const forgotPassword = async (email: string): Promise<boolean> => {
+export const updateUserProfile = async (user: User): Promise<void> => {
+  const { name, surname, location_id } = user; // Extract only the fields that can be updated
+
   try {
-    const response = await fetch('/user/forgot-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
+    const response = await fetch('/user/profile', {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, surname, location_id }), // Send only these fields
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to send password reset link');
+      throw new Error(errorData.message || 'Failed to update profile');
     }
 
-    return true; // Successfully sent password reset link
+    // Optionally handle the response if needed
+    const responseData = await response.json();
+    console.log('Profile update response:', responseData);
   } catch (error) {
-    console.error('Forgot password error:', error);
-    throw error; // Re-throw the error with the message from the server
+    console.error('Error updating user profile:', error);
+    throw error;
   }
 };
+
 
 /**
  * Fetches location options from the server and transforms them into the format required by the frontend.
@@ -293,6 +299,75 @@ export const getLocationOptions = async (): Promise<{ id: number; display_name: 
     throw error; // Rethrow or handle as needed
   }
 };
+
+
+/**
+ * Makes the request to change the user password on the server and handles the response.
+ * @param oldPassword - The user's current password.
+ * @param newPassword - The new password to set.
+ */
+export const changeUserPassword = async (oldPassword: string, newPassword: string): Promise<void> => {
+  try {
+    const response = await fetch('/user/change-password', {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ old_password: oldPassword, new_password: newPassword }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to change password');
+    }
+
+    await response.json();  // Using await to ensure the response is read
+  } catch (error) {
+    console.error('Error changing password:', error);
+    throw error;
+  }
+};
+
+
+
+/****************** PROFILE SECTION END ******************/
+
+
+/****************** USER CREDITS SECTION START ******************/
+
+export const fetchUserCredits = async (): Promise<number | null> => {
+  try {
+    const response = await fetch('/user/credits', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch user credits');
+    }
+
+    const data = await response.json();
+    return data.credits;
+  } catch (error) {
+    console.error('Error fetching user credits:', error);
+    return null;
+  }
+};
+
+
+/****************** USER CREDITS SECTION END ******************/
+
+
+
+/****************** API CALLS SECTION START ******************/
+
+
+
+
 
 
 /****************** API CALLS SECTION END ******************/

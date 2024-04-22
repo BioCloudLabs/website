@@ -2,13 +2,17 @@ from flask.views import MethodView
 from bleach import clean
 import schemas
 import models
+import os
 from blocklist import BLOCKLIST
 from flask_smorest import Blueprint, abort
 from passlib.hash import pbkdf2_sha256
 from database import db
 from sqlalchemy.exc import IntegrityError
 from datetime import timedelta
+from mail_utils import EmailSender
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
+
+email_sender = EmailSender(os.getenv("EMAIL_API_KEY"))
 
 blp = Blueprint("users", __name__, description="Users endpoint", url_prefix="/user")
 
@@ -193,3 +197,26 @@ class UserPassword(MethodView):
             abort(400, message=f"An integrity error has ocurred.")
 
         return {"message": "User password changed successfully."}, 201
+    
+@blp.route("/recover-password-email")
+class UserRecoverPasswordEmail(MethodView):
+
+    @blp.arguments(schemas.UserRecoverPasswordEmailSchema)
+    def post(self, payload):
+        """
+        API Endpoint to send an email to recover a password to an user.
+
+        :param payload: User data from the json to register.
+        :return: HTTP response with the registration result.
+        """
+
+        user = models.UserModel.query.filter_by(email=payload["email"]).one_or_404("User not found")
+            
+        email_token = create_access_token(identity=user.id, expires_delta=timedelta(minutes=15)) 
+
+        try:
+            email_sender.recover_password(f"http://localhost:5173/recoverpassword?token={email_token}", user.email, f"{user.name} {user.surname}")
+        except Exception as e:
+            return {"message": f"An error has ocurred while sending the email. {str(e)}"}, 500
+
+        return {"message": f"Email has sent to the email {user.email}", "email": user.email}, 201

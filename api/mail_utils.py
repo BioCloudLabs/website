@@ -1,12 +1,24 @@
-import requests
+import resend
+from dataclasses import dataclass
 
-def send_simple_message():
-	return requests.post(
-		"https://api.mailgun.net/v3/biocloudlabs.es/messages",
-		auth=("api", "3e72dc38d783e68da8901dbb0bc2a154-19806d14-75cb0a47"),
-		data={"from": "Excited User <pepe@biocloudlabs.es>",
-			"to": ["almamodev@gmail.com", "chrisgonzaco@gmail.com"],
-			"subject": "Hello",
-			"text": "Just testing!"})
+@dataclass
+class EmailSender():
+	api_key: str
 
-send_simple_message()
+	def __post_init__(self):
+		resend.api_key = self.api_key
+
+	def recover_password(self, link, user, name):
+		with open("recover_password_template.html", "r") as file:
+			template_html = file.read()
+
+			replaced_html = template_html.format(link=link, user=user, name=name)
+
+			r = resend.Emails.send({
+				"from": "onboarding@resend.dev",
+				"to": user,
+				"subject": "Password recovery",
+				"html": replaced_html
+			})
+
+

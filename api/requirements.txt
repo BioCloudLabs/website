@@ -11,3 +11,4 @@ marshmallow
 passlib
 pytest
 stripe
+resend

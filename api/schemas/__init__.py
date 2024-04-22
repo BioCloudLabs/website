@@ -3,3 +3,4 @@ from schemas.user_login_schema import UserLoginSchema
 from schemas.user_profile_schema import UserProfileSchema
 from schemas.user_password_schema import UserPasswordSchema
 from schemas.invoice_schema import InvoiceSchema
+from schemas.user_recover_password_schema import UserRecoverPasswordEmailSchema

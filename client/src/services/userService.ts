@@ -242,7 +242,7 @@ export const loginUser = async (email: string, password: string): Promise<LoginR
  */
 export const fetchUserProfile = async (): Promise<User | null> => {
   const url = '/user/profile'; // Assuming proxy is setup correctly in Vite
-  console.log(`Making API request to: ${url}`);
+  // console.log(`Making API request to: ${url}`);
 
   try {
     const response = await fetch(url, {
@@ -253,7 +253,7 @@ export const fetchUserProfile = async (): Promise<User | null> => {
       },
     });
 
-    console.log('Response status:', response.status);
+    // console.log('Response status:', response.status);
     if (!response.ok) {
       const errorData = await response.json();
       console.error('Failed to fetch profile:', errorData);
@@ -294,7 +294,7 @@ export const updateUserProfile = async (user: User): Promise<void> => {
 
     // Optionally handle the response if needed
     const responseData = await response.json();
-    console.log('Profile update response:', responseData);
+    // console.log('Profile update response:', responseData);
   } catch (error) {
     console.error('Error updating user profile:', error);
     throw error;

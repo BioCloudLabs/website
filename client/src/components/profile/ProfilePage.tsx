@@ -21,7 +21,7 @@ const ProfilePage = () => {
         const userData = await fetchUserProfile();
         const locationData = await getLocationOptions();
         const userCredits = await fetchUserCredits();
-        console.log("Credits fetched:", userCredits); // Log the fetched credits
+        // console.log("Credits fetched:", userCredits); // Log the fetched credits
         if (!userData) throw new Error('User not found');
         setUser(userData);
         setLocations(locationData);

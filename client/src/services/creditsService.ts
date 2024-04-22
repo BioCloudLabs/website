@@ -2,60 +2,63 @@ import { Offer } from '../models/Offer';
 import { getCurrentUserToken } from './userService';
 
 export const handleUserCheckout = async (
-  priceId: string, price: number, navigate: (path: string) => void, 
+  priceId: string, price: string, navigate: (path: string) => void,
   onNotAuthenticated: () => void, onSuccess: () => void, onError: (error: string) => void
 ) => {
   const token = await getCurrentUserToken();
   if (!token) {
-    onNotAuthenticated(); // Call the onNotAuthenticated callback if the user is not authenticated
-  } else {
-    try {
-      await checkout(priceId, price.toString(), navigate);
-      onSuccess(); // Call the onSuccess callback when checkout is successful
-    } catch (error: unknown) {
-      console.error('Checkout error:', error);
-      if (error instanceof Error) {
-        onError(error.message); // Now TypeScript knows error is an instance of Error and thus has a message property
-      } else {
-        onError('Checkout error'); // Default error message if it's not an instance of Error
-      }
-    }
+    onNotAuthenticated();
+    return;
   }
-};
 
+  // Convert price to a number
+  const numericPrice = parseFloat(price.replace('€', '').trim());
 
 export const checkout = async (price_id: string, price: string, _navigate: (path: string) => void): Promise<void> => {
   try {
-    const parsedPrice = parseFloat(price.replace('€', '').trim());
-    if (isNaN(parsedPrice)) {
-      throw new Error('Invalid price');
-    }
-
-    const response = await fetch('/stripe/create-checkout-session', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`, // Instead of Authoriation it would be Cookie : 
-      },
-      body: JSON.stringify({ price_id, price: parsedPrice }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    if (data.url) {
-      window.location.href = data.url;  // Redirect to the payment URL
-    } else {
-      throw new Error('Checkout URL not found in the response');
-    }
+    await checkout(priceId, numericPrice, navigate);
+    onSuccess();
   } catch (error) {
-    console.error('Error during checkout:', error);
-    throw error;  // Re-throw the error to handle it in the component (e.g., to show a message)
+    console.error('Checkout error:', error);
+    if (error instanceof Error) {
+      onError(error.message);
+    } else {
+      onError('Unknown checkout error');
+    }
   }
 };
 
+export const checkout = async (price_id: string, price: number, _navigate: (path: string) => void): Promise<void> => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    console.error('Authentication token not found');
+    throw new Error('Authentication token not found');
+  }
+
+  console.log(`Sending payload:`, { price_id, price });
+
+  const response = await fetch('/stripe/create-checkout-session', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ price_id, price }),
+  });
+
+  if (!response.ok) {
+    const errorResponse = await response.json();
+    console.error('HTTP Response Not OK:', errorResponse);
+    throw new Error(`HTTP error! Status: ${response.status} - Message: ${errorResponse.message}`);
+  }
+
+  const data = await response.json();
+  if (data.url) {
+    window.location.href = data.url;
+  } else {
+    throw new Error('Checkout URL not found in the response');
+  }
+};
 
 /**
  * Function to fetch products from the backend.
@@ -70,15 +73,20 @@ export const fetchProducts = async (): Promise<Offer[]> => {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
     const data = await response.json();
+    if (data.error) {
+      throw new Error(data.error);
+    }
+
     return data.products.map((product: any) => ({
       name: product.name,
       price: product.price,
       image: '/images/Credits/' + product.name + '.webp',
       priceId: product.price_id,
+      credits: product.credits,
     }));
   } catch (error) {
     console.error('Error fetching products:', error);

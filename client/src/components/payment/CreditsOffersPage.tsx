@@ -54,7 +54,7 @@ const CreditsOffersPage: React.FC = () => {
 
   return (
     <div className="credits-offers-page">
-      <ToastContainer /> {/* Add the ToastContainer component */}
+      <ToastContainer />
       <h1 className="text-center text-3xl font-bold">Available Credit Offers</h1>
       <div className="offers-container mt-4">
         {offers.length > 0 ? (
@@ -63,7 +63,7 @@ const CreditsOffersPage: React.FC = () => {
               <img src={offer.image} alt={offer.name} className="offer-image" />
               <h2>{offer.name}</h2>
               <p>{offer.price}</p>
-              <button onClick={() => handleUserCheckout(offer.priceId, parseFloat(offer.price.replace('€', '').trim()), navigate, onNotAuthenticated, onSuccess, onError)}
+              <button onClick={() => handleUserCheckout(offer.priceId, offer.price, navigate, onNotAuthenticated, onSuccess, onError)}
                       className="checkout-button">Checkout</button>
             </div>
           ))
@@ -73,6 +73,7 @@ const CreditsOffersPage: React.FC = () => {
       </div>
     </div>
   );
+
 };
 
 export default CreditsOffersPage;

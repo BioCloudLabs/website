@@ -29,7 +29,7 @@ const CreditsOffersPage: React.FC = () => {
 
   const onNotAuthenticated = () => {
     notify("You are not authenticated. Redirecting to login.", "info");
-    setTimeout(() => navigate('/login'), 3500);
+    setTimeout(() => navigate('/login'), 2500);
   };
 
   const onSuccess = () => {
@@ -45,7 +45,7 @@ const CreditsOffersPage: React.FC = () => {
       <div className="flex justify-center items-center h-screen">
         <div>
           <h1>Loading..</h1>
-          <div className="loader animate-spin rounded-full border-t-4 border-b-4 border-green-400 w-16 h-16"></div>
+          <div className="loader animate-spin rounded-full border-t-4 border-b-4 border-green-400 w-4 h-4"></div>
         </div>
       </div>
     );
@@ -56,7 +56,7 @@ const CreditsOffersPage: React.FC = () => {
     <div className="credits-offers-page">
       <ToastContainer /> {/* Add the ToastContainer component */}
       <h1 className="text-center text-3xl font-bold">Available Credit Offers</h1>
-      <div className="offers-container">
+      <div className="offers-container mt-4">
         {offers.length > 0 ? (
           offers.map((offer, index) => (
             <div key={index} className="offer-card">

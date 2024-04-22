@@ -42,10 +42,10 @@ function LoginPage({ onLoginSuccess, setIsAuthenticated }: LoginPageProps) {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
-            <div className="w-full max-w-md">
-            <h1 className="text-3xl font-bold text-center my-6">Log in</h1>
-                <div className="bg-white p-8 rounded-lg shadow-md">
+    <div className="flex flex-col items-center justify-center h-auto bg-gray-100 px-10">
+        <div className="w-full max-w-md">
+        <h1 className="text-3xl font-bold text-center my-4">Log in</h1>
+                <div className="bg-white p-2 rounded-lg shadow-md">
                     <form onSubmit={handleLogin} className="space-y-6">
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>

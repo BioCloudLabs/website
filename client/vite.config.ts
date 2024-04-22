@@ -24,6 +24,11 @@ export default defineConfig({
         target: 'http://127.0.0.1:5000',
         changeOrigin: true,
       },
+      // Existing proxy for /user requests
+      '/azuredata': {
+        target: 'http://127.0.0.1:5000',
+        changeOrigin: true,
+      },
     }
   }
 })

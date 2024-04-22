@@ -1,19 +1,5 @@
 /****************** CREDITS OFFERS SECTION START ******************/
 
-.credits-offers-page {
-    max-width: 1200px;
-    margin: 0 auto;
-    text-align: center;
-    /* Center text */
-}
-
-.credits-offers-page-loading {
-    display: flex;
-    min-height: 100vh; /* Make loader take full page height */
-    flex-direction: column;
-    justify-content: center; /* Center content vertically */
-    align-items: center; /* Center content horizontally */
-}
 
 /****************** CREDITS OFFERS SECTION END ******************/
 

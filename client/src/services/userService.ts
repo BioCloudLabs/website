@@ -96,6 +96,35 @@ export const getCurrentUserToken = (): string | null => {
 };
 
 
+/**
+ * Sends a POST request to the /users/logout endpoint to log out the user.
+ * @returns A Promise that resolves when the logout is successful.
+ */
+export const logoutUserService = async (): Promise<void> => {
+  try {
+    const response = await fetch('/user/logout', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Logout failed');
+    }
+    
+    // Clear localStorage upon successful logout
+    localStorage.removeItem('token');
+    localStorage.removeItem('userProfile');
+    localStorage.removeItem('userCredits');
+  } catch (error) {
+    console.error('Logout service error:', error);
+    throw error; // Re-throw the error if there's an issue with logging out
+  }
+};
+
 
 /**
  * Removes the login authentication from the localStorage.
@@ -103,12 +132,18 @@ export const getCurrentUserToken = (): string | null => {
  * This function will also need token destruction logic that would be used with a /logout endpoint.
  *
  */
-export const logoutUser = (): void => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('userProfile');
-  localStorage.removeItem('userCredits');
-
+export const logoutUser = async (): Promise<void> => { // Change the function to an asynchronous function
+  try {
+    await logoutUserService(); // Call the logoutUser function from the userService, which handles the API call
+    localStorage.removeItem('token');
+    localStorage.removeItem('userProfile');
+    localStorage.removeItem('userCredits');
+  } catch (error) {
+    console.error('Logout error:', error);
+    throw error; // Re-throw the error if there's an issue with logging out
+  }
 };
+
 
 
 /****************** USER UTILITY SERVICES SECTION END ******************/

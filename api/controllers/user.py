@@ -215,7 +215,7 @@ class UserRecoverPasswordEmail(MethodView):
         :return: HTTP response with the result.
         """
 
-        user = db.session.get()
+        user = models.UserModel.query.filter_by(email=payload["email"]).one_or_404("User not found")
             
         email_token = create_access_token(identity=user.id, expires_delta=timedelta(minutes=15)) 
 

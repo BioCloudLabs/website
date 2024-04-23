@@ -1,5 +1,5 @@
-import { User } from './../models/User'; 
-import { LoginResponse } from './../models/LoginResponse'; 
+import { User } from './../models/User';
+import { LoginResponse } from './../models/LoginResponse';
 import { RegistrationForm } from '../models/RegistrationForm';
 import { Location } from '../models/Locations';
 import { notify } from './../utils/notificationUtils';
@@ -8,12 +8,11 @@ import { notify } from './../utils/notificationUtils';
 
 /****************** TOKEN SERVICES SECTION START ******************/
 
-
 /**
  * Validates the authentication token by querying the backend endpoint.
- * Automatically logs out the user if the token is invalid.
+ * Automatically logs out the user if the token is invalid, with a delay to allow the user to see the notification.
  * Uses Toastify to notify users directly about the token validation status.
- * Handles various error scenarios gracefully.
+ * Handles various error scenarios gracefully, including network issues and invalid tokens.
  *
  * @returns {Promise<boolean>} True if the token is valid, otherwise false.
  */
@@ -21,12 +20,12 @@ export const isTokenValid = async (): Promise<boolean> => {
   const token = localStorage.getItem('token');
   if (!token) {
     notify('No token found. Please log in.', 'error');
-    await logoutUser();
+    setTimeout(() => logoutUser(), 3000);  // Delay logout to give user time to see the message
     return false;
   }
 
   try {
-    const response = await fetch('/validate-token', {
+    const response = await fetch('/user/validate-token', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -35,17 +34,21 @@ export const isTokenValid = async (): Promise<boolean> => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      notify(errorData.message || 'Token validation failed. Logging out...', 'error');
-      await logoutUser();
+      const statusCode = response.status;
+      if (statusCode === 401 || statusCode === 403 || statusCode === 422) {
+        notify('Session expired or invalid. Please log in again.', 'error');
+        setTimeout(() => logoutUser(), 3000);  // Delay logout to give user time to see the message
+        return false;
+      }
+      notify(errorData.message || 'Failed to validate token. Please try again.', 'error');
       return false;
     }
 
     return true;
   } catch (error) {
     console.error('Error validating token:', error);
-    notify('A network or server error occurred. Please try again.', 'error');
-    // Consider whether to log out the user automatically in case of network errors
-    throw error;
+    notify('A network or server error occurred. Please check your connection and try again.', 'error');
+    return false;
   }
 };
 
@@ -70,7 +73,10 @@ export const handleApiResponse = async (response: Response, navigate: (path: str
 
 /****************** USER UTILITY SERVICES SECTION START ******************/
 
-
+/**
+ * Redirects the user to the login page after clearing the token and user info.
+ * @param navigate - The navigate function from React Router to redirect the user.
+ */
 export const redirectToLogin = (navigate: (path: string) => void) => {
   logoutUser();  // This will clear the token and user info
   navigate('/login');  // Use the passed navigate function
@@ -113,57 +119,73 @@ export const getCurrentUserToken = (): string | null => {
 };
 
 
-/**
- * Sends a POST request to the /users/logout endpoint to log out the user.
- * @returns A Promise that resolves when the logout is successful.
- */
-export const logoutUserService = async (): Promise<void> => {
-  try {
-    const response = await fetch('/user/logout', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Logout failed');
-    }
-    
-    // Clear localStorage upon successful logout
-    localStorage.removeItem('token');
-    localStorage.removeItem('userProfile');
-    localStorage.removeItem('userCredits');
-  } catch (error) {
-    console.error('Logout service error:', error);
-    throw error; // Re-throw the error if there's an issue with logging out
-  }
-};
-
-
-/**
- * Removes the login authentication from the localStorage.
- * 
- * This function will also need token destruction logic that would be used with a /logout endpoint.
- *
- */
-export const logoutUser = async (): Promise<void> => { // Change the function to an asynchronous function
-  try {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userProfile');
-    localStorage.removeItem('userCredits');
-    await logoutUserService(); // Call the logoutUser function from the userService, which handles the API call
-  } catch (error) {
-    console.error('Logout error:', error);
-    throw error; // Re-throw the error if there's an issue with logging out
-  }
-};
 
 
 
 /****************** USER UTILITY SERVICES SECTION END ******************/
+
+/****************** LOGOUT SECTION START ******************/
+
+
+
+/**
+ * Sends a POST request to the /users/logout endpoint to log out the user.
+ * @returns A Promise that resolves when the logout is successful.
+ */
+export const invalidateToken = async (): Promise<void> => {
+  const response = await fetch('/user/logout', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Logout failed');
+  }
+};
+
+
+/**
+ * Logs out the user by clearing the local storage and making a call to the server to invalidate the token.
+ */
+export const logoutUser = async (isTokenInvalid = false): Promise<void> => {
+  try {
+    await invalidateToken(); // Attempt to communicate with the server to invalidate the session
+  } catch (error) {
+    console.error('Logout error:', error); // Log any error that occurs during the logout process
+  }
+  logoutUserLocally();
+
+  if (isTokenInvalid) {
+    // Notify the user that their session has expired or is invalid and that they will be logged out
+    notify('Session expired or invalid. You will be logged out. Please log in again.', 'error');
+
+    // Use setTimeout to delay the redirection, giving the user time to read the message
+    setTimeout(() => {
+      window.location.href = '/login'; // Redirect to the login page after 3 seconds
+    }, 3000); // Delay set to 3000 milliseconds (3 seconds)
+  } else {
+    // For user-initiated logout, redirect immediately
+    window.location.href = '/login';
+  }
+};
+
+/**
+ * Logs out the user by clearing the local storage. 
+ * This function is used mainly when the token is invalid.
+ */
+export const logoutUserLocally = async (): Promise<void> => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('userProfile');
+  localStorage.removeItem('userCredits');
+};
+
+/****************** LOGOUT SECTION END ******************/
+
+
 
 /****************** REGISTER SECTION START ******************/
 
@@ -204,46 +226,45 @@ export const registerUser = async (userDetails: RegistrationForm): Promise<boole
 
 /****************** LOGIN SECTION START ******************/
 
+  export const loginUser = async (email: string, password: string): Promise<LoginResponse | null> => {
+    try {
+      const response = await fetch('/user/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-export const loginUser = async (email: string, password: string): Promise<LoginResponse | null> => {
-  try {
-    const response = await fetch('/user/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
+      }
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Login failed');
+      const data: LoginResponse = await response.json();
+
+      // Store the token in localStorage
+      localStorage.setItem('token', data.access_token);
+
+      // Fetch user credits and profile
+      const credits = await fetchUserCredits();
+      const userProfile = await fetchUserProfile();
+
+      if (credits !== null && userProfile !== null) {
+        // Store the user credits and profile in localStorage
+        localStorage.setItem('userCredits', credits.toString());
+        localStorage.setItem('userProfile', JSON.stringify(userProfile));
+      } else {
+        console.error('Failed to fetch user credits or profile');
+      }
+
+      // Redirect to home or wherever you need to go after login
+      // You can use React Router's history object to navigate programmatically
+
+      return data;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error; // Re-throw the error with the message from the server
     }
-
-    const data: LoginResponse = await response.json();
-
-    // Store the token in localStorage
-    localStorage.setItem('token', data.access_token);
-
-    // Fetch user credits and profile
-    const credits = await fetchUserCredits();
-    const userProfile = await fetchUserProfile();
-
-    if (credits !== null && userProfile !== null) {
-      // Store the user credits and profile in localStorage
-      localStorage.setItem('userCredits', credits.toString());
-      localStorage.setItem('userProfile', JSON.stringify(userProfile));
-    } else {
-      console.error('Failed to fetch user credits or profile');
-    }
-
-    // Redirect to home or wherever you need to go after login
-    // You can use React Router's history object to navigate programmatically
-
-    return data;
-  } catch (error) {
-    console.error('Login error:', error);
-    throw error; // Re-throw the error with the message from the server
-  }
-};
+  };
 
 
 /****************** LOGIN SECTION END ******************/
@@ -291,7 +312,7 @@ export const fetchUserProfile = async (): Promise<User> => {
       throw new Error('An unexpected error occurred');
     }
   }
-  
+
 };
 
 
@@ -327,7 +348,7 @@ export const updateUserProfile = async (user: User): Promise<void> => {
 
     // const responseData = await response.json();
     // console.log('Profile update response:', responseData); // Log the response for debugging
-  
+
   } catch (error) {
     console.error('Error updating user profile:', error);
     throw error;
@@ -346,7 +367,7 @@ export const getLocationOptions = async (): Promise<{ id: number; display_name: 
 
   try {
     const response = await fetch('/azuredata/locations', {
-      method: 'GET', 
+      method: 'GET',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json'

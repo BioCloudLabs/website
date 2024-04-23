@@ -15,7 +15,7 @@ class EmailSender():
 			replaced_html = template_html.format(link=link, user=user, name=name)
 
 			r = resend.Emails.send({
-				"from": "onboarding@resend.dev",
+				"from": "noreply@biocloudlabs.es",
 				"to": user,
 				"subject": "Password recovery",
 				"html": replaced_html

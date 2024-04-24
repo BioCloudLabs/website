@@ -14,7 +14,6 @@ export const handleUserCheckout = async (
   // Convert price to a number
   const numericPrice = parseFloat(price.replace('€', '').trim());
 
-export const checkout = async (price_id: string, price: string, _navigate: (path: string) => void): Promise<void> => {
   try {
     await checkout(priceId, numericPrice, navigate);
     onSuccess();
@@ -28,7 +27,7 @@ export const checkout = async (price_id: string, price: string, _navigate: (path
   }
 };
 
-export const checkout = async (price_id: string, price: number, _navigate: (path: string) => void): Promise<void> => {
+export const checkout = async (price_id: string, price: number, navigate: (path: string) => void): Promise<void> => {
   const token = localStorage.getItem('token');
   if (!token) {
     console.error('Authentication token not found');

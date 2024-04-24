@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import './../../css/CancelledPage.css';
+import { useNavigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import { Offer } from '../../models/Offer';
+import { fetchProducts, handleUserCheckout } from '../../services/creditsService';
+import { notify } from '../../utils/notificationUtils'; 
+import './../../css/CreditsOffersPage.css';
 
-/**
- * Represents the CancelledPage component.
- * This component displays a message indicating that the operation was cancelled and redirects to the homepage after a countdown.
- */
-const CancelledPage: React.FC = () => {
-  const [countdown, setCountdown] = useState(3); // Initialize countdown state with 3
+const CreditsOffersPage: React.FC = () => {
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {

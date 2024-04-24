@@ -10,7 +10,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 blp = Blueprint("stripe", __name__, description="Stripe endpoint", url_prefix="/stripe")
 
-DOMAIN = os.getenv("DOMAIN")
+DOMAIN = os.getenv("DOMAIN_URL")
 stripe.api_key = os.getenv("STRIPE_KEY")
 ENDPOINT_SECRET = os.getenv("ENDPOINT_SECRET")
 

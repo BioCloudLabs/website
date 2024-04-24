@@ -11,8 +11,9 @@ function LoginPage({ onLoginSuccess, setIsAuthenticated }: LoginPageProps) {
     const navigate = useNavigate();
 
     useEffect(() => {
+        // Check if user is already logged in and redirect to dashboard
         if (localStorage.getItem('token')) {
-            navigate('/dashboard');
+            navigate('/dashboard', { replace: true });
         }
     }, [navigate]);
 
@@ -23,14 +24,14 @@ function LoginPage({ onLoginSuccess, setIsAuthenticated }: LoginPageProps) {
             if (loginResult) {
                 setIsAuthenticated(true);
                 onLoginSuccess();
-                navigate('/dashboard');
+                navigate('/dashboard', { replace: true });
             } else {
                 setLoginError('Failed to log in. Please check your credentials and try again.');
             }
         } catch (error: unknown) {
             console.error('Login error:', error);
             if (error instanceof Error) {
-                setLoginError(error.message);
+                setLoginError(error.message || 'Failed to log in. Please check your credentials and try again.');
             } else {
                 setLoginError('Login failed due to an unexpected error.');
             }
@@ -42,10 +43,10 @@ function LoginPage({ onLoginSuccess, setIsAuthenticated }: LoginPageProps) {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
+        <div className="flex flex-col items-center justify-center h-auto bg-gray-100 px-10">
             <div className="w-full max-w-md">
-            <h1 className="text-3xl font-bold text-center my-6">Log in</h1>
-                <div className="bg-white p-8 rounded-lg shadow-md">
+                <h1 className="text-3xl font-bold text-center my-4">Log in</h1>
+                <div className="bg-white p-2 rounded-lg shadow-md">
                     <form onSubmit={handleLogin} className="space-y-6">
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
@@ -77,7 +78,7 @@ function LoginPage({ onLoginSuccess, setIsAuthenticated }: LoginPageProps) {
                             Log In
                         </button>
                         <div className="text-center">
-                            <button onClick={handleForgotPasswordClick} className="font-medium text-indigo-600 hover:text-indigo-500">
+                            <button onClick={handleForgotPasswordClick} type="button" className="font-medium text-indigo-600 hover:text-indigo-500">
                                 Forgot Password?
                             </button>
                         </div>
@@ -91,9 +92,6 @@ function LoginPage({ onLoginSuccess, setIsAuthenticated }: LoginPageProps) {
             </div>
         </div>
     );
-    
-    
-    
 }
 
 export default LoginPage;

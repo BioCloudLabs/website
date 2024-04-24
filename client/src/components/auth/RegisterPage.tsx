@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { registerUser, getLocationOptions } from '../../services/userService';
 import { Location } from '../../models/Locations';
 import { notify } from '../../utils/notificationUtils';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 function RegisterPage() {
     const [email, setEmail] = useState('');
@@ -18,7 +16,7 @@ function RegisterPage() {
 
     useEffect(() => {
         const fetchLocations = async () => {
-            try {
+            try { // Fetch locations and set the default location once the component mounts
                 const locationData = await getLocationOptions();
                 setLocations(locationData);
                 if (locationData.length > 0) {
@@ -42,17 +40,17 @@ function RegisterPage() {
 
             if (response) {
                 notify('Registration successful! Redirecting to login page.', 'success');
+                // Notify the user that the registration was successful
                 setTimeout(() => navigate('/login'), 3000); // Redirect to login after a delay
             }
         } catch (error: any) {
             setRegistrationError(error.message || 'Registration failed. Please try again.');
-            notify(error.message || 'Registration failed. Please try again.', 'error');
+            // For errors, its better to keep the message static
         }
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
-            <ToastContainer />
+        <div className="flex flex-col items-center justify-center bg-gray-100 px-4">
             <div className="w-full max-w-md">
                 <h1 className="text-3xl font-bold text-center mb-6">Register</h1>
                 <div className="bg-white p-8 rounded-lg shadow-md">

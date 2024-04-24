@@ -3,11 +3,12 @@ flask
 flask-cors
 flask-smorest
 python-dotenv
-psycopg2
 flask-migrate
 bleach 
 flask-jwt-extended
 marshmallow
 passlib
+gunicorn
 pytest
 stripe
+resend

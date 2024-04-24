@@ -11,6 +11,8 @@ from controllers.stripe import blp as StripeBlueprint
 from controllers.azuredata import blp as AzuredataBlueprint
 from dotenv import load_dotenv
 
+from mail_utils import EmailSender
+
 app: Flask = Flask(__name__)
 
 load_dotenv()
@@ -157,6 +159,3 @@ with app.app_context():
     
     # # Commit the changes to persist them in the database
     # db.session.commit()
-
-
-

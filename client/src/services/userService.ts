@@ -1,59 +1,16 @@
-import { User } from './../models/User'; 
-import { LoginResponse } from './../models/LoginResponse'; 
+import { User } from './../models/User';
+import { LoginResponse } from './../models/LoginResponse';
 import { RegistrationForm } from '../models/RegistrationForm';
 import { Location } from '../models/Locations';
+import { notify } from './../utils/notificationUtils';
 
-
-
-/****************** TOKEN SERVICES SECTION START ******************/
-
-/**
- * BACKEND ENDPOINT TO DO:
- * 
- * This function requires a backend endpoint to validate the token.
- * @returns 
- */
-export const isTokenValid = async (): Promise<boolean> => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    return false;
-  }
-  
-  try {
-    const response = await fetch('/validate-token', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    
-    return response.ok;
-  } catch (error) {
-    console.error('Error validating token:', error);
-    throw error; // Re-throw the error with the message from the server
-  }
-};
-
-
-// Add check for token expiration with a cookie to request if the token is valid
-
-export const handleApiResponse = async (response: Response, navigate: (path: string) => void) => {
-  if (!response.ok) {
-    const errorData = await response.json();
-    if (response.status === 401 && errorData.msg.includes("Token has expired")) {
-      redirectToLogin(navigate);  // Pass the navigate function
-      throw new Error("Session has expired. Please log in again.");
-    }
-    throw new Error(errorData.msg || 'There was a problem processing your request.');
-  }
-  return response.json();
-};
-
-
-/****************** TOKEN SERVICES SECTION END ******************/
 
 /****************** USER UTILITY SERVICES SECTION START ******************/
 
-
+/**
+ * Redirects the user to the login page after clearing the token and user info.
+ * @param navigate - The navigate function from React Router to redirect the user.
+ */
 export const redirectToLogin = (navigate: (path: string) => void) => {
   logoutUser();  // This will clear the token and user info
   navigate('/login');  // Use the passed navigate function
@@ -96,57 +53,140 @@ export const getCurrentUserToken = (): string | null => {
 };
 
 
+
+
+
+/****************** USER UTILITY SERVICES SECTION END ******************/
+
+
+/****************** TOKEN SERVICES SECTION START ******************/
+
 /**
- * Sends a POST request to the /users/logout endpoint to log out the user.
- * @returns A Promise that resolves when the logout is successful.
+ * Validates the authentication token by querying the backend endpoint.
+ * Automatically logs out the user if the token is invalid, with a delay to allow the user to see the notification.
+ * Uses Toastify to notify users directly about the token validation status.
+ * Handles various error scenarios gracefully, including network issues and invalid tokens.
+ *
+ * @returns {Promise<boolean>} True if the token is valid, otherwise false.
  */
-export const logoutUserService = async (): Promise<void> => {
+export const isTokenValid = async (): Promise<boolean> => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    notify('No token found. Please log in.', 'error');
+    logoutUser();
+    return false;
+  }
+
   try {
-    const response = await fetch('/user/logout', {
+    const response = await fetch('/user/validate-token', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
       },
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || 'Logout failed');
+      notify(errorData.message || 'Session expired or invalid. Please log in again.', 'error');
+      logoutUser(true);
+      return false;
     }
-    
-    // Clear localStorage upon successful logout
-    localStorage.removeItem('token');
-    localStorage.removeItem('userProfile');
-    localStorage.removeItem('userCredits');
+
+    return true;
   } catch (error) {
-    console.error('Logout service error:', error);
-    throw error; // Re-throw the error if there's an issue with logging out
+    console.error('Error validating token:', error);
+    notify('A network or server error occurred. Please check your connection and try again.', 'error');
+    logoutUser()
+    return false;
+  }
+};
+
+
+
+
+// Add check for token expiration with a cookie to request if the token is valid
+
+export const handleApiResponse = async (response: Response, navigate: (path: string) => void) => {
+  if (!response.ok) {
+    const errorData = await response.json();
+    if (response.status === 401 && errorData.msg.includes("Token has expired")) {
+      redirectToLogin(navigate);  // Pass the navigate function
+      throw new Error("Session has expired. Please log in again.");
+    }
+    throw new Error(errorData.msg || 'There was a problem processing your request.');
+  }
+  return response.json();
+};
+
+
+/****************** TOKEN SERVICES SECTION END ******************/
+
+
+
+
+/****************** LOGOUT SECTION START ******************/
+
+
+
+/**
+ * Sends a POST request to the /users/logout endpoint to log out the user.
+ * @returns A Promise that resolves when the logout is successful.
+ */
+export const invalidateToken = async (): Promise<void> => {
+  const token = localStorage.getItem('token');
+  const response = await fetch('/user/logout', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Logout failed');
+  }
+};
+
+/**
+ * Logs out the user by making a call to the server to invalidate the token
+ * and then handling local storage and redirection based on whether the logout
+ * was due to an invalid token.
+ */
+export const logoutUser = async (isTokenInvalid = false): Promise<void> => {
+  try {
+    await invalidateToken();  // Attempt to invalidate server-side session first
+  } catch (error) {
+    console.error('Logout error:', error); // Log any error that occurs during the logout process
+  }
+
+  logoutUserLocally(); // Then clear local storage
+
+  if (isTokenInvalid) {
+    sessionStorage.setItem('postLogoutMessage', 'Session expired or token invalid. Please log in again.');
+    window.location.href = '/login';  // Redirect to login page
+  } else {
+    window.location.href = '/';  // Redirect to home page
+
+
   }
 };
 
 
 /**
- * Removes the login authentication from the localStorage.
- * 
- * This function will also need token destruction logic that would be used with a /logout endpoint.
- *
+/**
+ * Logs out the user locally by clearing the local storage. 
+ * This function is called after the server has confirmed the token invalidation.
  */
-export const logoutUser = async (): Promise<void> => { // Change the function to an asynchronous function
-  try {
-    await logoutUserService(); // Call the logoutUser function from the userService, which handles the API call
-    localStorage.removeItem('token');
-    localStorage.removeItem('userProfile');
-    localStorage.removeItem('userCredits');
-  } catch (error) {
-    console.error('Logout error:', error);
-    throw error; // Re-throw the error if there's an issue with logging out
-  }
+export const logoutUserLocally = (): void => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('userProfile');
+  localStorage.removeItem('userCredits');
 };
 
+/****************** LOGOUT SECTION END ******************/
 
 
-/****************** USER UTILITY SERVICES SECTION END ******************/
 
 /****************** REGISTER SECTION START ******************/
 
@@ -187,46 +227,45 @@ export const registerUser = async (userDetails: RegistrationForm): Promise<boole
 
 /****************** LOGIN SECTION START ******************/
 
+  export const loginUser = async (email: string, password: string): Promise<LoginResponse | null> => {
+    try {
+      const response = await fetch('/user/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-export const loginUser = async (email: string, password: string): Promise<LoginResponse | null> => {
-  try {
-    const response = await fetch('/user/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
+      }
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Login failed');
+      const data: LoginResponse = await response.json();
+
+      // Store the token in localStorage
+      localStorage.setItem('token', data.access_token);
+
+      // Fetch user credits and profile
+      const credits = await fetchUserCredits();
+      const userProfile = await fetchUserProfile();
+
+      if (credits !== null && userProfile !== null) {
+        // Store the user credits and profile in localStorage
+        localStorage.setItem('userCredits', credits.toString());
+        localStorage.setItem('userProfile', JSON.stringify(userProfile));
+      } else {
+        console.error('Failed to fetch user credits or profile');
+      }
+
+      // Redirect to home or wherever you need to go after login
+      // You can use React Router's history object to navigate programmatically
+
+      return data;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error; // Re-throw the error with the message from the server
     }
-
-    const data: LoginResponse = await response.json();
-
-    // Store the token in localStorage
-    localStorage.setItem('token', data.access_token);
-
-    // Fetch user credits and profile
-    const credits = await fetchUserCredits();
-    const userProfile = await fetchUserProfile();
-
-    if (credits !== null && userProfile !== null) {
-      // Store the user credits and profile in localStorage
-      localStorage.setItem('userCredits', credits.toString());
-      localStorage.setItem('userProfile', JSON.stringify(userProfile));
-    } else {
-      console.error('Failed to fetch user credits or profile');
-    }
-
-    // Redirect to home or wherever you need to go after login
-    // You can use React Router's history object to navigate programmatically
-
-    return data;
-  } catch (error) {
-    console.error('Login error:', error);
-    throw error; // Re-throw the error with the message from the server
-  }
-};
+  };
 
 
 /****************** LOGIN SECTION END ******************/
@@ -238,12 +277,12 @@ export const loginUser = async (email: string, password: string): Promise<LoginR
 
 /**
  * Fetches the current user profile from the server using the /profile endpoint.
+ * Ensures token is valid before making the request.
+ * Throws an error if the token is invalid or if the profile fetch fails.
  * @returns A Promise that resolves to the user object if successful.
  */
 export const fetchUserProfile = async (): Promise<User | null> => {
-  const url = '/user/profile'; // Assuming proxy is setup correctly in Vite
-  console.log(`Making API request to: ${url}`);
-
+  const url = '/user/profile';
   try {
     const response = await fetch(url, {
       method: 'GET',
@@ -253,8 +292,14 @@ export const fetchUserProfile = async (): Promise<User | null> => {
       },
     });
 
-    console.log('Response status:', response.status);
     if (!response.ok) {
+      // If the profile request fails, check if it's due to an invalid token
+      const tokenStillValid = await isTokenValid();
+      if (!tokenStillValid) {
+        // If token is not valid, the function isTokenValid() will handle logout
+        return null;
+      }
+
       const errorData = await response.json();
       console.error('Failed to fetch profile:', errorData);
       throw new Error(`Failed to fetch user profile with status: ${response.status}`);
@@ -263,10 +308,17 @@ export const fetchUserProfile = async (): Promise<User | null> => {
     const user = await response.json();
     return user;
   } catch (error) {
-    console.error('Error fetching user profile:', error);
-    return null;
+    if (error instanceof Error) {
+      console.error('Error fetching user profile:', error.message);
+      throw new Error(`Error fetching user profile: ${error.message}`);
+    } else {
+      console.error('An unexpected error occurred:', error);
+      throw new Error('An unexpected error occurred');
+    }
   }
 };
+
+
 
 
 /**
@@ -275,7 +327,7 @@ export const fetchUserProfile = async (): Promise<User | null> => {
  * @returns A Promise that resolves if the update is successful.
  */
 export const updateUserProfile = async (user: User): Promise<void> => {
-  const { name, surname, location_id } = user; // Extract only the fields that can be updated
+  const { name, surname, location_id } = user;
 
   try {
     const response = await fetch('/user/profile', {
@@ -284,17 +336,20 @@ export const updateUserProfile = async (user: User): Promise<void> => {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name, surname, location_id }), // Send only these fields
+      body: JSON.stringify({ name, surname, location_id }),
     });
 
     if (!response.ok) {
+      isTokenValid(); // Check if the token is valid before proceeding
       const errorData = await response.json();
       throw new Error(errorData.message || 'Failed to update profile');
     }
 
-    // Optionally handle the response if needed
-    const responseData = await response.json();
-    console.log('Profile update response:', responseData);
+    // Uncomment the lines below to log the response data
+
+    // const responseData = await response.json();
+    // console.log('Profile update response:', responseData); // Log the response for debugging
+
   } catch (error) {
     console.error('Error updating user profile:', error);
     throw error;
@@ -306,11 +361,13 @@ export const updateUserProfile = async (user: User): Promise<void> => {
  * Fetches location options from the server and transforms them into the format required by the frontend.
  * @returns A Promise that resolves to an array of location objects containing id and display_name.
  */
-export const getLocationOptions = async (): Promise<{ id: number; display_name: string, name: string }[]> => {
+export const getLocationOptions = async (): Promise<{ id: number; display_name: string, name: string }[]> => {  
+
   try {
     const response = await fetch('/azuredata/locations', {
-      method: 'GET', // Method is GET by default, but explicitly defined for clarity
+      method: 'GET',
       headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json'
       }
     });
@@ -319,21 +376,18 @@ export const getLocationOptions = async (): Promise<{ id: number; display_name: 
       throw new Error('Failed to fetch locations');
     }
 
-    const data = await response.json(); // The backend returns JSON
-
-    // Mapping the response to the expected format
+    const data = await response.json();
     return data.locations.map((location: Location) => ({
       display_name: location.display_name,
       id: location.id,
       name: location.name,
-
     }));
-
   } catch (error) {
     console.error('Error fetching locations:', error);
-    throw error; // Rethrow or handle as needed
+    throw error;
   }
 };
+
 
 
 /**
@@ -342,6 +396,7 @@ export const getLocationOptions = async (): Promise<{ id: number; display_name: 
  * @param newPassword - The new password to set.
  */
 export const changeUserPassword = async (oldPassword: string, newPassword: string): Promise<void> => {
+
   try {
     const response = await fetch('/user/change-password', {
       method: 'PUT',
@@ -366,12 +421,15 @@ export const changeUserPassword = async (oldPassword: string, newPassword: strin
 
 
 
+
 /****************** PROFILE SECTION END ******************/
 
 
 /****************** USER CREDITS SECTION START ******************/
 
 export const fetchUserCredits = async (): Promise<number | null> => {
+  
+
   try {
     const response = await fetch('/user/credits', {
       method: 'GET',
@@ -389,9 +447,10 @@ export const fetchUserCredits = async (): Promise<number | null> => {
     return data.credits;
   } catch (error) {
     console.error('Error fetching user credits:', error);
-    return null;
+    throw error;
   }
 };
+
 
 
 /****************** USER CREDITS SECTION END ******************/

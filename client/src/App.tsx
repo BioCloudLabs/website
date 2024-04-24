@@ -15,12 +15,12 @@ import CancelledPage from './components/payment/CancelledPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import ChangePasswordPage from './components/auth/ChangePasswordPage';
 import { ToastContainer } from './utils/notificationUtils';
+import { notify } from './utils/notificationUtils';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!localStorage.getItem('token'));
   const [userCredits, setUserCredits] = useState<number | null>(null);
   const [isOpen, setIsOpen] = useState(false); // State to manage the navbar toggle
-  const [isClicked, setIsClicked] = useState(false); // State to track click status
 
   useEffect(() => {
     const handleStorageChange = () => {
@@ -32,7 +32,14 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // Fetch user credits from localStorage when the user logs in
+    const message = sessionStorage.getItem('postLogoutMessage');
+    if (message) {
+      notify(message, 'error'); // Display the message as an error notification
+      sessionStorage.removeItem('postLogoutMessage'); // Clear the message after showing it
+    }
+  }, []);
+
+  useEffect(() => {
     if (isAuthenticated) {
       const credits = localStorage.getItem('userCredits');
       setUserCredits(credits ? parseInt(credits, 10) : null);
@@ -41,13 +48,10 @@ function App() {
     }
   }, [isAuthenticated]);
 
-  const handleClick = () => {
-    setIsClicked(true);
-    setTimeout(() => {
-      setIsClicked(false);
-    }, 1000);
+  const handleLogout = async () => {
+    setIsAuthenticated(false); // Update authentication state
+    setUserCredits(null); // Reset credits info
   };
-
   return (
     <Router>
       <div className="flex flex-col bg-gray-100 min-h-screen">
@@ -76,13 +80,12 @@ function App() {
                 <Link
                   to="/credits-offers"
                   className={`text-white px-3 py-2 rounded-md text-sm font-medium hover:underline`}
-                  onClick={handleClick}
                 >
-                  <span className={`text-${isClicked ? 'white' : 'blue-400'} hover:text-white transition-colors duration-300`}>
+                  <span className={`text-blue hover:text-white transition-colors duration-300`}>
                     Credits: {userCredits}
                   </span>
                 </Link>
-                <LogoutButton onLogout={() => { localStorage.removeItem('token'); setIsAuthenticated(false); }} />
+                <LogoutButton onLogout={handleLogout} />
               </>
             ) : (
               <>

@@ -16,7 +16,7 @@ function RegisterPage() {
 
     useEffect(() => {
         const fetchLocations = async () => {
-            try {
+            try { // Fetch locations and set the default location once the component mounts
                 const locationData = await getLocationOptions();
                 setLocations(locationData);
                 if (locationData.length > 0) {
@@ -40,11 +40,12 @@ function RegisterPage() {
 
             if (response) {
                 notify('Registration successful! Redirecting to login page.', 'success');
+                // Notify the user that the registration was successful
                 setTimeout(() => navigate('/login'), 3000); // Redirect to login after a delay
             }
         } catch (error: any) {
             setRegistrationError(error.message || 'Registration failed. Please try again.');
-            notify(error.message || 'Registration failed. Please try again.', 'error');
+            // For errors, its better to keep the message static
         }
     };
 

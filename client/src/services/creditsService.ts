@@ -24,7 +24,7 @@ export const handleUserCheckout = async (
 };
 
 
-export const checkout = async (price_id: string, price: string, navigate: (path: string) => void): Promise<void> => {
+export const checkout = async (price_id: string, price: string): Promise<void> => {
   try {
     const parsedPrice = parseFloat(price.replace('€', '').trim());
     if (isNaN(parsedPrice)) {

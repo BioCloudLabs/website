@@ -3,8 +3,7 @@ flask
 flask-cors
 flask-smorest
 python-dotenv
-psycopg2
-flask-migrate
+flask-migrategit 
 bleach 
 flask-jwt-extended
 marshmallow

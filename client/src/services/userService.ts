@@ -280,9 +280,6 @@ export const registerUser = async (userDetails: RegistrationForm): Promise<boole
  * @returns A Promise that resolves to the user object if successful.
  */
 export const fetchUserProfile = async (): Promise<User> => {
-  if (!await isTokenValid()) {
-    throw new Error('Token validation failed. Cannot fetch user profile.');
-  }
 
   const url = '/user/profile';
   try {
@@ -323,10 +320,6 @@ export const fetchUserProfile = async (): Promise<User> => {
  */
 export const updateUserProfile = async (user: User): Promise<void> => {
   const { name, surname, location_id } = user;
-
-  if (!await isTokenValid()) {
-    throw new Error('Token validation failed. Cannot update profile.');
-  }
 
   try {
     const response = await fetch('/user/profile', {
@@ -394,9 +387,6 @@ export const getLocationOptions = async (): Promise<{ id: number; display_name: 
  * @param newPassword - The new password to set.
  */
 export const changeUserPassword = async (oldPassword: string, newPassword: string): Promise<void> => {
-  if (!await isTokenValid()) {
-    throw new Error('Token validation failed. Cannot change password.');
-  }
 
   try {
     const response = await fetch('/user/change-password', {
@@ -430,9 +420,6 @@ export const changeUserPassword = async (oldPassword: string, newPassword: strin
 
 export const fetchUserCredits = async (): Promise<number | null> => {
   
-  if (!await isTokenValid()) {
-    throw new Error('Token validation failed. Cannot fetch user credits.');
-  }
 
   try {
     const response = await fetch('/user/credits', {

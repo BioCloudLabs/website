@@ -390,37 +390,6 @@ export const getLocationOptions = async (): Promise<{ id: number; display_name: 
 
 
 
-/**
- * Makes the request to change the user password on the server and handles the response.
- * @param oldPassword - The user's current password.
- * @param newPassword - The new password to set.
- */
-export const changeUserPassword = async (oldPassword: string, newPassword: string): Promise<void> => {
-
-  try {
-    const response = await fetch('/user/change-password', {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ old_password: oldPassword, new_password: newPassword }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to change password');
-    }
-
-    await response.json();  // Using await to ensure the response is read
-  } catch (error) {
-    console.error('Error changing password:', error);
-    throw error;
-  }
-};
-
-
-
 
 /****************** PROFILE SECTION END ******************/
 
@@ -457,11 +426,46 @@ export const fetchUserCredits = async (): Promise<number | null> => {
 
 
 
-/****************** API CALLS SECTION START ******************/
+/****************** FORGOT PASSWORD SECTION START ******************/
+
+/**
+ * Changes the user's password.
+ * @param {string} oldPassword - The current password of the user.
+ * @param {string} newPassword - The new password to be set.
+ * @returns {Promise<void>} - A promise that resolves when the password is changed successfully.
+ */
+export const changeUserPassword = async (oldPassword: string, newPassword: string) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+      notify('You are not logged in. Please log in to change your password.', 'error');
+      return Promise.reject(new Error('No authentication token found.'));
+  }
+
+  try {
+      const response = await fetch('/user/change-password', {
+          method: 'PUT',
+          headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ old_password: oldPassword, new_password: newPassword })
+      });
+
+      if (!response.ok) {
+          const errorData = await response.json();
+          notify(errorData.message || 'Failed to change password.', 'error');
+          return Promise.reject(new Error(errorData.message || 'Failed to change password.'));
+      }
+
+      const data = await response.json();
+      notify(data.message, 'success');
+      return Promise.resolve();
+  } catch (error) {
+      console.error('Error changing password:', error);
+      notify('An error occurred while changing your password. Please try again.', 'error');
+      return Promise.reject(error);
+  }
+};
 
 
-
-
-
-
-/****************** API CALLS SECTION END ******************/
+/****************** FORGOT PASSWORD SECTION END ******************/

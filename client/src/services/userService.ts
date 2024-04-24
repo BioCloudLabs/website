@@ -147,7 +147,6 @@ export const invalidateToken = async (): Promise<void> => {
   }
 };
 
-
 /**
  * Logs out the user by clearing the local storage and making a call to the server to invalidate the token.
  */
@@ -165,11 +164,11 @@ export const logoutUser = async (isTokenInvalid = false): Promise<void> => {
 
     // Use setTimeout to delay the redirection, giving the user time to read the message
     setTimeout(() => {
-      window.location.href = '/login'; // Redirect to the login page after 3 seconds
+      window.location.href = '/'; // Redirect to the home page after 3 seconds
     }, 3000); // Delay set to 3000 milliseconds (3 seconds)
   } else {
     // For user-initiated logout, redirect immediately
-    window.location.href = '/login';
+    window.location.href = '/';
   }
 };
 
@@ -360,10 +359,7 @@ export const updateUserProfile = async (user: User): Promise<void> => {
  * Fetches location options from the server and transforms them into the format required by the frontend.
  * @returns A Promise that resolves to an array of location objects containing id and display_name.
  */
-export const getLocationOptions = async (): Promise<{ id: number; display_name: string, name: string }[]> => {
-  if (!await isTokenValid()) {
-    throw new Error('Token validation failed. Cannot fetch location options.');
-  }
+export const getLocationOptions = async (): Promise<{ id: number; display_name: string, name: string }[]> => {  
 
   try {
     const response = await fetch('/azuredata/locations', {
@@ -433,6 +429,7 @@ export const changeUserPassword = async (oldPassword: string, newPassword: strin
 /****************** USER CREDITS SECTION START ******************/
 
 export const fetchUserCredits = async (): Promise<number | null> => {
+  
   if (!await isTokenValid()) {
     throw new Error('Token validation failed. Cannot fetch user credits.');
   }

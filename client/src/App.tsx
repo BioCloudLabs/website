@@ -82,7 +82,7 @@ function App() {
                     Credits: {userCredits}
                   </span>
                 </Link>
-                <LogoutButton onLogout={() => { localStorage.removeItem('token'); setIsAuthenticated(false); }} />
+                <LogoutButton onLogout={() => {  }} />
               </>
             ) : (
               <>

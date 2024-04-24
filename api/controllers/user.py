@@ -220,7 +220,7 @@ class UserRecoverPasswordEmail(MethodView):
         email_token = create_access_token(identity=user.id, expires_delta=timedelta(minutes=15)) 
 
         try:
-            email_sender.recover_password(f"{os.getenv('DOMAIN')}/recoverpassword?token={email_token}", user.email, f"{user.name} {user.surname}")
+            email_sender.recover_password(f"{os.getenv('DOMAIN_URL')}/recoverpassword?token={email_token}", user.email, f"{user.name} {user.surname}")
         except Exception as e:
             return {"message": f"An error has ocurred while sending the email. {str(e)}"}, 500
 

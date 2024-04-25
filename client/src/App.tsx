@@ -6,7 +6,6 @@ import BlastPage from './components/common/BlastPage';
 import DashboardPage from './components/common/DashboardPage';
 import LoginPage from './components/auth/LoginPage';
 import RegisterPage from './components/auth/RegisterPage';
-import LogoutButton from './components/auth/LogoutButton';
 import ForgotPasswordPage from './components/auth/ForgotPasswordPage';
 import ProfilePage from './components/profile/ProfilePage';
 import CreditsOffersPage from './components/payment/CreditsOffersPage';
@@ -14,13 +13,13 @@ import SuccessPage from './components/payment/SuccessPage';
 import CancelledPage from './components/payment/CancelledPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import ChangePasswordPage from './components/auth/ChangePasswordPage';
-import { ToastContainer } from './utils/notificationUtils';
-import { notify } from './utils/notificationUtils';
+import { ToastContainer, notify } from './utils/notificationUtils';
+import { logoutUser } from './services/userService';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!localStorage.getItem('token'));
   const [userCredits, setUserCredits] = useState<number | null>(null);
-  const [isOpen, setIsOpen] = useState(false); // State to manage the navbar toggle
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const handleStorageChange = () => {
@@ -28,14 +27,16 @@ function App() {
     };
 
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   useEffect(() => {
     const message = sessionStorage.getItem('postLogoutMessage');
     if (message) {
-      notify(message, 'error'); // Display the message as an error notification
-      sessionStorage.removeItem('postLogoutMessage'); // Clear the message after showing it
+      notify(message, 'error');
+      sessionStorage.removeItem('postLogoutMessage');
     }
   }, []);
 
@@ -49,9 +50,14 @@ function App() {
   }, [isAuthenticated]);
 
   const handleLogout = async () => {
-    setIsAuthenticated(false); // Update authentication state
-    setUserCredits(null); // Reset credits info
+    try {
+      await logoutUser(); // No need to handle isAuthenticated or navigation here
+    } catch (error) {
+      console.error('Error during logout:', error);
+      notify('Logout failed. Please try again.', 'error');
+    }
   };
+  
   return (
     <Router>
       <div className="flex flex-col bg-gray-100 min-h-screen">
@@ -77,15 +83,10 @@ function App() {
           <div className="flex space-x-4 items-center">
             {isAuthenticated ? (
               <>
-                <Link
-                  to="/credits-offers"
-                  className={`text-white px-3 py-2 rounded-md text-sm font-medium hover:underline`}
-                >
-                  <span className={`text-blue hover:text-white transition-colors duration-300`}>
-                    Credits: {userCredits}
-                  </span>
+                <Link to="/credits-offers" className="text-white px-3 py-2 rounded-md text-sm font-medium hover:underline">
+                  Credits: {userCredits}
                 </Link>
-                <LogoutButton onLogout={handleLogout} />
+                <button onClick={handleLogout} className="text-white px-3 py-2 rounded-md text-sm font-medium">Logout</button>
               </>
             ) : (
               <>

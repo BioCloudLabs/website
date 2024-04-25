@@ -11,7 +11,6 @@ function LoginPage({ onLoginSuccess, setIsAuthenticated }: LoginPageProps) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Check if user is already logged in and redirect to dashboard
         if (localStorage.getItem('token')) {
             navigate('/dashboard', { replace: true });
         }

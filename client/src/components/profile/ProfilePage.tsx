@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { logoutUser, fetchUserCredits, updateUserProfile, fetchUserProfile, getLocationOptions } from '../../services/userService';
+import { fetchUserCredits, updateUserProfile, fetchUserProfile, getLocationOptions } from '../../services/userService';
 import { User } from '../../models/User';
 import { Location } from '../../models/Locations';
 
@@ -65,8 +65,7 @@ const ProfilePage = () => {
       await updateUserProfile(updateData);
       setSuccessMessage('Profile updated successfully!');
       setTimeout(() => {
-        logoutUser();
-        navigate('/login');
+        setSuccessMessage('');
       }, 1500);
     } catch (error) {
       setErrorMessage('Failed to update profile. Please try again.');

@@ -13,8 +13,9 @@ import SuccessPage from './components/payment/SuccessPage';
 import CancelledPage from './components/payment/CancelledPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import ChangePasswordPage from './components/auth/ChangePasswordPage';
+import AuthGuard from './components/auth/AuthGuard';
 import { ToastContainer, notify } from './utils/notificationUtils';
-import { logoutUser } from './services/userService';
+import { invalidateToken, logoutUserLocally } from './services/userService';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!localStorage.getItem('token'));
@@ -23,7 +24,8 @@ function App() {
 
   useEffect(() => {
     const handleStorageChange = () => {
-      setIsAuthenticated(!!localStorage.getItem('token'));
+      const updatedAuthStatus = !!localStorage.getItem('token');
+      setIsAuthenticated(updatedAuthStatus);
     };
 
     window.addEventListener('storage', handleStorageChange);
@@ -50,14 +52,28 @@ function App() {
   }, [isAuthenticated]);
 
   const handleLogout = async () => {
+    let isTokenInvalid = false; // This should ideally come from the logout attempt
+
     try {
-      await logoutUser(); // No need to handle isAuthenticated or navigation here
+      // Attempt to invalidate the server-side session first
+      await invalidateToken();  // This should be an async call that might set `isTokenInvalid` based on response
     } catch (error) {
-      console.error('Error during logout:', error);
+      console.error('Logout error:', error);
       notify('Logout failed. Please try again.', 'error');
+      isTokenInvalid = true;  // Assume token is invalid if there's an error, adjust as necessary based on actual error response
+    }
+
+    // Clear local storage
+    logoutUserLocally();
+
+    if (isTokenInvalid) {
+      sessionStorage.setItem('postLogoutMessage', 'Session expired or token invalid. Please log in again.');
+      window.location.href = '/login';  // Redirect to login page
+    } else {
+      window.location.href = '/home';  // Redirect to home page
     }
   };
-  
+
   return (
     <Router>
       <div className="flex flex-col bg-gray-100 min-h-screen">
@@ -69,7 +85,7 @@ function App() {
               </svg>
             </button>
             <div className={`lg:flex flex-grow items-center ${isOpen ? 'flex' : 'hidden'}`}>
-              <Link to="/" className="text-white px-3 py-2 rounded-md text-sm font-medium">Home</Link>
+              <Link to="/home" className="text-white px-3 py-2 rounded-md text-sm font-medium">Home</Link>
               <Link to="/credits-offers" className="text-white px-3 py-2 rounded-md text-sm font-medium">Credits Offers</Link>
               {isAuthenticated && (
                 <>
@@ -99,14 +115,15 @@ function App() {
 
         <div className="flex-grow pt-8">
           <Routes>
-            <Route path="/" element={<Homepage />} />
+          <Route path="/" element={<><Homepage /></>} /> {/* This is the default route, it will render Homepage component when the path is correct */}
+          <Route path="/home" element={<AuthGuard><Homepage /></AuthGuard>} />
             <Route path="/blast" element={<ProtectedRoute isAuthenticated={isAuthenticated}><BlastPage /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute isAuthenticated={isAuthenticated}><DashboardPage /></ProtectedRoute>} />
             <Route path="/login" element={<LoginPage onLoginSuccess={() => setIsAuthenticated(true)} setIsAuthenticated={setIsAuthenticated} />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/change-password" element={<ProtectedRoute isAuthenticated={isAuthenticated}><ChangePasswordPage /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute isAuthenticated={isAuthenticated}><ProfilePage /></ProtectedRoute>} />
+            <Route path="/profile" element={<AuthGuard><ProfilePage /></AuthGuard>} />
             <Route path="/credits-offers" element={<CreditsOffersPage />} />
             <Route path="/success" element={<SuccessPage />} />
             <Route path="/cancelled" element={<CancelledPage />} />

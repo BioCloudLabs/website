@@ -76,8 +76,8 @@ class PaymentIntent(MethodView):
                     },
                 ],
                 mode='payment',
-                success_url=DOMAIN + '?success=true',
-                cancel_url=DOMAIN + '?canceled=true',
+                success_url=DOMAIN + '/success',
+                cancel_url=DOMAIN + '/cancelled',
                 automatic_tax={'enabled': True},
             )
 

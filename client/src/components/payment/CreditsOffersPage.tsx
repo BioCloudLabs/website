@@ -65,13 +65,13 @@ const CreditsOffersPage: React.FC = () => {
   return (
     <div className="credits-offers-page">
       <ToastContainer />
-      <h1 className="text-center text-3xl font-bold">Available Credit Offers</h1>
-      <div className="flex justify-center flex-wrap gap-2 mt-5">
+      <h1 className="text-center text-2xl font-bold my-2">Available Credit Offers</h1>
+      <div className="flex justify-center flex-wrap gap-x-6 gap-y-2">
         {offers.length > 0 ? (
           offers.map((offer, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-md w-64 p-5 flex flex-col items-center text-center">
+            <div key={index} className="bg-white rounded-lg shadow-lg w-64 p-2 flex flex-col items-center text-center m-2">
               <img src={offer.image} alt={offer.name} className="w-full h-auto rounded-lg mb-4" />
-              <h2 className="text-lg font-semibold text-gray-700">{offer.name}</h2>
+              <h2 className="text-lg font-semibold text-gray-500">{offer.name}</h2>
               <p className="text-gray-600">{offer.price}</p>
               <button onClick={() => handleCheckoutClick(offer.priceId, Number(offer.price))}
                       className="bg-blue-500 text-white px-4 py-2 rounded-md cursor-pointer mt-3 transition-colors duration-300 hover:bg-blue-400">Checkout</button>
@@ -83,6 +83,6 @@ const CreditsOffersPage: React.FC = () => {
       </div>
     </div>
   );
-};
-
+}
+  
 export default CreditsOffersPage;

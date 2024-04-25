@@ -130,15 +130,17 @@ export const invalidateToken = async (): Promise<void> => {
  * Logs out the user by making a call to the server to invalidate the token
  * and then handling local storage and redirection based on whether the logout
  * was due to an invalid token.
+ * @param isTokenInvalid Optional parameter to specify if the token was invalid, triggering a forced logout.
  */
 export const logoutUser = async (isTokenInvalid = false): Promise<void> => {
   try {
-    await invalidateToken();  // Invalidate server-side session first
+    await invalidateToken();  // Attempt to invalidate server-side session first
   } catch (error) {
-    console.error('Logout error:', error);
+    console.error('Logout error:', error); // Log any error that occurs during the logout process
+    notify('Logout failed. Please try again.', 'error');
   }
 
-  logoutUserLocally(); // Clear local storage
+  logoutUserLocally(); // Then clear local storage
 
   if (isTokenInvalid) {
     sessionStorage.setItem('postLogoutMessage', 'Session expired or token invalid. Please log in again.');
@@ -147,6 +149,8 @@ export const logoutUser = async (isTokenInvalid = false): Promise<void> => {
     window.location.href = '/';  // Redirect to home page
   }
 };
+
+
 
 
 
@@ -388,6 +392,11 @@ export const fetchUserCredits = async (): Promise<number | null> => {
 
     if (!response.ok) {
       throw new Error('Failed to fetch user credits');
+    }
+
+    if (!response.ok && response.status === 401) { // Using 401 is unauthorized due to invalid token
+
+      await logoutUser(true); // Log out the user if token is invalid
     }
 
     const data = await response.json();

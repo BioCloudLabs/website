@@ -5,16 +5,9 @@ import { Location } from '../models/Locations';
 import { notify } from './../utils/notificationUtils';
 
 
+
 /****************** USER UTILITY SERVICES SECTION START ******************/
 
-/**
- * Redirects the user to the login page after clearing the token and user info.
- * @param navigate - The navigate function from React Router to redirect the user.
- */
-export const redirectToLogin = (navigate: (path: string) => void) => {
-  logoutUser();  // This will clear the token and user info
-  navigate('/login');  // Use the passed navigate function
-};
 
 
 /**
@@ -51,8 +44,6 @@ export const getCurrentUser = async (): Promise<User | null> => {
 export const getCurrentUserToken = (): string | null => {
   return localStorage.getItem('token');
 };
-
-
 
 
 
@@ -104,19 +95,6 @@ export const isTokenValid = async (): Promise<boolean> => {
 
 
 
-// Add check for token expiration with a cookie to request if the token is valid
-
-export const handleApiResponse = async (response: Response, navigate: (path: string) => void) => {
-  if (!response.ok) {
-    const errorData = await response.json();
-    if (response.status === 401 && errorData.msg.includes("Token has expired")) {
-      redirectToLogin(navigate);  // Pass the navigate function
-      throw new Error("Session has expired. Please log in again.");
-    }
-    throw new Error(errorData.msg || 'There was a problem processing your request.');
-  }
-  return response.json();
-};
 
 
 /****************** TOKEN SERVICES SECTION END ******************/
@@ -155,22 +133,22 @@ export const invalidateToken = async (): Promise<void> => {
  */
 export const logoutUser = async (isTokenInvalid = false): Promise<void> => {
   try {
-    await invalidateToken();  // Attempt to invalidate server-side session first
+    await invalidateToken();  // Invalidate server-side session first
   } catch (error) {
-    console.error('Logout error:', error); // Log any error that occurs during the logout process
+    console.error('Logout error:', error);
   }
 
-  logoutUserLocally(); // Then clear local storage
+  logoutUserLocally(); // Clear local storage
 
   if (isTokenInvalid) {
     sessionStorage.setItem('postLogoutMessage', 'Session expired or token invalid. Please log in again.');
     window.location.href = '/login';  // Redirect to login page
   } else {
     window.location.href = '/';  // Redirect to home page
-
-
   }
 };
+
+
 
 
 /**
@@ -390,37 +368,6 @@ export const getLocationOptions = async (): Promise<{ id: number; display_name: 
 
 
 
-/**
- * Makes the request to change the user password on the server and handles the response.
- * @param oldPassword - The user's current password.
- * @param newPassword - The new password to set.
- */
-export const changeUserPassword = async (oldPassword: string, newPassword: string): Promise<void> => {
-
-  try {
-    const response = await fetch('/user/change-password', {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ old_password: oldPassword, new_password: newPassword }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to change password');
-    }
-
-    await response.json();  // Using await to ensure the response is read
-  } catch (error) {
-    console.error('Error changing password:', error);
-    throw error;
-  }
-};
-
-
-
 
 /****************** PROFILE SECTION END ******************/
 
@@ -457,11 +404,46 @@ export const fetchUserCredits = async (): Promise<number | null> => {
 
 
 
-/****************** API CALLS SECTION START ******************/
+/****************** FORGOT PASSWORD SECTION START ******************/
+
+/**
+ * Changes the user's password.
+ * @param {string} oldPassword - The current password of the user.
+ * @param {string} newPassword - The new password to be set.
+ * @returns {Promise<void>} - A promise that resolves when the password is changed successfully.
+ */
+export const changeUserPassword = async (oldPassword: string, newPassword: string) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+      notify('You are not logged in. Please log in to change your password.', 'error');
+      return Promise.reject(new Error('No authentication token found.'));
+  }
+
+  try {
+      const response = await fetch('/user/change-password', {
+          method: 'PUT',
+          headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ old_password: oldPassword, new_password: newPassword })
+      });
+
+      if (!response.ok) {
+          const errorData = await response.json();
+          notify(errorData.message || 'Failed to change password.', 'error');
+          return Promise.reject(new Error(errorData.message || 'Failed to change password.'));
+      }
+
+      const data = await response.json();
+      notify(data.message, 'success');
+      return Promise.resolve();
+  } catch (error) {
+      console.error('Error changing password:', error);
+      notify('An error occurred while changing your password. Please try again.', 'error');
+      return Promise.reject(error);
+  }
+};
 
 
-
-
-
-
-/****************** API CALLS SECTION END ******************/
+/****************** FORGOT PASSWORD SECTION END ******************/

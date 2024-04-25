@@ -27,7 +27,7 @@ export const handleUserCheckout = async (
   }
 };
 
-export const checkout = async (price_id: string, price: number, navigate: (path: string) => void): Promise<void> => {
+export const checkout = async (price_id: string, price: number, _navigate: (path: string) => void): Promise<void> => {
   const token = localStorage.getItem('token');
   if (!token) {
     console.error('Authentication token not found');

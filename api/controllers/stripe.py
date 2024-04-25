@@ -32,12 +32,10 @@ def getProducts():
     except Exception as e:
         return {"error": str(e)}, 503
 
-PRODUCTS = getProducts()
-
 @blp.route("/products")
 class GetProducts(MethodView):
     def get(self):
-        return PRODUCTS
+        return getProducts()
 
 @blp.route("/create-checkout-session")
 class PaymentIntent(MethodView):
@@ -48,6 +46,8 @@ class PaymentIntent(MethodView):
         user_id = get_jwt_identity() # Get the user id from the jwt
 
         credits = 0
+
+        PRODUCTS = getProducts()
 
         for i in PRODUCTS["products"]:
             if i["price"] == f"{payload['price']} €":
@@ -76,8 +76,8 @@ class PaymentIntent(MethodView):
                     },
                 ],
                 mode='payment',
-                success_url=DOMAIN + '?success=true',
-                cancel_url=DOMAIN + '?canceled=true',
+                success_url=DOMAIN + '/success',
+                cancel_url=DOMAIN + '/cancelled',
                 automatic_tax={'enabled': True},
             )
 

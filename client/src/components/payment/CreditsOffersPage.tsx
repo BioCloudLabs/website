@@ -56,7 +56,7 @@ const CreditsOffersPage: React.FC = () => {
       <div className="flex justify-center items-center h-screen">
         <div className="flex flex-col items-center">
           <h1 className="text-lg font-semibold text-blue-500 mb-4">Loading...</h1>
-          <div className="loader animate-spin rounded-full border-t-4 border-b-4 border-green-500 w-12 h-12"></div>
+          <div className="loader animate-spin rounded-full border-t-4 border-b-4 border-blue-500 w-12 h-12"></div>
         </div>
       </div>
     );
@@ -73,8 +73,11 @@ const CreditsOffersPage: React.FC = () => {
               <img src={offer.image} alt={offer.name} className="w-full h-auto rounded-lg mb-4" />
               <h2 className="text-lg font-semibold text-gray-500">{offer.name}</h2>
               <p className="text-gray-600">{offer.price}</p>
-              <button onClick={() => handleUserCheckout(offer.priceId, parseFloat(offer.price.replace('€', '').trim()).toString(), navigate, onNotAuthenticated, onSuccess, onError)}                className="bg-blue-500 text-white px-4 py-2 rounded-md cursor-pointer mt-3 transition-colors duration-300 hover:bg-blue-400">Checkout</button>
-            </div>
+              <button
+                onClick={() => handleCheckoutClick(offer.priceId, parseFloat(offer.price.replace('€', '').trim()))}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md cursor-pointer mt-3 transition-colors duration-300 hover:bg-blue-400">
+                Checkout
+              </button>            </div>
           ))
         ) : (
           <p className="text-center">No offers available at this time.</p>

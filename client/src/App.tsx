@@ -70,7 +70,7 @@ function App() {
       sessionStorage.setItem('postLogoutMessage', 'Session expired or token invalid. Please log in again.');
       window.location.href = '/login';  // Redirect to login page
     } else {
-      window.location.href = '/home';  // Redirect to home page
+      window.location.href = '/';  // Redirect to home page
     }
   };
 

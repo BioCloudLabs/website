@@ -34,15 +34,17 @@ export const checkout = async (price_id: string, price: number, _navigate: (path
     console.error('Authentication token not found');
     throw new Error('Authentication token not found');
   }
-    console.log(`Sending payload:`, { price_id, price });
+
+  // // Uncomment below for debugging to check data types before interaction 
+  // console.log(`Sending payload:`, { price_id, price });
 
   if (isNaN(price)) {
     console.error('Invalid price value:', price);
     throw new Error('Invalid price value');
   }
 
-
-  console.log(`Sending payload:`, { price_id, price });
+  // // Uncomment below for debugging to check data types after interaction
+  // console.log(`Sending payload:`, { price_id, price });
 
   const response = await fetch('/stripe/create-checkout-session', {
     method: 'POST',

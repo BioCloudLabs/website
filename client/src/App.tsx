@@ -85,7 +85,7 @@ function App() {
               </svg>
             </button>
             <div className={`lg:flex flex-grow items-center ${isOpen ? 'flex' : 'hidden'}`}>
-              <Link to="/home" className="text-white px-3 py-2 rounded-md text-sm font-medium">Home</Link>
+              <Link to="/" className="text-white px-3 py-2 rounded-md text-sm font-medium">Home</Link>
               <Link to="/credits-offers" className="text-white px-3 py-2 rounded-md text-sm font-medium">Credits Offers</Link>
               {isAuthenticated && (
                 <>

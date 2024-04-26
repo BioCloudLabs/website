@@ -5,10 +5,7 @@ import { Location } from '../models/Locations';
 import { notify } from './../utils/notificationUtils';
 
 
-
 /****************** USER UTILITY SERVICES SECTION START ******************/
-
-
 
 /**
  * Retrieves the current user from the local storage.
@@ -46,9 +43,7 @@ export const getCurrentUserToken = (): string | null => {
 };
 
 
-
 /****************** USER UTILITY SERVICES SECTION END ******************/
-
 
 /****************** TOKEN SERVICES SECTION START ******************/
 
@@ -87,19 +82,9 @@ export const isTokenValid = async (): Promise<boolean> => {
   }
 };
 
-
-
-
-
-
 /****************** TOKEN SERVICES SECTION END ******************/
 
-
-
-
 /****************** LOGOUT SECTION START ******************/
-
-
 
 /**
  * Sends a POST request to the /users/logout endpoint to log out the user.
@@ -144,11 +129,6 @@ export const logoutUser = async (isTokenInvalid = false): Promise<void> => {
     window.location.href = '/';  // Redirect to home page
   }
 };
-
-
-
-
-
 
 /**
 /**
@@ -408,7 +388,7 @@ export const fetchUserCredits = async (): Promise<number | null> => {
 
 
 
-/****************** FORGOT PASSWORD SECTION START ******************/
+/****************** CHANGE PASSWORD SECTION START ******************/
 
 /**
  * Changes the user's password.
@@ -450,4 +430,101 @@ export const changeUserPassword = async (oldPassword: string, newPassword: strin
 };
 
 
+/****************** CHANGE PASSWORD SECTION END ******************/
+
+/****************** FORGOT PASSWORD SECTION START ******************/
+
+/**
+ * Sends a recovery password email to the user's email address.
+ * @param email The email address of the user to send the recovery email.
+ * @returns A promise that resolves when the email has been sent.
+ */
+export const sendRecoverPasswordEmail = async (email: string): Promise<void> => {
+  try {
+    const response = await fetch('/user/recover-password-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      notify(errorData.message || 'Failed to send recovery email.', 'error');
+      return Promise.reject(new Error(errorData.message || 'Failed to send recovery email.'));
+    }
+
+    // const data = await response.json();
+    notify(`Email has been sent to ${email}`, 'success');
+  } catch (error) {
+    console.error('Error sending recovery email:', error);
+    notify('An error occurred while sending the recovery email. Please try again.', 'error');
+    throw error;
+  }
+};
+
+/**
+ * Validates the recovery password token received via email.
+ * @param token The token received from the URL.
+ * @returns A promise that resolves to a boolean indicating whether the token is valid.
+ */
+export const validateRecoveryToken = async (token: string): Promise<boolean> => {
+  try {
+    const response = await fetch(`/user/validate-recover-token?token=${encodeURIComponent(token)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Token validation error:', errorData.message);
+      return false;
+    }
+
+    const data = await response.json();
+    return data.isValid;
+  } catch (error) {
+    console.error('Error validating recovery token:', error);
+    return false;
+  }
+};
+
+
+
+/**
+ * Resets the password of the user using a token received in the recovery email.
+ * @param newPassword The new password that the user wants to set.
+ * @param token The token that the user received in the recovery email.
+ * @returns A promise that resolves when the password has been reset.
+ */
+export const recoverPassword = async (newPassword: string, token: string): Promise<void> => {
+  try {
+    const response = await fetch('/user/recover-password', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ password: newPassword })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      notify(errorData.message || 'Failed to reset password.', 'error');
+      return Promise.reject(new Error(errorData.message || 'Failed to reset password.'));
+    }
+
+    const data = await response.json();
+    notify(data.message, 'success');
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    notify('An error occurred while resetting your password. Please try again.', 'error');
+    throw error;
+  }
+};
+
 /****************** FORGOT PASSWORD SECTION END ******************/
+

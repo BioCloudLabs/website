@@ -16,6 +16,7 @@ import ChangePasswordPage from './components/auth/ChangePasswordPage';
 import AuthGuard from './components/auth/AuthGuard';
 import { ToastContainer, notify } from './utils/notificationUtils';
 import { invalidateToken, logoutUserLocally } from './services/userService';
+import RecoverPasswordPage from './components/auth/RecoverPassword';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!localStorage.getItem('token'));
@@ -85,7 +86,7 @@ function App() {
               </svg>
             </button>
             <div className={`lg:flex flex-grow items-center ${isOpen ? 'flex' : 'hidden'}`}>
-              <Link to="/home" className="text-white px-3 py-2 rounded-md text-sm font-medium">Home</Link>
+              <Link to="/" className="text-white px-3 py-2 rounded-md text-sm font-medium">Home</Link>
               <Link to="/credits-offers" className="text-white px-3 py-2 rounded-md text-sm font-medium">Credits Offers</Link>
               {isAuthenticated && (
                 <>
@@ -116,13 +117,13 @@ function App() {
         <div className="flex-grow pt-8">
           <Routes>
           <Route path="/" element={<><Homepage /></>} /> {/* This is the default route, it will render Homepage component when the path is correct */}
-          <Route path="/home" element={<AuthGuard><Homepage /></AuthGuard>} />
             <Route path="/blast" element={<ProtectedRoute isAuthenticated={isAuthenticated}><BlastPage /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute isAuthenticated={isAuthenticated}><DashboardPage /></ProtectedRoute>} />
             <Route path="/login" element={<LoginPage onLoginSuccess={() => setIsAuthenticated(true)} setIsAuthenticated={setIsAuthenticated} />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/change-password" element={<ProtectedRoute isAuthenticated={isAuthenticated}><ChangePasswordPage /></ProtectedRoute>} />
+            <Route path="/recover-password" element={<RecoverPasswordPage />} />
             <Route path="/profile" element={<AuthGuard><ProfilePage /></AuthGuard>} />
             <Route path="/credits-offers" element={<CreditsOffersPage />} />
             <Route path="/success" element={<ProtectedRoute isAuthenticated={isAuthenticated}><SuccessPage/> </ProtectedRoute>} />

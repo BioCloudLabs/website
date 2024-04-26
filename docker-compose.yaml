@@ -3,8 +3,6 @@ services:
   server:
     build: ./api
     ports:
-      - '5000:5000'
-  client:
-    build: ./client
-    ports:
-      - "80:5173"
+      - '443:5000'
+    env_file:
+          - api/.env

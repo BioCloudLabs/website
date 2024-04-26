@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask
 from blocklist import BLOCKLIST
 from flask_smorest import Api
 import models
@@ -11,9 +11,7 @@ from controllers.stripe import blp as StripeBlueprint
 from controllers.azuredata import blp as AzuredataBlueprint
 from dotenv import load_dotenv
 
-from mail_utils import EmailSender
-
-app: Flask = Flask(__name__)
+app: Flask = Flask(__name__, static_folder="dist", static_url_path="/")
 
 load_dotenv()
 
@@ -159,3 +157,7 @@ with app.app_context():
     
     # # Commit the changes to persist them in the database
     # db.session.commit()
+
+@app.route('/')
+def home():
+   return app.send_static_file('index.html')

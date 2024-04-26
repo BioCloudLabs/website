@@ -70,7 +70,7 @@ function App() {
       sessionStorage.setItem('postLogoutMessage', 'Session expired or token invalid. Please log in again.');
       window.location.href = '/login';  // Redirect to login page
     } else {
-      window.location.href = '/home';  // Redirect to home page
+      window.location.href = '/';  // Redirect to home page
     }
   };
 
@@ -125,8 +125,8 @@ function App() {
             <Route path="/change-password" element={<ProtectedRoute isAuthenticated={isAuthenticated}><ChangePasswordPage /></ProtectedRoute>} />
             <Route path="/profile" element={<AuthGuard><ProfilePage /></AuthGuard>} />
             <Route path="/credits-offers" element={<CreditsOffersPage />} />
-            <Route path="/success" element={<SuccessPage />} />
-            <Route path="/cancelled" element={<CancelledPage />} />
+            <Route path="/success" element={<ProtectedRoute isAuthenticated={isAuthenticated}><SuccessPage/> </ProtectedRoute>} />
+            <Route path="/cancelled" element={<ProtectedRoute isAuthenticated={isAuthenticated}><CancelledPage/> </ProtectedRoute>} />
           </Routes>
         </div>
       </div>

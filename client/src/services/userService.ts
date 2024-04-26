@@ -62,11 +62,6 @@ export const getCurrentUserToken = (): string | null => {
  */
 export const isTokenValid = async (): Promise<boolean> => {
   const token = localStorage.getItem('token');
-  if (!token) {
-    notify('No token found. Please log in.', 'error');
-    logoutUser();
-    return false;
-  }
 
   try {
     const response = await fetch('/user/validate-token', {

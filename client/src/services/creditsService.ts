@@ -13,6 +13,7 @@ export const handleUserCheckout = async (
 
   // Convert price to a number
   const numericPrice = parseFloat(price.replace('€', '').trim());
+  
 
   try {
     await checkout(priceId, numericPrice, navigate);
@@ -33,6 +34,13 @@ export const checkout = async (price_id: string, price: number, _navigate: (path
     console.error('Authentication token not found');
     throw new Error('Authentication token not found');
   }
+    console.log(`Sending payload:`, { price_id, price });
+
+  if (isNaN(price)) {
+    console.error('Invalid price value:', price);
+    throw new Error('Invalid price value');
+  }
+
 
   console.log(`Sending payload:`, { price_id, price });
 

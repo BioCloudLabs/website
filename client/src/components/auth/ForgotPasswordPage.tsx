@@ -1,15 +1,29 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { sendRecoverPasswordEmail } from './../../services/userService'; // Ensure this import path matches the location of your userService
 
 function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    // console.log('Password reset request for:', email);
-    setMessage('If your account exists, a reset link is on its way. Please check your email inbox.');
+    setLoading(true);
+    setError('');
+    setMessage('');
+
+    try {
+      await sendRecoverPasswordEmail(email);
+      setMessage('If your account exists, a reset link is on its way. Please check your email inbox.');
+    } catch (error) {
+      setError('Failed to send reset instructions. Please try again.'); // It's critical to handle errors explicitly
+      console.error('Error sending password reset email:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -28,10 +42,11 @@ function ForgotPasswordPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                disabled={loading}
               />
             </div>
-            <button type="submit" className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-              Send Reset Instructions
+            <button type="submit" disabled={loading} className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              {loading ? 'Sending...' : 'Send Reset Instructions'}
             </button>
           </form>
           <button
@@ -45,6 +60,11 @@ function ForgotPasswordPage() {
         {message && (
           <div className="text-sm text-green-600 bg-green-100 border-l-4 border-green-500 p-4 rounded-md shadow-lg mt-4 w-full max-w-md text-center">
             {message}
+          </div>
+        )}
+        {error && (
+          <div className="text-sm text-red-600 bg-red-100 border-l-4 border-red-500 p-4 rounded-md shadow-lg mt-4 w-full max-w-md text-center">
+            {error}
           </div>
         )}
       </div>

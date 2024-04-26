@@ -125,8 +125,8 @@ function App() {
             <Route path="/change-password" element={<ProtectedRoute isAuthenticated={isAuthenticated}><ChangePasswordPage /></ProtectedRoute>} />
             <Route path="/profile" element={<AuthGuard><ProfilePage /></AuthGuard>} />
             <Route path="/credits-offers" element={<CreditsOffersPage />} />
-            <Route path="/success" element={<SuccessPage />} />
-            <Route path="/cancelled" element={<CancelledPage />} />
+            <Route path="/success" element={<ProtectedRoute isAuthenticated={isAuthenticated}><SuccessPage/> </ProtectedRoute>} />
+            <Route path="/cancelled" element={<ProtectedRoute isAuthenticated={isAuthenticated}><CancelledPage/> </ProtectedRoute>} />
           </Routes>
         </div>
       </div>

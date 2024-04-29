@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
 import Homepage from './components/common/Homepage';
-import BlastPage from './components/common/BlastPage';
+import JobRequest from './components/blast/JobRequest';
 import DashboardPage from './components/common/DashboardPage';
 import LoginPage from './components/auth/LoginPage';
 import RegisterPage from './components/auth/RegisterPage';
@@ -92,7 +92,7 @@ function App() {
                 <>
                   <Link to="/profile" className="text-white px-3 py-2 rounded-md text-sm font-medium">Profile</Link>
                   <Link to="/dashboard" className="text-white px-3 py-2 rounded-md text-sm font-medium">Dashboard</Link>
-                  <Link to="/blast" className="text-white px-3 py-2 rounded-md text-sm font-medium">BLAST</Link>
+                  <Link to="/blast" className="text-white px-3 py-2 rounded-md text-sm font-medium">Request VM</Link>
                 </>
               )}
             </div>
@@ -117,7 +117,7 @@ function App() {
         <div className="flex-grow pt-8">
           <Routes>
           <Route path="/" element={<><Homepage /></>} /> {/* This is the default route, it will render Homepage component when the path is correct */}
-            <Route path="/blast" element={<ProtectedRoute isAuthenticated={isAuthenticated}><BlastPage /></ProtectedRoute>} />
+            <Route path="/blast" element={<ProtectedRoute isAuthenticated={isAuthenticated}><JobRequest /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute isAuthenticated={isAuthenticated}><DashboardPage /></ProtectedRoute>} />
             <Route path="/login" element={<LoginPage onLoginSuccess={() => setIsAuthenticated(true)} setIsAuthenticated={setIsAuthenticated} />} />
             <Route path="/register" element={<RegisterPage />} />

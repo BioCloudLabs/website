@@ -296,12 +296,6 @@ export const updateUserProfile = async (user: User): Promise<void> => {
       body: JSON.stringify({ name, surname, location_id }),
     });
 
-    if (!response.ok) {
-      isTokenValid(); // Check if the token is valid before proceeding
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to update profile');
-    }
-
     // Uncomment the lines below to log the response data
 
     // const responseData = await response.json();
@@ -451,55 +445,19 @@ export const sendRecoverPasswordEmail = async (email: string): Promise<void> => 
 
     if (!response.ok) {
       const errorData = await response.json();
-      notify(errorData.message || 'Failed to send recovery email.', 'error');
-      return Promise.reject(new Error(errorData.message || 'Failed to send recovery email.'));
+      throw new Error(errorData.message || 'Failed to send recovery email.');
     }
 
-    // const data = await response.json();
-    notify(`Email has been sent to ${email}`, 'success');
+    notify(`Email has been sent to ${email}. Check your inbox for further instructions.`, 'success');
   } catch (error) {
     console.error('Error sending recovery email:', error);
-    notify('An error occurred while sending the recovery email. Please try again.', 'error');
+    notify(error.message || 'An error occurred while sending the recovery email. Please try again.', 'error');
     throw error;
   }
 };
 
-/**
- * Validates the recovery password token received via email.
- * @param token The token received from the URL.
- * @returns A promise that resolves to a boolean indicating whether the token is valid.
- */
-export const validateRecoveryToken = async (token: string): Promise<boolean> => {
-  try {
-    const response = await fetch(`/user/validate-recover-token?token=${encodeURIComponent(token)}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Token validation error:', errorData.message);
-      return false;
-    }
-
-    const data = await response.json();
-    return data.isValid;
-  } catch (error) {
-    console.error('Error validating recovery token:', error);
-    return false;
-  }
-};
 
 
-
-/**
- * Resets the password of the user using a token received in the recovery email.
- * @param newPassword The new password that the user wants to set.
- * @param token The token that the user received in the recovery email.
- * @returns A promise that resolves when the password has been reset.
- */
 export const recoverPassword = async (newPassword: string, token: string): Promise<void> => {
   try {
     const response = await fetch('/user/recover-password', {
@@ -513,18 +471,35 @@ export const recoverPassword = async (newPassword: string, token: string): Promi
 
     if (!response.ok) {
       const errorData = await response.json();
-      notify(errorData.message || 'Failed to reset password.', 'error');
-      return Promise.reject(new Error(errorData.message || 'Failed to reset password.'));
+      // Handling more specific errors based on backend response
+      switch (errorData.code) {
+        case 409: // Specific error when new password is the same as the old one
+          const message409 = errorData.message || "New password is the same as the old one.";
+          notify(message409, 'error');
+          throw new Error(message409); // Throw to exit and handle in the catch block without notifying again
+        case 401: // Token expiry could also be handled here
+          const message401 = 'The token has expired. Please request a new password reset.';
+          notify(message401, 'error');
+          throw new Error(message401); // Throw to exit and handle in the catch block without notifying again
+        default:
+          // Generic error handling
+          throw new Error(errorData.message || 'Failed to reset password.');
+      }
     }
 
     const data = await response.json();
-    notify(data.message, 'success');
-  } catch (error) {
+    notify(data.message || 'Your password has been successfully reset.', 'success');
+  } catch (error: unknown) {
     console.error('Error resetting password:', error);
-    notify('An error occurred while resetting your password. Please try again.', 'error');
-    throw error;
+    if (!(error instanceof Error && (error.message === "New password is the same as the old one." || error.message === "The token has expired. Please request a new password reset."))) {
+      // Only notify if not already handled specifically
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred while resetting your password. Please try again.';
+      notify(errorMessage, 'error');
+    }
+    throw error; // Re-throw to allow further handling if necessary
   }
 };
+
 
 /****************** FORGOT PASSWORD SECTION END ******************/
 

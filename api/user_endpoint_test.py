@@ -301,3 +301,22 @@ def test_logout_correct(client, auth_token):
     assert response.status_code == 200
     assert response.json['message'] == "Successfully logged out"
 
+# Test recover password email endpoint when everything it's correct
+def test_recover_password_email_correct(client):
+    response = client.post('/user/recover-password-email', json={"email": "test@example.com"})
+    assert response.status_code == 201
+    assert "message" in response.json
+
+# Test recover password email endpoint when email format isn't correct
+def test_recover_password_email_wrong_format(client):
+    response = client.post('/user/recover-password-email', json={"email": "test@example"})
+    print(response.json)
+    assert response.status_code == 422
+    assert "email" in response.json["errors"]["json"]
+
+# Test recover password email endpoint when email not in the POST request
+def test_recover_password_email_missing_data(client):
+    response = client.post('/user/recover-password-email')
+    print(response.json)
+    assert response.status_code == 422
+    assert "email" in response.json["errors"]["json"]

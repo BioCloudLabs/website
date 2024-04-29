@@ -449,11 +449,15 @@ export const sendRecoverPasswordEmail = async (email: string): Promise<void> => 
     }
 
     notify(`Email has been sent to ${email}. Check your inbox for further instructions.`, 'success');
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error sending recovery email:', error);
-    notify(error.message || 'An error occurred while sending the recovery email. Please try again.', 'error');
+    if (error instanceof Error) {
+        notify(error.message || 'An error occurred while sending the recovery email. Please try again.', 'error');
+    } else {
+        notify('An error occurred while sending the recovery email. Please try again.', 'error');
+    }
     throw error;
-  }
+}
 };
 
 
@@ -475,15 +479,19 @@ export const recoverPassword = async (newPassword: string, token: string): Promi
       switch (errorData.code) {
         case 409: // Specific error when new password is the same as the old one
           const message409 = errorData.message || "New password is the same as the old one.";
-          notify(message409, 'error');
+          notify(message409, 'error', 5000);
           throw new Error(message409); // Throw to exit and handle in the catch block without notifying again
         case 401: // Token expiry could also be handled here
           const message401 = 'The token has expired. Please request a new password reset.';
-          notify(message401, 'error');
+          notify(message401, 'error', 5000);
           throw new Error(message401); // Throw to exit and handle in the catch block without notifying again
+        case 422: // Token expiry could also be handled here
+          const message422 = 'The token has expired. Please request a new password reset.';
+          notify(message422, 'error', 5000);
+          throw new Error(message422); // Throw to exit and handle in the catch block without notifying again
         default:
           // Generic error handling
-          throw new Error(errorData.message || 'Failed to reset password.');
+          throw new Error(errorData.message || 'Failed to reset password. Please try again.');
       }
     }
 

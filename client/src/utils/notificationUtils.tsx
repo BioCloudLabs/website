@@ -1,47 +1,41 @@
 import { toast, ToastContainer, ToastPosition } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// Common toast options that will be used for all types of toasts
-const commonOptions = {
-  position: 'top-center' as ToastPosition,
-  autoClose: 2000,
-  hideProgressBar: false,
-  closeOnClick: true,
-  pauseOnHover: true,
-  draggable: true,
-  theme: "colored", // Use "colored" for vibrant styles
-};
-
-// Custom toast styles for different types
-const toastTypeStyles = {
-  info: 'bg-purple-600 text-white',
-  success: 'bg-green-600 text-white',
-  error: 'bg-red-600 text-white',
-  warning: 'bg-yellow-600 text-white',
-  default: 'bg-blue-600 text-white',
-};
-
-// Generic notify function to display toast notifications with different styles
-export const notify = (message: string, type: 'info' | 'success' | 'error' | 'warning' | 'default' = 'default') => {
+/**
+ * Displays a notification with configurable auto-close timing.
+ * 
+ * @param message The message to be displayed in the notification.
+ * @param type The type of notification ('error', 'success', etc.).
+ * @param timeout Duration in milliseconds before the notification auto-closes. 
+ *                If not provided, defaults to 5000 milliseconds.
+ */
+export const notify = (message: string, type: 'info' | 'success' | 'error' | 'warning' | 'default' = 'default', timeout: number = 2000) => {
   const options = {
-    ...commonOptions,
-    className: `${toastTypeStyles[type]} rounded-lg px-6 py-4 shadow-lg max-w-md mx-auto`
+    position: "top-center" as ToastPosition,
+    autoClose: timeout,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    theme: "colored",
+    progress: undefined,
   };
+
   switch (type) {
-    case 'info':
-      toast.info(message, options);
+    case 'error':
+      toast.error(message, options);
       break;
     case 'success':
       toast.success(message, options);
       break;
-    case 'error':
-      toast.error(message, options);
+    case 'info':
+      toast.info(message, options);
       break;
     case 'warning':
       toast.warn(message, options);
       break;
     default:
-      toast(message, options); // Default case for generic messages without specific styling
+      toast(message, options); // Default toast with no type specified
       break;
   }
 };

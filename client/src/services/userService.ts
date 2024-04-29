@@ -122,7 +122,7 @@ export const logoutUser = async (isTokenInvalid = false): Promise<void> => {
 
   logoutUserLocally(); // Then clear local storage
 
-  if (isTokenInvalid) {
+  if (isTokenInvalid) { // If at this point the token was found invalid, redirect to login page
     sessionStorage.setItem('postLogoutMessage', 'Session expired or token invalid. Please log in again.');
     window.location.href = '/login';  // Redirect to login page
   } else {

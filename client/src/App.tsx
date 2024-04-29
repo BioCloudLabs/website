@@ -123,7 +123,7 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/change-password" element={<ProtectedRoute isAuthenticated={isAuthenticated}><ChangePasswordPage /></ProtectedRoute>} />
-            <Route path="/recover-password" element={<RecoverPasswordPage />} />
+            <Route path="/recoverpassword" element={<RecoverPasswordPage />} />
             <Route path="/profile" element={<AuthGuard><ProfilePage /></AuthGuard>} />
             <Route path="/credits-offers" element={<CreditsOffersPage />} />
             <Route path="/success" element={<ProtectedRoute isAuthenticated={isAuthenticated}><SuccessPage/> </ProtectedRoute>} />

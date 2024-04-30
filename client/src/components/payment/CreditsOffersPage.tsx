@@ -70,7 +70,7 @@ const CreditsOffersPage: React.FC = () => {
         {offers.length > 0 ? (
           offers.map((offer, index) => (
             <div key={index} className="bg-white rounded-lg shadow-lg w-64 p-2 flex flex-col items-center text-center m-2">
-              <img src={offer.image} alt={offer.name} className="w-full h-auto rounded-lg mb-4" />
+              <img src={offer.image} alt="Offer Image" className="w-full h-auto rounded-lg mb-4" />
               <h2 className="text-lg font-semibold text-gray-500">{offer.name}</h2>
               <p className="text-gray-600">{offer.price}</p>
               <button

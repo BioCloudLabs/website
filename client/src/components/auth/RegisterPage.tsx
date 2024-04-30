@@ -13,6 +13,8 @@ function RegisterPage() {
     const [locations, setLocations] = useState<Location[]>([]);
     const [registrationError, setRegistrationError] = useState('');
     const navigate = useNavigate();
+    const [showTooltip, setShowTooltip] = useState(false);
+
 
     useEffect(() => {
         const fetchLocations = async () => {
@@ -67,18 +69,28 @@ function RegisterPage() {
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                             />
                         </div>
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                            />
-                        </div>
+                        <div className="relative">
+    <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+    <input
+        type="password"
+        id="password"
+        name="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+        aria-describedby="password-info"
+    />
+    <div className="absolute right-0 top-0 mt-8 mr-3">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-gray-400 cursor-pointer" onMouseEnter={() => setShowTooltip(true)} onMouseLeave={() => setShowTooltip(false)}>
+            <path fillRule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7-4a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM9 9a.75.75 0 0 0 0 1.5h.253a.25.25 0 0 1 .244.304l-.459 2.066A1.75 1.75 0 0 0 10.747 15H11a.75.75 0 0 0 0-1.5h-.253a.25.25 0 0 1-.244-.304l.459-2.066A1.75 1.75 0 0 0 9.253 9H9Z" clipRule="evenodd" />
+        </svg>
+    </div>
+    <div id="password-info" className="absolute z-10 w-64 p-2 text-sm text-gray-100 bg-gray-900 rounded-md shadow-lg" style={{ display: showTooltip ? 'block' : 'none', right: '0', top: '2.5rem' }}>
+        Password must be at least 8 characters including 1 uppercase, 1 lowercase, and 1 special character.
+    </div>
+</div>
+
                         <div>
                             <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
                             <input

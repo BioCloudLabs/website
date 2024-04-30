@@ -9,6 +9,9 @@ export default defineConfig({
     port: 5173,
     strictPort: true
   },
+  optimizeDeps: {
+    exclude: ['package-name']
+  },
   server: {
     port: 5173,
     strictPort: true,

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registerUser, getLocationOptions } from '../../services/userService';
+import { registerUser, getLocationOptions, validatePassword } from '../../services/userService';
 import { Location } from '../../models/Locations';
 import { notify } from '../../utils/notificationUtils';
 
@@ -12,8 +12,21 @@ function RegisterPage() {
     const [location_id, setLocationId] = useState('');
     const [locations, setLocations] = useState<Location[]>([]);
     const [registrationError, setRegistrationError] = useState('');
-    const navigate = useNavigate();
     const [showTooltip, setShowTooltip] = useState(false);
+    const [isFormValid, setIsFormValid] = useState(false);
+    const [passwordError, setPasswordError] = useState('');
+    const [passwordTouched, setPasswordTouched] = useState(false);
+    const navigate = useNavigate();
+
+
+
+    useEffect(() => {
+        const { isValid, errorMessage } = validatePassword(password);
+        setPasswordError(errorMessage); // Display password validation error
+        setIsFormValid(isValid && !!email && !!name && !!surname && !!location_id); // Update form validity
+    }, [email, password, name, surname, location_id]);
+
+
 
 
     useEffect(() => {
@@ -32,22 +45,33 @@ function RegisterPage() {
         fetchLocations();
     }, []);
 
+    const handlePasswordBlur = () => {
+        setPasswordTouched(true);  // Set the touched flag when the field is blurred
+        const { isValid, errorMessage } = validatePassword(password);
+        if (!isValid) {
+            setPasswordError(errorMessage);
+        } else {
+            setPasswordError(''); // Clear the error if the password is valid
+        }
+    };
+
+
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        setRegistrationError('');  // Clear previous errors
-        try {
-            const response = await registerUser({
-                email, password, name, surname, location_id: parseInt(location_id)
-            });
+        if (!isFormValid) {
+            notify('Please ensure all fields are filled out correctly.', 'error');
+            return;
+        }
 
-            if (response) {
+        try {
+            const success = await registerUser({ email, password, name, surname, location_id: parseInt(location_id) });
+            if (success) {
                 notify('Registration successful! Redirecting to login page.', 'success');
-                // Notify the user that the registration was successful
-                setTimeout(() => navigate('/login'), 3000); // Redirect to login after a delay
+                setTimeout(() => navigate('/login'), 3000);
             }
-        } catch (error: any) {
-            setRegistrationError(error.message || 'Registration failed. Please try again.');
-            // For errors, its better to keep the message static
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Registration failed. Please try again.';
+            setRegistrationError(errorMessage);
         }
     };
 
@@ -56,7 +80,9 @@ function RegisterPage() {
             <div className="w-full max-w-md">
                 <h1 className="text-3xl font-bold text-center mb-6">Register</h1>
                 <div className="bg-white p-8 rounded-lg shadow-md">
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form autoComplete="off" onSubmit={handleSubmit} className="space-y-6">
+                        <input autoComplete="false" name="hidden" type="text" style={{ display: 'none' }} />
+
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
                             <input
@@ -66,30 +92,41 @@ function RegisterPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
+                                autoComplete="off"
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                             />
                         </div>
                         <div className="relative">
-    <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-    <input
-        type="password"
-        id="password"
-        name="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-        aria-describedby="password-info"
-    />
-    <div className="absolute right-0 top-0 mt-8 mr-3">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-gray-400 cursor-pointer" onMouseEnter={() => setShowTooltip(true)} onMouseLeave={() => setShowTooltip(false)}>
-            <path fillRule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7-4a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM9 9a.75.75 0 0 0 0 1.5h.253a.25.25 0 0 1 .244.304l-.459 2.066A1.75 1.75 0 0 0 10.747 15H11a.75.75 0 0 0 0-1.5h-.253a.25.25 0 0 1-.244-.304l.459-2.066A1.75 1.75 0 0 0 9.253 9H9Z" clipRule="evenodd" />
-        </svg>
-    </div>
-    <div id="password-info" className="absolute z-10 w-64 p-2 text-sm text-gray-100 bg-gray-900 rounded-md shadow-lg" style={{ display: showTooltip ? 'block' : 'none', right: '0', top: '2.5rem' }}>
-        Password must be at least 8 characters including 1 uppercase, 1 lowercase, and 1 special character.
-    </div>
-</div>
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+                            <div className="flex items-center">
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    autoComplete="off"
+                                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                    aria-describedby="password-info"
+                                    onBlur={handlePasswordBlur}  // Validate password onBlur when leaving field
+                                />
+
+                                {passwordTouched && passwordError && (
+                                    <div className="text-sm text-red-500 mt-2">{passwordError}</div>
+                                )}
+                                <div className="ml-2 relative">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-gray-400 cursor-pointer" onMouseEnter={() => setShowTooltip(true)} onMouseLeave={() => setShowTooltip(false)}>
+                                        <path fillRule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7-4a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM9 9a.75.75 0 0 0 0 1.5h.253a.25.25 0 0 1 .244.304l-.459 2.066A1.75 1.75 0 0 0 10.747 15H11 a.75.75 0 0 0 0-1.5h-.253a.25.25 0 0 1-.244-.304l.459-2.066A1.75 1.75 0 0 0 9.253 9H9Z" clipRule="evenodd" />
+                                    </svg>
+                                    <div id="password-info" className="absolute z-10 w-64 p-2 text-sm text-gray-100 bg-gray-900 rounded-md shadow-lg" style={{ display: showTooltip ? 'block' : 'none', left: '100%', top: '0', marginLeft: '10px' }}>
+                                        Password must be at least 8 characters including 1 uppercase, 1 lowercase, and 1 special character.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
 
                         <div>
                             <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>

@@ -184,45 +184,37 @@ export const registerUser = async (userDetails: RegistrationForm): Promise<boole
 
 /****************** LOGIN SECTION START ******************/
 
-  export const loginUser = async (email: string, password: string): Promise<LoginResponse | null> => {
-    try {
-      const response = await fetch('/user/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+export const loginUser = async (email: string, password: string): Promise<LoginResponse | null> => {
+  try {
+    const response = await fetch('/user/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
-      }
-
-      const data: LoginResponse = await response.json();
-
-      // Store the token in localStorage
-      localStorage.setItem('token', data.access_token);
-
-      // Fetch user credits and profile
-      const credits = await fetchUserCredits();
-      const userProfile = await fetchUserProfile();
-
-      if (credits !== null && userProfile !== null) {
-        // Store the user credits and profile in localStorage
-        localStorage.setItem('userCredits', credits.toString());
-        localStorage.setItem('userProfile', JSON.stringify(userProfile));
-      } else {
-        console.error('Failed to fetch user credits or profile');
-      }
-
-      // Redirect to home or wherever you need to go after login
-      // You can use React Router's history object to navigate programmatically
-
-      return data;
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error; // Re-throw the error with the message from the server
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Login failed');
     }
-  };
+
+    const data: LoginResponse = await response.json();
+    localStorage.setItem('token', data.access_token);
+
+    const credits = await fetchUserCredits(); // Fetch and update local storage and state
+    if (credits !== null) {
+      localStorage.setItem('userCredits', credits.toString());
+    } else {
+      console.error('Failed to fetch user credits');
+    }
+
+    // Redirect to home or wherever needed
+    return data;
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
+  }
+};
+
 
 
 /****************** LOGIN SECTION END ******************/
@@ -312,7 +304,7 @@ export const updateUserProfile = async (user: User): Promise<void> => {
  * Fetches location options from the server and transforms them into the format required by the frontend.
  * @returns A Promise that resolves to an array of location objects containing id and display_name.
  */
-export const getLocationOptions = async (): Promise<{ id: number; display_name: string, name: string }[]> => {  
+export const getLocationOptions = async (): Promise<{ id: number; display_name: string, name: string }[]> => {
 
   try {
     const response = await fetch('/azuredata/locations', {
@@ -348,8 +340,6 @@ export const getLocationOptions = async (): Promise<{ id: number; display_name: 
 /****************** USER CREDITS SECTION START ******************/
 
 export const fetchUserCredits = async (): Promise<number | null> => {
-  
-
   try {
     const response = await fetch('/user/credits', {
       method: 'GET',
@@ -363,13 +353,10 @@ export const fetchUserCredits = async (): Promise<number | null> => {
       throw new Error('Failed to fetch user credits');
     }
 
-    if (!response.ok && response.status === 401) { // Using 401 is unauthorized due to invalid token
-
-      await logoutUser(true); // Log out the user if token is invalid
-    }
-
     const data = await response.json();
-    return data.credits;
+
+    localStorage.setItem('userCredits', data.credits.toString()); // Update localStorage with the latest credits
+    return data.credits; // Return the latest credits
   } catch (error) {
     console.error('Error fetching user credits:', error);
     throw error;
@@ -393,33 +380,33 @@ export const fetchUserCredits = async (): Promise<number | null> => {
 export const changeUserPassword = async (oldPassword: string, newPassword: string) => {
   const token = localStorage.getItem('token');
   if (!token) {
-      notify('You are not logged in. Please log in to change your password.', 'error');
-      return Promise.reject(new Error('No authentication token found.'));
+    notify('You are not logged in. Please log in to change your password.', 'error');
+    return Promise.reject(new Error('No authentication token found.'));
   }
 
   try {
-      const response = await fetch('/user/change-password', {
-          method: 'PUT',
-          headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ old_password: oldPassword, new_password: newPassword })
-      });
+    const response = await fetch('/user/change-password', {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ old_password: oldPassword, new_password: newPassword })
+    });
 
-      if (!response.ok) {
-          const errorData = await response.json();
-          notify(errorData.message || 'Failed to change password.', 'error');
-          return Promise.reject(new Error(errorData.message || 'Failed to change password.'));
-      }
+    if (!response.ok) {
+      const errorData = await response.json();
+      notify(errorData.message || 'Failed to change password.', 'error');
+      return Promise.reject(new Error(errorData.message || 'Failed to change password.'));
+    }
 
-      const data = await response.json();
-      notify(data.message, 'success');
-      return Promise.resolve();
+    const data = await response.json();
+    notify(data.message, 'success');
+    return Promise.resolve();
   } catch (error) {
-      console.error('Error changing password:', error);
-      notify('An error occurred while changing your password. Please try again.', 'error');
-      return Promise.reject(error);
+    console.error('Error changing password:', error);
+    notify('An error occurred while changing your password. Please try again.', 'error');
+    return Promise.reject(error);
   }
 };
 
@@ -452,12 +439,12 @@ export const sendRecoverPasswordEmail = async (email: string): Promise<void> => 
   } catch (error: unknown) {
     console.error('Error sending recovery email:', error);
     if (error instanceof Error) {
-        notify(error.message || 'An error occurred while sending the recovery email. Please try again.', 'error');
+      notify(error.message || 'An error occurred while sending the recovery email. Please try again.', 'error');
     } else {
-        notify('An error occurred while sending the recovery email. Please try again.', 'error');
+      notify('An error occurred while sending the recovery email. Please try again.', 'error');
     }
     throw error;
-}
+  }
 };
 
 

@@ -17,6 +17,7 @@ import AuthGuard from './components/auth/AuthGuard';
 import { ToastContainer, notify } from './utils/notificationUtils';
 import { invalidateToken, logoutUserLocally } from './services/userService';
 import RecoverPasswordPage from './components/auth/RecoverPassword';
+import { fetchUserCredits } from './services/userService';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!localStorage.getItem('token'));
@@ -44,13 +45,26 @@ function App() {
   }, []);
 
   useEffect(() => {
+    const handleCreditsUpdate = async () => {
+      const updatedCredits = await fetchUserCredits();
+      setUserCredits(updatedCredits);
+    };
+  
     if (isAuthenticated) {
-      const credits = localStorage.getItem('userCredits');
-      setUserCredits(credits ? parseInt(credits, 10) : null);
+      handleCreditsUpdate();
     } else {
       setUserCredits(null);
     }
+  
+    // Adding an event listener for localStorage changes
+    window.addEventListener('storage', handleCreditsUpdate);
+  
+    return () => {
+      // Clean up the event listener when the component unmounts
+      window.removeEventListener('storage', handleCreditsUpdate);
+    };
   }, [isAuthenticated]);
+  
 
   const handleLogout = async () => {
     let isTokenInvalid = false; // This should ideally come from the logout attempt

@@ -148,10 +148,9 @@ export const logoutUserLocally = (): void => {
 /****************** REGISTER SECTION START ******************/
 
 /**
- * Registers a new user with the provided details.
- * @param userDetails - An object containing user details like email, password, name, etc.
- * @returns A Promise that resolves to a boolean indicating whether the registration was successful.
- * If registration fails, throws an error with the backend message.
+ * Attempts to register a new user with the provided user details.
+ * @param userDetails An object containing the user's registration information.
+ * @returns A promise that resolves to true if registration is successful, or throws an error if not.
  */
 export const registerUser = async (userDetails: RegistrationForm): Promise<boolean> => {
   try {
@@ -161,22 +160,53 @@ export const registerUser = async (userDetails: RegistrationForm): Promise<boole
       body: JSON.stringify(userDetails),
     });
 
-    const data = await response.json(); // Parse JSON regardless of the response status
+    const data = await response.json() as { errors?: { json?: Record<string, string[]> }, message?: string };
 
     if (!response.ok) {
-      // Check if there are detailed field errors to be displayed
-      if (data.errors && data.errors.json) {
-        const fieldErrors = Object.entries(data.errors.json).map(([key, val]) => `${key}: ${(val as string[]).join(', ')}`).join('\n');
-        throw new Error(fieldErrors || 'Registration failed. Please try again.');
+      if (response.status === 422 && data.errors && data.errors.json) {
+        const fieldErrors = Object.entries(data.errors.json)
+          .map(([field, errors]) => `${capitalizeFirstLetter(field)}: ${errors.join(', ')}.`)
+          .join(' ');
+        notify(fieldErrors || 'Invalid input data provided.', 'error', 7000);
+        throw new Error(fieldErrors);
+      } else if (response.status === 409) {
+        notify(data.message || "Username already exists.", 'error', 7000);
+        throw new Error(data.message || "Username already exists.");
+      } else {
+        notify(data.message || 'Registration failed. Please try again.', 'error', 7000);
+        throw new Error(data.message || 'Registration failed. Please try again.');
       }
-      throw new Error(data.message || 'Registration failed. Please try again.');
     }
 
-    return true; // Indicate success
-  } catch (error: any) {
-    console.error('Registration error:', error.message);
-    throw new Error(error.message); // Re-throwing to be handled by the calling component
+    notify(data.message || 'User created successfully.', 'success', 5000);
+    return true;
+  } catch (error) {
+    console.error('Registration error:', error);
+    throw error;
   }
+};
+
+function capitalizeFirstLetter(string: string): string {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+
+export const validatePassword = (password: string) => {
+  const minLength = password.length >= 8;
+  const hasUpper = /[A-Z]/.test(password);
+  const hasLower = /[a-z]/.test(password);
+  const hasSpecial = /[!@#$%^&*]/.test(password);
+
+  let errorMessage = '';
+  if (!minLength) errorMessage += 'Password must be at least 8 characters long. ';
+  if (!hasUpper) errorMessage += 'Include at least one uppercase letter. ';
+  if (!hasLower) errorMessage += 'Include at least one lowercase letter. ';
+  if (!hasSpecial) errorMessage += 'Include at least one special character. ';
+
+  return {
+      isValid: minLength && hasUpper && hasLower && hasSpecial,
+      errorMessage
+  };
 };
 
 

@@ -1,3 +1,8 @@
+/* 
+    The following directives import tailwind and inject the tailwind
+   styles into the app. Do not modify this file.
+*/
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

@@ -1,6 +1,16 @@
 import { Offer } from '../models/Offer';
 import { getCurrentUserToken } from './userService';
 
+/**
+ * Function to handle the user checkout process.
+ * @param priceId 
+ * @param price 
+ * @param navigate 
+ * @param onNotAuthenticated 
+ * @param onSuccess 
+ * @param onError 
+ * @returns  A promise that resolves to an array of Offer objects.
+ */
 export const handleUserCheckout = async (
   priceId: string, price: string, navigate: (path: string) => void,
   onNotAuthenticated: () => void, onSuccess: () => void, onError: (error: string) => void
@@ -13,8 +23,11 @@ export const handleUserCheckout = async (
 
   // Convert price to a number
   const numericPrice = parseFloat(price.replace('€', '').trim());
-  
-
+  if (isNaN(numericPrice)) {
+    console.error('Invalid price value:', price);
+    onError('Invalid price value');
+    return;
+  }
   try {
     await checkout(priceId, numericPrice, navigate);
     onSuccess();
@@ -28,6 +41,12 @@ export const handleUserCheckout = async (
   }
 };
 
+/**
+ * Function to initiate the checkout process.
+ * @param price_id The price ID of the product.
+ * @param price The price of the product.
+ * @param _navigate The navigate function from the router.
+ */
 export const checkout = async (price_id: string, price: number, _navigate: (path: string) => void): Promise<void> => {
   const token = localStorage.getItem('token');
   if (!token) {
@@ -71,6 +90,8 @@ export const checkout = async (price_id: string, price: number, _navigate: (path
 
 /**
  * Function to fetch products from the backend.
+ * @returns A promise that resolves to an array of Offer objects.
+ * @throws An error if the fetch operation fails.
  */
 export const fetchProducts = async (): Promise<Offer[]> => {
   try {

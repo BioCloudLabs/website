@@ -189,6 +189,11 @@ function capitalizeFirstLetter(string: string): string {
 }
 
 
+/**
+ * Validates a password based on certain criteria.
+ * @param password - The password to be validated.
+ * @returns An object containing the validation result and error message.
+ */
 export const validatePassword = (password: string) => {
   const minLength = password.length >= 8;
   const hasUpper = /[A-Z]/.test(password);
@@ -202,8 +207,8 @@ export const validatePassword = (password: string) => {
   if (!hasSpecial) errorMessage += 'Include at least one special character. ';
 
   return {
-      isValid: minLength && hasUpper && hasLower && hasSpecial,
-      errorMessage
+    isValid: minLength && hasUpper && hasLower && hasSpecial,
+    errorMessage
   };
 };
 
@@ -335,8 +340,8 @@ export const updateUserProfile = async (user: User): Promise<void> => {
 
     // Uncomment the lines below to log the response data
 
-    // const responseData = await response.json();
-    // console.log('Profile update response:', responseData); // Log the response for debugging
+    const responseData = await response.json();
+    console.error('Profile update response:', responseData); // Log the response for debugging
 
   } catch (error) {
     console.error('Error updating user profile:', error);
@@ -442,7 +447,7 @@ export const fetchUserCredits = async (): Promise<number | null> => {
  * @param {string} newPassword - The new password to be set.
  * @returns {Promise<void>} - A promise that resolves when the password is changed successfully.
  */
-export const changeUserPassword = async (oldPassword: string, newPassword: string) => {
+export const changeUserPassword = async (oldPassword: string, newPassword: string): Promise<boolean> => {
   const token = localStorage.getItem('token');
   if (!token) {
     notify('You are not logged in. Please log in to change your password.', 'error');
@@ -461,19 +466,33 @@ export const changeUserPassword = async (oldPassword: string, newPassword: strin
 
     if (!response.ok) {
       const errorData = await response.json();
-      notify(errorData.message || 'Failed to change password.', 'error');
+      switch (response.status) {
+        case 401:
+          notify(errorData.message || 'Invalid credentials.', 'error');
+          break;
+        case 422:
+          // Assume errorData.errors is an object with string keys and array of strings as values
+          const errors = Object.entries(errorData.errors || {})
+            .map(([field, errs]) => `${field}: ${(errs as string[]).join(', ')}`)
+            .join('. ');
+          notify(errors || 'Invalid input data provided.', 'error');
+          break;
+        default:
+          notify(errorData.message || 'Failed to change password.', 'error');
+      }
       return Promise.reject(new Error(errorData.message || 'Failed to change password.'));
     }
 
     const data = await response.json();
     notify(data.message, 'success');
-    return Promise.resolve();
+    return Promise.resolve(true);  // Indicating success to the caller
   } catch (error) {
     console.error('Error changing password:', error);
     notify('An error occurred while changing your password. Please try again.', 'error');
     return Promise.reject(error);
   }
 };
+
 
 
 /****************** CHANGE PASSWORD SECTION END ******************/
@@ -514,6 +533,16 @@ export const sendRecoverPasswordEmail = async (email: string): Promise<void> => 
 
 
 
+/**
+ * Recovers the user's password by sending a request to the server with a new password and a token.
+ * If the request is successful, the user's password is reset.
+ * If the request fails, specific errors are handled based on the backend response.
+ *
+ * @param newPassword - The new password to set for the user.
+ * @param token - The token used for authentication and authorization.
+ * @returns A promise that resolves with void when the password recovery is complete.
+ * @throws An error if the password recovery fails or if specific errors occur during the process.
+ */
 export const recoverPassword = async (newPassword: string, token: string): Promise<void> => {
   try {
     const response = await fetch('/user/recover-password', {

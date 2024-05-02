@@ -16,5 +16,6 @@ class UserModel(db.Model):
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), default=1, nullable=False)
 
     location = relationship("LocationModel", back_populates="users")
+    virtualmachines = relationship("VirtualMachineModel", back_populates="user")
     invoices = relationship("InvoiceModel", back_populates="user")
     role = relationship("RoleModel", back_populates="users")

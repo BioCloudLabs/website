@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import './App.css';
 import Homepage from './components/common/Homepage';
 import JobRequest from './components/blast/JobRequest';
@@ -44,38 +44,38 @@ function App() {
     }
   }, []);
 
+  // New useEffect for handling credits update
   useEffect(() => {
     const handleCreditsUpdate = async () => {
-      const updatedCredits = await fetchUserCredits();
-      setUserCredits(updatedCredits);
+      if (isAuthenticated) {
+        const updatedCredits = await fetchUserCredits();
+        setUserCredits(updatedCredits);
+      } else {
+        setUserCredits(null);
+      }
     };
-  
-    if (isAuthenticated) {
-      handleCreditsUpdate();
-    } else {
-      setUserCredits(null);
-    }
-  
-    // Adding an event listener for localStorage changes
+
+    handleCreditsUpdate();
+
+    // Subscribe to storage event
     window.addEventListener('storage', handleCreditsUpdate);
-  
+
     return () => {
-      // Clean up the event listener when the component unmounts
       window.removeEventListener('storage', handleCreditsUpdate);
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, location]); // Now this effect depends on both authentication status and location
   
 
   const handleLogout = async () => {
-    let isTokenInvalid = false; // This should ideally come from the logout attempt
+    let isTokenInvalid = false; // Flag to check if the token is invalid
 
     try {
       // Attempt to invalidate the server-side session first
-      await invalidateToken();  // This should be an async call that might set `isTokenInvalid` based on response
+      await invalidateToken();  
     } catch (error) {
       console.error('Logout error:', error);
       notify('Logout failed. Please try again.', 'error');
-      isTokenInvalid = true;  // Assume token is invalid if there's an error, adjust as necessary based on actual error response
+      isTokenInvalid = true;  //  Set the flag to true if the token is invalid
     }
 
     // Clear local storage

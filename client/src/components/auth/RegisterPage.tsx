@@ -141,9 +141,6 @@ function RegisterPage() {
                                 </div>
                             </div>
                         </div>
-
-
-
                         <div className="relative">
                             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
                             <input
@@ -164,12 +161,6 @@ function RegisterPage() {
                                 </div>
                             )}
                         </div>
-
-
-
-
-
-
                         <div>
                             <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
                             <input
@@ -194,21 +185,29 @@ function RegisterPage() {
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                             />
                         </div>
-                        <div>
+                        <div className="relative">
                             <label htmlFor="location_id" className="block text-sm font-medium text-gray-700">Location</label>
-                            <select
-                                id="location_id"
-                                name="location_id"
-                                value={location_id}
-                                onChange={(e) => setLocationId(e.target.value)}
-                                required
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                            >
-                                {locations.map((location) => (
-                                    <option key={location.id} value={location.id}>{location.display_name}</option>
-                                ))}
-                            </select>
+                            <div className="inline-block relative w-full">
+                                <select
+                                    id="location_id"
+                                    name="location_id"
+                                    value={location_id}
+                                    onChange={(e) => setLocationId(e.target.value)}
+                                    required
+                                    className="block w-full px-3 py-2 bg-white text-gray-700 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
+                                >
+                                    {locations.map((location) => (
+                                        <option key={location.id} value={location.id}>{location.display_name}</option>
+                                    ))}
+                                </select>
+                                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                    <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </div>
                         </div>
+
                         <button
                             type="submit"
                             disabled={!email || !password || !confirmPassword || !name || !surname || !location_id || Boolean(passwordError) || Boolean(confirmPasswordError)}

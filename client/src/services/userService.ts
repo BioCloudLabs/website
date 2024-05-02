@@ -177,8 +177,6 @@ export const registerUser = async (userDetails: RegistrationForm): Promise<boole
         throw new Error(data.message || 'Registration failed. Please try again.');
       }
     }
-
-    notify(data.message || 'User created successfully.', 'success', 5000);
     return true;
   } catch (error) {
     console.error('Registration error:', error);
@@ -214,36 +212,53 @@ export const validatePassword = (password: string) => {
 
 /****************** LOGIN SECTION START ******************/
 
+/**
+ * Logs in a user with the provided email and password.
+ * 
+ * @param email - The user's email.
+ * @param password - The user's password.
+ * @returns A promise that resolves to a `LoginResponse` object if the login is successful, or `null` otherwise.
+ * @throws An error if the login fails.
+ */
 export const loginUser = async (email: string, password: string): Promise<LoginResponse | null> => {
   try {
+    // Make a POST request to the server with the user's email and password
     const response = await fetch('/user/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
 
+    // Check if the response was successful
     if (!response.ok) {
+      // Parse the error response from the server
       const errorData = await response.json();
-      throw new Error(errorData.message || 'Login failed');
+
+      // Specific handling for password and username errors
+      if (response.status === 422 && errorData.errors?.json?.password?.includes('Password is not strong enough.')) {
+        throw new Error('Invalid credentials. Please try again.'); // More specific for password strength issue
+      } else if (response.status === 401 && errorData.message === 'Invalid credentials.') {
+        throw new Error('Invalid username. Please try again.'); // Handling invalid credentials
+      }
+
+      // Default to server-provided message or a generic error if not detailed
+      throw new Error(errorData.message || 'Login failed. Please try again.');
     }
 
+    // Parse the successful response and store the access token locally
     const data: LoginResponse = await response.json();
     localStorage.setItem('token', data.access_token);
 
-    const credits = await fetchUserCredits(); // Fetch and update local storage and state
-    if (credits !== null) {
-      localStorage.setItem('userCredits', credits.toString());
-    } else {
-      console.error('Failed to fetch user credits');
-    }
-
-    // Redirect to home or wherever needed
+    // Successful login, return data
     return data;
   } catch (error) {
+    // Log the error to the console and rethrow to handle it appropriately elsewhere
     console.error('Login error:', error);
     throw error;
   }
 };
+
+
 
 
 

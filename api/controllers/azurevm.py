@@ -2,6 +2,7 @@ from flask_jwt_extended import (
     jwt_required, 
     get_jwt_identity
 )
+from sqlalchemy.exc import IntegrityError
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 import models
@@ -27,9 +28,27 @@ class SetupVirtualMachine(MethodView):
         json_res = res.json()
         print(json_res)
 
-        if json_res["code"] == 500:
-            abort(500, message="Error trying to create a VM, please try again.")
+        if "code" in json_res:
+            if json_res["code"] == 500:
+                abort(500, message="Error trying to create a VM, please try again.")
 
-        return {"ip": json_res["ip"], "dns": json_res["dns"]}, 200
+        dns = json_res["dns"]
+        ip = json_res["ip"]
+
+        try:
+            vm = models.VirtualMachineModel(
+                type="Standard_B2s",
+                name=dns,
+                user_id=user.id
+            )
+
+            db.session.add(vm)
+            db.session.commit()
+
+        except IntegrityError:
+            db.session.rollback()
+            abort(400, message=f"An integrity error has ocurred.")
+
+        return {"ip": ip, "dns": dns}, 200
 
         

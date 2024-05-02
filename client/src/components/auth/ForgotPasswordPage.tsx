@@ -27,10 +27,10 @@ function ForgotPasswordPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
+    <div className="flex flex-col items-center justify-center bg-gray-100 px-4">
       <div className="w-full max-w-md">
+      <h1 className="text-3xl font-bold text-center mb-6">Forgot Password</h1>
         <div className="bg-white p-8 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold text-center text-gray-800 mb-4">Forgot Password</h2>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email:</label>

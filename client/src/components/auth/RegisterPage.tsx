@@ -4,6 +4,11 @@ import { registerUser, getLocationOptions, validatePassword } from '../../servic
 import { Location } from '../../models/Locations';
 import { notify } from '../../utils/notificationUtils';
 
+/**
+ * Represents the registration page component.
+ * Allows users to register by providing their email, password, name, surname, and location.
+ * Performs validation on form fields and handles form submission.
+ */
 function RegisterPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -18,11 +23,6 @@ function RegisterPage() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [confirmPasswordError, setConfirmPasswordError] = useState('');
     const navigate = useNavigate();
-
-
-
-
-
 
     useEffect(() => {
         const fetchLocations = async () => {
@@ -125,7 +125,7 @@ function RegisterPage() {
                                             <ul className="list-disc pl-5 space-y-1">
                                                 {passwordError ? (
                                                     passwordError.split('. ').map((error, index) => (
-                                                        <li key={index} className="text-red-500">{error.trim().endsWith('.') ? error : `${error}.`}</li>
+                                                        <li key={index} className="text-red-500">{error.trim().endsWith('.') ? error : `${error}...`}</li>
                                                     ))
                                                 ) : (
                                                     <>

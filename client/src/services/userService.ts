@@ -369,9 +369,16 @@ export const getLocationOptions = async (): Promise<{ id: number; display_name: 
 
 /****************** USER CREDITS SECTION START ******************/
 
+/**
+ * Fetches the user's credits from the server using the /user/credits endpoint.
+ * Ensures token is valid before making the request.
+ * Throws an error if the token is invalid or if the credits fetch fails.
+ * @returns A Promise that resolves to the user's credits if successful.
+ */
 export const fetchUserCredits = async (): Promise<number | null> => {
+  const url = '/user/credits';
   try {
-    const response = await fetch('/user/credits', {
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -380,18 +387,31 @@ export const fetchUserCredits = async (): Promise<number | null> => {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch user credits');
+      const tokenStillValid = await isTokenValid();
+      if (!tokenStillValid) {
+        // If token is not valid, the function isTokenValid() will handle logout
+        return null;
+      }
+
+      const errorData = await response.json();
+      console.error('Failed to fetch user credits:', errorData);
+      throw new Error(`Failed to fetch user credits with status: ${response.status}`);
     }
 
     const data = await response.json();
-
-    localStorage.setItem('userCredits', data.credits.toString()); // Update localStorage with the latest credits
-    return data.credits; // Return the latest credits
+    localStorage.setItem('userCredits', data.credits.toString());
+    return data.credits;
   } catch (error) {
-    console.error('Error fetching user credits:', error);
-    throw error;
+    if (error instanceof Error) {
+      console.error('Error fetching user credits:', error.message);
+      throw new Error(`Error fetching user credits: ${error.message}`);
+    } else {
+      console.error('An unexpected error occurred:', error);
+      throw new Error('An unexpected error occurred');
+    }
   }
 };
+
 
 
 

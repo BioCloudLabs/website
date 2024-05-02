@@ -63,22 +63,23 @@ function RegisterPage() {
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault(); // Prevents the default form submission behavior
-    
+
         // Additional check to prevent submission if any fields are incorrect or empty
         if (!email || !name || !surname || !location_id || !password || !confirmPassword || passwordError || confirmPasswordError) {
             notify('Please ensure all fields are filled out correctly and that there are no errors.', 'error');
             return; // Stop the function if validation fails
         }
-    
+
         try {
             const success = await registerUser({ email, password, name, surname, location_id: parseInt(location_id) });
             if (success) {
                 setTimeout(() => navigate('/login'), 3000); // Navigate after successful registration
             }
         } catch (error) {
-            console.error('Failed to register user:', error);}
+            console.error('Failed to register user:', error);
+        }
     };
-    
+
     return (
         <div className="flex flex-col items-center justify-center bg-gray-100 px-4">
             <div className="w-full max-w-md">
@@ -102,7 +103,7 @@ function RegisterPage() {
                         </div>
                         <div className="relative">
                             <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-                            <div className="flex items-center">
+                            <div className="flex items-center space-x-2">
                                 <input
                                     type="password"
                                     id="password"
@@ -115,32 +116,33 @@ function RegisterPage() {
                                     aria-describedby="password-info"
                                     onBlur={handlePasswordBlur}
                                 />
-                                <div className="ml-2 relative">
+                                <div className="relative">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-gray-400 cursor-pointer" onMouseEnter={() => setShowTooltip(true)} onMouseLeave={() => setShowTooltip(false)}>
                                         <path fillRule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7-4a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM9 9a.75.75 0 0 0 0 1.5h.253a.25.25 0 0 1 .244.304l-.459 2.066A1.75 1.75 0 0 0 10.747 15H11 a.75.75 0 0 0 0-1.5h-.253a.25.25 0 0 1-.244-.304l.459-2.066A1.75 1.75 0 0 0 9.253 9H9Z" clipRule="evenodd" />
                                     </svg>
-                                    {showTooltip && (
-                                        <div className="absolute z-10 left-full ml-2 w-64 p-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md shadow-lg">
+                                    {showTooltip || passwordError ? (
+                                        <div className="absolute z-10 right-0 mr-10 w-64 p-2 text-sm bg-white border border-gray-300 rounded-md shadow-lg">
                                             <ul className="list-disc pl-5 space-y-1">
-                                                <li>Password must be at least 8 characters long.</li>
-                                                <li>Include at least one uppercase letter.</li>
-                                                <li>Include at least one lowercase letter.</li>
-                                                <li>Include at least one special character.</li>
+                                                {passwordError ? (
+                                                    passwordError.split('. ').map((error, index) => (
+                                                        <li key={index} className="text-red-500">{error.trim().endsWith('.') ? error : `${error}.`}</li>
+                                                    ))
+                                                ) : (
+                                                    <>
+                                                        <li>Password must be at least 8 characters long.</li>
+                                                        <li>Include at least one uppercase letter.</li>
+                                                        <li>Include at least one lowercase letter.</li>
+                                                        <li>Include at least one special character.</li>
+                                                    </>
+                                                )}
                                             </ul>
                                         </div>
-                                    )}
+                                    ) : null}
                                 </div>
                             </div>
-                            {passwordTouched && passwordError && (
-                                <div className="absolute left-full ml-3 mt-1 w-64 p-2 text-sm text-red-500 bg-white border border-red-300 rounded-md shadow-lg">
-                                    <ul className="list-disc pl-5 space-y-1">
-                                        {passwordError.split('. ').map((error, index) => (
-                                            error ? <li key={index}>{error.trim().endsWith('.') ? error : `${error}.`}</li> : null
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
                         </div>
+
+
 
                         <div className="relative">
                             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
@@ -155,13 +157,16 @@ function RegisterPage() {
                                 onBlur={() => { }}
                             />
                             {confirmPasswordError && (
-                                <div className="absolute left-full ml-3 mt-1 w-64 p-2 text-sm text-red-500 bg-white border border-red-300 rounded-md shadow-lg">
+                                <div className="absolute right-0 mr-10 mt-1 w-64 p-2 text-sm text-red-500 bg-white border border-red-300 rounded-md shadow-lg">
                                     <ul className="list-disc pl-5 space-y-1">
                                         <li>{confirmPasswordError}</li>
                                     </ul>
                                 </div>
                             )}
                         </div>
+
+
+
 
 
 

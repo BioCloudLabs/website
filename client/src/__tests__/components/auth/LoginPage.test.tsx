@@ -1,12 +1,13 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { useNavigate } from 'react-router-dom';
 import LoginPage from '../../../components/auth/LoginPage';
 import { loginUser } from '../../../services/userService';
+import { act } from 'react-dom/test-utils';
 import '@testing-library/jest-dom';
 
-const mockedNavigate = jest.fn();
+
 jest.mock('react-router-dom', () => ({
-    useNavigate: () => mockedNavigate,
+    useNavigate: () => jest.fn(),
 }));
 
 jest.mock('../../../services/userService', () => ({
@@ -24,10 +25,10 @@ describe('LoginPage', () => {
                 setIsAuthenticated={mockSetIsAuthenticated}
             />
         );
-        loginUser.mockClear();
-        mockedNavigate.mockClear();
-        mockOnLoginSuccess.mockClear();
-        mockSetIsAuthenticated.mockClear();
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
     });
 
     it('renders the login form', () => {
@@ -36,51 +37,53 @@ describe('LoginPage', () => {
     });
 
     it('updates email state on input change', () => {
-        const emailInput = screen.getByLabelText('Email');
+        const emailInput: HTMLInputElement = screen.getByLabelText('Email');
         fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
         expect(emailInput.value).toBe('test@example.com');
     });
 
     it('updates password state on input change', () => {
-        const passwordInput = screen.getByLabelText('Password');
+        const passwordInput: HTMLInputElement = screen.getByLabelText('Password');
         fireEvent.change(passwordInput, { target: { value: 'password123' } });
         expect(passwordInput.value).toBe('password123');
     });
 
-    it('calls loginUser and navigates to dashboard on successful login', async () => {
-        const emailInput = screen.getByLabelText('Email');
-        const passwordInput = screen.getByLabelText('Password');
-        const loginButton = screen.getByRole('button', { name: 'Log In' });
+it('calls loginUser and navigates to dashboard on successful login', async () => {
+    const emailInput = screen.getByLabelText('Email');
+    const passwordInput = screen.getByLabelText('Password');
+    const loginButton = screen.getByRole('button', { name: 'Log In' });
 
-        fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-        fireEvent.change(passwordInput, { target: { value: 'password123' } });
-        loginUser.mockResolvedValueOnce(true);
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
 
-        await waitFor(async () => {
-            fireEvent.click(loginButton);
-        });
+    (loginUser as jest.Mock).mockResolvedValueOnce(true);
 
-        expect(loginUser).toHaveBeenCalledWith('test@example.com', 'password123');
-        expect(mockSetIsAuthenticated).toHaveBeenCalledWith(true);
-        expect(mockOnLoginSuccess).toHaveBeenCalled();
-        expect(mockedNavigate).toHaveBeenCalledWith('/dashboard', { replace: true });
+    await act(async () => {
+        fireEvent.click(loginButton);
     });
+
+    expect(loginUser).toHaveBeenCalledWith('test@example.com', 'password123');
+    expect(mockSetIsAuthenticated).toHaveBeenCalledWith(true);
+    expect(mockOnLoginSuccess).toHaveBeenCalled();
+    expect(useNavigate()).toHaveBeenCalledWith('/dashboard', { replace: true });
+});
 
     it('displays error message on failed login', async () => {
         const emailInput = screen.getByLabelText('Email');
         const passwordInput = screen.getByLabelText('Password');
         const loginButton = screen.getByRole('button', { name: 'Log In' });
 
-        loginUser.mockResolvedValueOnce(false);
+        fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+        fireEvent.change(passwordInput, { target: { value: 'password123' } });
 
-        await waitFor(() => {
-            fireEvent.click(loginButton);
-        });
+        (loginUser as jest.Mock).mockReturnValueOnce(Promise.resolve(false));
+
+        fireEvent.click(loginButton);
 
         expect(loginUser).toHaveBeenCalledWith('test@example.com', 'password123');
         expect(mockSetIsAuthenticated).not.toHaveBeenCalled();
         expect(mockOnLoginSuccess).not.toHaveBeenCalled();
-        expect(mockedNavigate).not.toHaveBeenCalled();
+        expect(useNavigate).not.toHaveBeenCalled();
         expect(screen.getByText('Failed to log in. Please check your credentials and try again.')).toBeInTheDocument();
     });
 
@@ -89,16 +92,17 @@ describe('LoginPage', () => {
         const passwordInput = screen.getByLabelText('Password');
         const loginButton = screen.getByRole('button', { name: 'Log In' });
 
-        loginUser.mockRejectedValueOnce(new Error('Unexpected error'));
+        fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+        fireEvent.change(passwordInput, { target: { value: 'password123' } });
 
-        await waitFor(() => {
-            fireEvent.click(loginButton);
-        });
+        (loginUser as jest.Mock).mockRejectedValueOnce(new Error('Unexpected error'));
+
+        fireEvent.click(loginButton);
 
         expect(loginUser).toHaveBeenCalledWith('test@example.com', 'password123');
         expect(mockSetIsAuthenticated).not.toHaveBeenCalled();
         expect(mockOnLoginSuccess).not.toHaveBeenCalled();
-        expect(mockedNavigate).not.toHaveBeenCalled();
+        expect(useNavigate).not.toHaveBeenCalled();
         expect(screen.getByText('Login failed due to an unexpected error.')).toBeInTheDocument();
     });
 });

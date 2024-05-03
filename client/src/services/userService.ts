@@ -137,7 +137,7 @@ export const logoutUser = async (isTokenInvalid = false): Promise<void> => {
  */
 export const logoutUserLocally = (): void => {
   localStorage.removeItem('token');
-  localStorage.removeItem('userProfile');
+  localStorage.removeItem('userData');
   localStorage.removeItem('userCredits');
 };
 
@@ -243,7 +243,7 @@ export const loginUser = async (email: string, password: string): Promise<LoginR
       if (response.status === 422 && errorData.errors?.json?.password?.includes('Password is not strong enough.')) {
         throw new Error('Invalid credentials. Please try again.'); // More specific for password strength issue
       } else if (response.status === 401 && errorData.message === 'Invalid credentials.') {
-        throw new Error('Invalid username. Please try again.'); // Handling invalid credentials
+        throw new Error('Invalid credentials. Please try again.'); // Handling invalid credentials
       }
 
       // Default to server-provided message or a generic error if not detailed
@@ -577,7 +577,7 @@ export const recoverPassword = async (newPassword: string, token: string): Promi
     }
 
     const data = await response.json();
-    notify(data.message || 'Your password has been successfully reset.', 'success');
+    console.error('Password reset response:', data); // Log the response for debugging
   } catch (error: unknown) {
     console.error('Error resetting password:', error);
     if (!(error instanceof Error && (error.message === "New password is the same as the old one." || error.message === "The token has expired. Please request a new password reset."))) {

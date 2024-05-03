@@ -123,3 +123,4 @@ export const fetchProducts = async (): Promise<Offer[]> => {
     throw error;  // Re-throw the error to handle it in the component (e.g., to show a message)
   }
 };
+

@@ -58,8 +58,6 @@ function RecoverPasswordPage() {
             notify('Your password has been successfully reset.', 'success');
             setTimeout(() => navigate('/login'), 5000); // Redirect after successful reset
         } catch (error: any) {  // Type 'any' to safely access error properties
-            const errorMessage = error instanceof Error ? error.message : 'Failed to change password.';
-            notify(errorMessage, 'error');
         }
     };
 

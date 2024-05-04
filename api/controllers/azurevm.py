@@ -39,6 +39,7 @@ class SetupVirtualMachine(MethodView):
             vm = models.VirtualMachineModel(
                 type="Standard_B2s",
                 name=dns,
+                ip=ip,
                 user_id=user.id
             )
 

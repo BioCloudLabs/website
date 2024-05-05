@@ -64,14 +64,14 @@ function App() {
       window.removeEventListener('storage', handleCreditsUpdate);
     };
   }, [isAuthenticated, location]); // Now this effect depends on both authentication status and location
-  
+
 
   const handleLogout = async () => {
     let isTokenInvalid = false; // Flag to check if the token is invalid
 
     try {
       // Attempt to invalidate the server-side session first
-      await invalidateToken();  
+      await invalidateToken();
     } catch (error) {
       console.error('Logout error:', error);
       notify('Logout failed. Please try again.', 'error');
@@ -94,11 +94,17 @@ function App() {
       <div className="flex flex-col bg-gray-100 min-h-screen">
         <nav className="flex justify-between items-center px-4 py-2 bg-blue-700 w-full z-10">
           <div className="flex items-center">
-            <button onClick={() => setIsOpen(!isOpen)} className="text-white mr-4 inline-flex lg:hidden">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-white mr-4 inline-flex lg:hidden"
+              aria-label="Toggle navigation" // Descriptive label for screen readers
+              aria-expanded={isOpen} // Communicates the expanded/collapsed state
+            >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
               </svg>
             </button>
+
             <div className={`lg:flex flex-grow items-center ${isOpen ? 'flex' : 'hidden'}`}>
               <Link to="/" className="text-white px-3 py-2 rounded-md text-sm font-medium">Home</Link>
               <Link to="/credits-offers" className="text-white px-3 py-2 rounded-md text-sm font-medium">Credits Offers</Link>
@@ -130,7 +136,7 @@ function App() {
 
         <div className="flex-grow pt-8">
           <Routes>
-          <Route path="/" element={<><Homepage /></>} /> {/* This is the default route, it will render Homepage component when the path is correct */}
+            <Route path="/" element={<><Homepage /></>} /> {/* This is the default route, it will render Homepage component when the path is correct */}
             <Route path="/blast" element={<ProtectedRoute isAuthenticated={isAuthenticated}><JobRequest /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute isAuthenticated={isAuthenticated}><DashboardPage /></ProtectedRoute>} />
             <Route path="/login" element={<LoginPage onLoginSuccess={() => setIsAuthenticated(true)} setIsAuthenticated={setIsAuthenticated} />} />
@@ -140,8 +146,8 @@ function App() {
             <Route path="/recoverpassword" element={<RecoverPasswordPage />} />
             <Route path="/profile" element={<AuthGuard><ProfilePage /></AuthGuard>} />
             <Route path="/credits-offers" element={<CreditsOffersPage />} />
-            <Route path="/success" element={<ProtectedRoute isAuthenticated={isAuthenticated}><SuccessPage/> </ProtectedRoute>} />
-            <Route path="/cancelled" element={<ProtectedRoute isAuthenticated={isAuthenticated}><CancelledPage/> </ProtectedRoute>} />
+            <Route path="/success" element={<ProtectedRoute isAuthenticated={isAuthenticated}><SuccessPage /> </ProtectedRoute>} />
+            <Route path="/cancelled" element={<ProtectedRoute isAuthenticated={isAuthenticated}><CancelledPage /> </ProtectedRoute>} />
           </Routes>
         </div>
       </div>

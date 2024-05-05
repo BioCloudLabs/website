@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './../../css/SuccessPage.css';
 
 const SuccessPage: React.FC = () => {
   const [countdown, setCountdown] = useState(3); // Initialize countdown state with 3
   const navigate = useNavigate();
 
   useEffect(() => {
-    // console.log('Operation successful, redirecting in 3 seconds...');
-    
     // Update the countdown every second
     const interval = setInterval(() => {
       setCountdown((currentCountdown) => currentCountdown - 1);
@@ -27,9 +24,9 @@ const SuccessPage: React.FC = () => {
   }, [navigate]);
 
   return (
-    <div className='success-container '>
-      <h1>Success!</h1>
-      <p>Your operation was successful. Redirecting to homepage in {countdown} seconds...</p>
+    <div className='bg-green-200 text-green-800 text-center p-6 rounded-lg max-w-lg mx-auto mt-16 shadow-md'>
+      <h1 className='text-3xl font-bold mb-4'>Success!</h1>
+      <p className='text-lg'>Your operation was successful. Redirecting to homepage in {countdown} seconds...</p>
     </div>
   );
 };

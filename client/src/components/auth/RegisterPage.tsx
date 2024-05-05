@@ -19,7 +19,6 @@ function RegisterPage() {
     const [registrationError] = useState('');
     const [showTooltip, setShowTooltip] = useState(false);
     const [passwordError, setPasswordError] = useState('');
-    const [passwordTouched, setPasswordTouched] = useState(false);
     const [confirmPassword, setConfirmPassword] = useState('');
     const [confirmPasswordError, setConfirmPasswordError] = useState('');
     const navigate = useNavigate();
@@ -42,7 +41,6 @@ function RegisterPage() {
 
 
     const handlePasswordBlur = () => {
-        setPasswordTouched(true);
         const { isValid, errorMessage } = validatePassword(password);
         setPasswordError(errorMessage);
         return isValid;

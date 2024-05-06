@@ -1,20 +1,16 @@
 import React, { useState } from 'react';
 import { createVirtualMachine } from './../../services/vmService';
 import { VirtualMachine } from './../../models/VirtualMachines';
+import { notify } from '../../utils/notificationUtils';
 
 type VMSpec = {
   name: string;
   cpu: string;
   memory: string;
-  credits: number; // Replacing price with credits
+  credits: number; 
   description: string;
 };
 
-// Reference:
-
-// https://azure.microsoft.com/en-us/pricing/details/virtual-machines/linux/?ef_id=_k_Cj0KCQjwir2xBhC_ARIsAMTXk85h4yFmSV1nGQdFb5e27ZDIpZsI6cf-Fr1fn-BciCRIn59pIiIUWKwaAp5rEALw_wcB_k_&OCID=AIDcmm68ejnsa0_SEM__k_Cj0KCQjwir2xBhC_ARIsAMTXk85h4yFmSV1nGQdFb5e27ZDIpZsI6cf-Fr1fn-BciCRIn59pIiIUWKwaAp5rEALw_wcB_k_&gad_source=1&gclid=Cj0KCQjwir2xBhC_ARIsAMTXk85h4yFmSV1nGQdFb5e27ZDIpZsI6cf-Fr1fn-BciCRIn59pIiIUWKwaAp5rEALw_wcB#pricing
-
-// VM specifications array updated to include credits
 const vmSpecs: VMSpec[] = [
   { name: 'VM1', cpu: '2 vCPUs', memory: '8 GB', credits: 0.0922, description: 'Basic VM for small BLAST jobs.' },
   { name: 'VM2', cpu: '4 vCPUs', memory: '16 GB', credits: 0.1847, description: 'Intermediate VM for medium-sized BLAST jobs.' },
@@ -34,11 +30,14 @@ const JobRequest: React.FC = () => {
     try {
       const vm = await createVirtualMachine(selectedVM);
       setVirtualMachine(vm);
+      notify(`Virtual machine created successfully: IP ${vm.ip}, DNS ${vm.url}`, 'success');
     } catch (error) {
       console.error('Error creating virtual machine:', error);
+      notify(`Error creating virtual machine: ${(error as Error).message}`, 'error');
     } finally {
       setIsLoading(false);
     }
+
   };
 
   const handleVMSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -73,27 +72,27 @@ const JobRequest: React.FC = () => {
       </div>
       <div className="mb-4">
         <h2 className="text-lg font-semibold mb-2">Virtual Machine Specifications</h2>
-        <table className="w-full border-collapse border border-gray-300 text-sm">
-          <thead>
-            <tr className="bg-gray-200">
-              <th className="border border-gray-300 px-4 py-2">VM</th>
-              <th className="border border-gray-300 px-4 py-2">CPU</th>
-              <th className="border border-gray-300 px-4 py-2">Memory</th>
-              <th className="border border-gray-300 px-4 py-2">€/hour</th>
-              <th className="border border-gray-300 px-4 py-2">Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {vmSpecs.map((vm) => (
-              <tr key={vm.name} className={`${vm.name === selectedVM ? 'bg-blue-100' : ''}`}>
-                <td className="border border-gray-300 px-4 py-2">{vm.name}</td>
-                <td className="border border-gray-300 px-4 py-2">{vm.cpu}</td>
-                <td className="border border-gray-300 px-4 py-2">{vm.memory}</td>
-                <td className="border border-gray-300 px-4 py-2">{vm.credits}</td>
-                <td className="border border-gray-300 px-4 py-2">{vm.description}</td>
-              </tr>
-            ))}
-          </tbody>
+        <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <thead className="text-xs uppercase bg-gray-50 dark:bg-gray-700 dark:text-white">
+  <tr>
+    <th scope="col" className="py-3 px-6">VM</th>
+    <th scope="col" className="py-3 px-6">CPU</th>
+    <th scope="col" className="py-3 px-6">Memory</th>
+    <th scope="col" className="py-3 px-6">€/hour</th>
+    <th scope="col" className="py-3 px-6">Description</th>
+  </tr>
+</thead>
+<tbody>
+  {vmSpecs.map((vm) => (
+    <tr key={vm.name} className={`border-b ${vm.name === selectedVM ? 'bg-blue-100' : 'bg-white hover:bg-gray-50'}`}>
+      <td className="py-4 px-6 text-gray-900">{vm.name}</td>
+      <td className="py-4 px-6 text-gray-900">{vm.cpu}</td>
+      <td className="py-4 px-6 text-gray-900">{vm.memory}</td>
+      <td className="py-4 px-6 text-gray-900">{vm.credits}</td>
+      <td className="py-4 px-6 text-gray-900">{vm.description}</td>
+    </tr>
+  ))}
+</tbody>
         </table>
       </div>
       <p className="text-gray-600 mb-4">Estimated Credits per hour: {estimatedCredits}</p>
@@ -109,7 +108,7 @@ const JobRequest: React.FC = () => {
           {virtualMachine ? (
             <div className="text-green-500 mb-4">
               <p>Virtual machine created successfully.</p>
-              <p>Redirecting to: <a href={virtualMachine.url}>{virtualMachine.url}</a></p>
+              <p>Redirecting to: <a href={virtualMachine.url} className="text-blue-600 hover:underline">{virtualMachine.url}</a></p>
             </div>
           ) : (
             <button

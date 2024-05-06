@@ -51,5 +51,3 @@ class SetupVirtualMachine(MethodView):
             abort(400, message=f"An integrity error has ocurred.")
 
         return {"ip": ip, "dns": dns}, 200
-
-        

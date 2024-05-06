@@ -9,6 +9,7 @@ from flask_migrate import Migrate
 from controllers.user import blp as UserBlueprint
 from controllers.stripe import blp as StripeBlueprint
 from controllers.azuredata import blp as AzuredataBlueprint
+from controllers.azurevm import blp as AzureVmBlueprint
 from dotenv import load_dotenv
 
 app: Flask = Flask(__name__, static_folder="dist", static_url_path="/")
@@ -32,6 +33,7 @@ api: Api = Api(app)
 api.register_blueprint(UserBlueprint)
 api.register_blueprint(StripeBlueprint)
 api.register_blueprint(AzuredataBlueprint)
+api.register_blueprint(AzureVmBlueprint)
 
 
 @jwt.token_in_blocklist_loader

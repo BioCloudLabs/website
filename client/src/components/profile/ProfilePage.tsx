@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { fetchUserCredits, updateUserProfile, fetchUserProfile, getLocationOptions } from '../../services/userService';
 import { User } from '../../models/User';
 import { Location } from '../../models/Locations';
+import { notify } from '../../utils/notificationUtils';
+
 
 const ProfilePage = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -63,12 +65,12 @@ const ProfilePage = () => {
     setIsUpdating(true);
     try {
       await updateUserProfile(updateData);
-      setSuccessMessage('Profile updated successfully!');
+      notify('Profile updated successfully!', "success");
       setTimeout(() => {
         setSuccessMessage('');
       }, 1500);
     } catch (error) {
-      setErrorMessage('Failed to update profile. Please try again.');
+      notify('Failed to update profile. Please try again.', "error");
     } finally {
       setIsUpdating(false);
     }

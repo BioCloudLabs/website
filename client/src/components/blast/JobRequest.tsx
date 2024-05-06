@@ -50,42 +50,44 @@ const JobRequest: React.FC = () => {
         It compares nucleotide or protein sequences to sequence databases and calculates the statistical significance.
       </p>
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Select VM</label>
-        <select
-          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-          value={selectedVM}
-          onChange={handleVMSelectChange}
-        >
-          {vmSpecs.map((vm) => (
-            <option key={vm.name} value={vm.name}>
-              {vm.name}
-            </option>
-          ))}
-        </select>
-      </div>
+  <label htmlFor="vmSelect" className="block text-sm font-medium text-gray-700">Select VM</label>
+  <select
+    id="vmSelect"  // Ensure the ID matches the htmlFor attribute of the label
+    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+    value={selectedVM}
+    onChange={handleVMSelectChange}
+  >
+    {vmSpecs.map((vm) => (
+      <option key={vm.name} value={vm.name}>
+        {vm.name}
+      </option>
+    ))}
+  </select>
+</div>
+
       <div className="mb-4">
         <h2 className="text-lg font-semibold mb-2">Virtual Machine Specifications</h2>
         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-        <thead className="text-xs uppercase bg-gray-50 dark:bg-gray-700 dark:text-white">
-  <tr>
-    <th scope="col" className="py-3 px-6">VM</th>
-    <th scope="col" className="py-3 px-6">CPU</th>
-    <th scope="col" className="py-3 px-6">Memory</th>
-    <th scope="col" className="py-3 px-6">€/hour</th>
-    <th scope="col" className="py-3 px-6">Description</th>
-  </tr>
-</thead>
-<tbody>
-  {vmSpecs.map((vm) => (
-    <tr key={vm.name} className={`border-b ${vm.name === selectedVM ? 'bg-blue-100' : 'bg-white hover:bg-gray-50'}`}>
-      <td className="py-4 px-6 text-gray-900">{vm.name}</td>
-      <td className="py-4 px-6 text-gray-900">{vm.cpu}</td>
-      <td className="py-4 px-6 text-gray-900">{vm.memory}</td>
-      <td className="py-4 px-6 text-gray-900">{vm.credits}</td>
-      <td className="py-4 px-6 text-gray-900">{vm.description}</td>
-    </tr>
-  ))}
-</tbody>
+          <thead className="text-xs uppercase bg-gray-50 dark:bg-gray-700 dark:text-white">
+            <tr>
+              <th scope="col" className="py-3 px-6">VM</th>
+              <th scope="col" className="py-3 px-6">CPU</th>
+              <th scope="col" className="py-3 px-6">Memory</th>
+              <th scope="col" className="py-3 px-6">€/hour</th>
+              <th scope="col" className="py-3 px-6">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            {vmSpecs.map((vm) => (
+              <tr key={vm.name} className={`border-b ${vm.name === selectedVM ? 'bg-blue-100' : 'bg-white hover:bg-gray-50'}`}>
+                <td className="py-4 px-6 text-gray-900">{vm.name}</td>
+                <td className="py-4 px-6 text-gray-900">{vm.cpu}</td>
+                <td className="py-4 px-6 text-gray-900">{vm.memory}</td>
+                <td className="py-4 px-6 text-gray-900">{vm.credits}</td>
+                <td className="py-4 px-6 text-gray-900">{vm.description}</td>
+              </tr>
+            ))}
+          </tbody>
         </table>
       </div>
       <p className="text-gray-600 mb-4">Estimated Credits per hour: {estimatedCredits}</p>
@@ -105,7 +107,8 @@ const JobRequest: React.FC = () => {
             </div>
           ) : (
             <button
-              className="bg-blue-500 text-white font-bold py-2 px-4 rounded shadow-lg hover:bg-blue-700 focus:shadow-outline focus:outline-none"
+              className="inline-flex items-center justify-center bg-blue-700 text-white border-0 py-2 px-6 focus:outline-none hover:bg-blue-800 rounded text-lg transition duration-300 ease-in-out transform hover:-translate-y-1"
+
               onClick={handleCreateVirtualMachine}
               disabled={!selectedVM || isLoading}
             >

@@ -1,22 +1,45 @@
 import { VirtualMachine } from './../models/VirtualMachines';
 
 export async function createVirtualMachine(selectedVM: string): Promise<VirtualMachine> {
-  // Simulate an API call to create a virtual machine
-  // You can replace this with actual API calls in your application
-  return new Promise((resolve) => {
-    // Simulate some processing time (2 seconds)
-    setTimeout(() => {
-      const url = `http://example.com/${selectedVM}`;
-      const price = calculatePrice(selectedVM); // You can implement this function to calculate the price based on the selected VM
-      const virtualMachine: VirtualMachine = { url, price };
-      resolve(virtualMachine);
-    }, 2000);
-  });
+  const apiUrl = `/azurevm/setup`; // Adjust this URL based on where your service is hosted
+
+  try {
+    const token = localStorage.getItem('token'); // Retrieve the JWT token from local storage
+    if (!token) {
+      throw new Error('Authorization token not found');
+    }
+
+    const response = await fetch(apiUrl, {
+      method: 'GET', // Or POST if your backend expects a POST request
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      // Specific error handling similar to user registration example
+      if (data.code === 500) {
+        console.error('Internal Server Error: ', data.status);
+        throw new Error('Internal server error. Please try again.');
+      } else {
+        console.error('HTTP error: ', data.status);
+        throw new Error(`HTTP error! Status: ${response.status} Message: ${data.status}`);
+      }
+    }
+
+    return {
+      url: `http://${data.dns}`, // Assuming the DNS is what you use to connect to the VM
+      price: calculatePrice(selectedVM) // Continue using this function or adapt as needed
+    };
+  } catch (error) {
+    console.error("Failed to create virtual machine:", error);
+    throw error; // Re-throw the error if you want to handle it further up the chain
+  }
 }
 
 function calculatePrice(selectedVM: string): number {
-  // Calculate the price based on the selected VM
-  // This is just an example, replace it with your actual pricing logic
   switch (selectedVM) {
     case 'vm1':
       return 10.99;
@@ -25,6 +48,6 @@ function calculatePrice(selectedVM: string): number {
     case 'vm3':
       return 20.99;
     default:
-      return 0;
+      return 0; // Consider throwing an error or a default price if the VM type is unknown
   }
 }

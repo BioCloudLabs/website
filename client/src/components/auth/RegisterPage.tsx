@@ -84,7 +84,8 @@ function RegisterPage() {
                 <h1 className="text-3xl font-bold text-center mb-6">Register</h1>
                 <div className="bg-white p-8 rounded-lg shadow-md">
                     <form autoComplete="off" onSubmit={handleSubmit} className="space-y-6">
-                        <input autoComplete="false" name="hidden" type="text" style={{ display: 'none' }} />
+                        <label htmlFor="hidden" className="hidden">Hidden Field</label>
+                        <input autoComplete="false" id="hidden" name="hidden" type="text" className="hidden" />
 
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
@@ -111,7 +112,7 @@ function RegisterPage() {
                                     required
                                     autoComplete="off"
                                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                                    aria-describedby="password-info"
+                                    aria-describedby={passwordError ? 'password-error-info' : undefined}
                                     onBlur={handlePasswordBlur}
                                 />
                                 <div className="relative">

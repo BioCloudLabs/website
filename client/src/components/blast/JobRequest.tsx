@@ -1,15 +1,8 @@
 import React, { useState } from 'react';
 import { createVirtualMachine } from './../../services/vmService';
 import { VirtualMachine } from './../../models/VirtualMachines';
+import { VMSpec } from '../../models/VMSpec';
 import { notify } from '../../utils/notificationUtils';
-
-type VMSpec = {
-  name: string;
-  cpu: string;
-  memory: string;
-  credits: number; 
-  description: string;
-};
 
 const vmSpecs: VMSpec[] = [
   { name: 'VM1', cpu: '2 vCPUs', memory: '8 GB', credits: 0.0922, description: 'Basic VM for small BLAST jobs.' },

@@ -92,8 +92,8 @@ function App() {
   return (
     <Router>
       <div className="flex flex-col bg-gray-100 min-h-screen">
-        <nav className="flex justify-between items-center px-4 py-2 bg-blue-700 w-full z-10">
-          <div className="flex items-center">
+        <nav className="bg-white border-gray-200 px-2 sm:px-4 py-2.5 dark:bg-gray-900 w-full z-10">
+          <div className="container flex flex-wrap justify-between items-center mx-auto">
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="text-white mr-4 inline-flex lg:hidden"
@@ -104,7 +104,6 @@ function App() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
               </svg>
             </button>
-
             <div className={`lg:flex flex-grow items-center ${isOpen ? 'flex' : 'hidden'}`}>
               <Link to="/" className="text-white px-3 py-2 rounded-md text-sm font-medium">Home</Link>
               <Link to="/credits-offers" className="text-white px-3 py-2 rounded-md text-sm font-medium">Credits Offers</Link>
@@ -116,23 +115,26 @@ function App() {
                 </>
               )}
             </div>
-          </div>
-          <div className="flex space-x-4 items-center">
-            {isAuthenticated ? (
-              <>
-                <Link to="/credits-offers" className="text-white px-3 py-2 rounded-md text-sm font-medium hover:underline">
-                  Credits: {userCredits}
-                </Link>
-                <button onClick={handleLogout} className="text-white px-3 py-2 rounded-md text-sm font-medium">Logout</button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="text-white px-3 py-2 rounded-md text-sm font-medium">Login</Link>
-                <Link to="/register" className="text-white px-3 py-2 rounded-md text-sm font-medium">Register</Link>
-              </>
-            )}
+            <div className="flex space-x-4 items-center">
+              {isAuthenticated ? (
+                <>
+                  <Link to="/credits-offers" className="text-white px-3 py-2 rounded-md text-sm font-medium hover:underline">
+                    Credits: {userCredits}
+                  </Link>
+                  <button onClick={handleLogout} className="text-white px-3 py-2 rounded-md text-sm font-medium">Logout</button>
+                  <button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 mr-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Get Started</button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="text-white px-3 py-2 rounded-md text-sm font-medium">Login</Link>
+                  <Link to="/register" className="text-white px-3 py-2 rounded-md text-sm font-medium">Register</Link>
+                  <button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 mr-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Get Started</button>
+                </>
+              )}
+            </div>
           </div>
         </nav>
+
 
         <div className="flex-grow pt-8">
           <Routes>

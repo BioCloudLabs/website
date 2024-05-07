@@ -30,7 +30,8 @@ export async function createVirtualMachine(selectedVM: string): Promise<VirtualM
     }
 
     return {
-      url: `http://${data.dns}`, // Assuming the DNS is what you use to connect to the VM
+      ip: data.ip, // Add the missing 'ip' property
+      url: `https://${data.dns}`, // Assuming the DNS is what you use to connect to the VM
       price: calculatePrice(selectedVM) // Continue using this function or adapt as needed
     };
   } catch (error) {

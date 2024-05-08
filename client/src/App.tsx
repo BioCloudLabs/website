@@ -93,68 +93,57 @@ function App() {
   return (
     <Router>
       <div className="flex flex-col bg-gray-100 min-h-screen">
-        <nav className="bg-white border-gray-200 dark:bg-gray-900 fixed top-0 left-0 right-0 z-20">
-          <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-2.5 lg:py-3">
-              <a href="/" className="flex items-center space-x-3">
-                <img src="https://flowbite.com/docs/images/logo.svg" className="h-8" alt="Flowbite Logo" />
-                <span className="self-center text-lg font-semibold whitespace-nowrap dark:text-white">BioCloudLabs</span>
-              </a>
-              <div className="flex items-center">
-                {/* Collapsible Section */}
-                <div className={`items-center justify-between w-full md:hidden ${isOpen ? 'block' : 'hidden'}`} id="navbar-sticky">
-                  <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-                    <li>
-                      <Link to="/" className="block py-2 px-3 text-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-blue-500" onClick={() => setIsOpen(false)}>Home</Link>
-                    </li>
-                    <li>
-                      <Link to="/credits-offers" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:text-blue-700 md:p-0 dark:text-white" onClick={() => setIsOpen(false)}>Credits Offers</Link>
-                    </li>
-                    {isAuthenticated && (
-                      <>
-                        <li>
-                          <Link to="/profile" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:text-blue-700 md:p-0 dark:text-white" onClick={() => setIsOpen(false)}>Profile</Link>
-                        </li>
-                        <li>
-                          <Link to="/dashboard" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:text-blue-700 md:p-0 dark:text-white" onClick={() => setIsOpen(false)}>Dashboard</Link>
-                        </li>
-                        <li>
-                          <Link to="/blast" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:text-blue-700 md:p-0 dark:text-white" onClick={() => setIsOpen(false)}>Request VM</Link>
-                        </li>
-                      </>
-                    )}
-                  </ul>
-                </div>
+        <nav className="bg-blue dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
+          <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+            <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
+              <img src="/images/Brand/Brand_hero.webp" className="h-8" alt="BioCloudLabs Logo" />
+              <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white overflow-hidden text-ellipsis" style={{ maxWidth: '200px' }}>BioCloudLabs</span>
+            </a>
 
-                {/* Toggle Button */}
-                <button
-                  onClick={() => setIsOpen(!isOpen)}
-                  className="text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-600 rounded-lg md:hidden ml-auto" // Modified class: ml-auto
-                  aria-label="Toggle navigation"
-                  aria-expanded={isOpen}
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-                  </svg>
-                </button>
+            <div className="flex items-center space-x-3 md:space-x-0 rtl:space-x-reverse">
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                data-collapse-toggle="navbar-sticky"
+                type="button"
+                className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                aria-controls="navbar-sticky"
+                aria-expanded={isOpen}>
+                <span className="sr-only">Open main menu</span>
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 17 14" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M1 1h15M1 7h15M1 13h15" />
+                </svg>
+              </button>
+            </div>
 
-                {/* User Controls */}
-                <div className="flex items-center space-x-4 ml-4">
+            {/* User Controls - Improved Styling and Positioning */}
+            <div className={`${isOpen ? 'flex' : 'hidden'} md:flex items-center justify-between w-full md:w-auto`}>
+              {/* Navbar with unified item styling */}
+              {/* Navbar links adjusted for non-button appearance */}
+              <div className="flex items-center space-x-4">
+                <ul className="flex flex-col md:flex-row p-4 md:p-0 font-medium space-y-4 md:space-y-0 md:space-x-8 bg-gray-50 dark:bg-gray-900 md:bg-transparent rounded-lg md:rounded-none">
+                  <li><Link to="/" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Home</Link></li>
+                  <li><Link to="/credits-offers" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Credits Offers</Link></li>
                   {isAuthenticated ? (
                     <>
-                      <span className="text-white px-3 py-2 rounded-md">Credits: {userCredits}</span>
-                      <button onClick={handleLogout} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Logout</button>
+                      <li><Link to="/profile" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Profile</Link></li>
+                      <li><Link to="/dashboard" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Dashboard</Link></li>
+                      <li><Link to="/blast" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Request VM</Link></li>
+                      <li><Link to="/credits-offers" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Credits: {userCredits}</Link></li>
+                      <li><button onClick={handleLogout} className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500">Logout</button></li>
                     </>
                   ) : (
                     <>
-                      <Link to="/login" className="text-sm text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg px-3 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Login</Link>
-                      <Link to="/register" className="text-sm text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg px-3 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Register</Link>
+                      <li><Link to="/login" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Login</Link></li>
+                      <li><Link to="/register" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Register</Link></li>
                     </>
                   )}
-                  <button type="button" className="text-sm text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg px-3 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Get Started</button>
-                </div>
+                </ul>
               </div>
+
             </div>
+
+
+
           </div>
         </nav>
 

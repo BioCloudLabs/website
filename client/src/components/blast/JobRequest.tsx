@@ -44,7 +44,7 @@ const JobRequest: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-semibold mb-4">BLAST Job Request</h1>
+      <h1 className="text-3xl font-bold mb-4 my-12">BLAST Job Request</h1>
       <p className="mb-4">
         BLAST (Basic Local Alignment Search Tool) is a tool that finds regions of similarity between biological sequences.
         It compares nucleotide or protein sequences to sequence databases and calculates the statistical significance.

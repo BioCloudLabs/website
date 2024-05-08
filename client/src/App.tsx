@@ -86,55 +86,77 @@ function App() {
       window.location.href = '/login';  // Redirect to login page
     } else {
       window.location.href = '/';  // Redirect to home page
+
     }
   };
 
   return (
     <Router>
       <div className="flex flex-col bg-gray-100 min-h-screen">
-        <nav className="bg-white border-gray-200 px-2 sm:px-4 py-2.5 dark:bg-gray-900 w-full z-10">
-          <div className="container flex flex-wrap justify-between items-center mx-auto">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-white mr-4 inline-flex lg:hidden"
-              aria-label="Toggle navigation" // Descriptive label for screen readers
-              aria-expanded={isOpen} // Communicates the expanded/collapsed state
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-              </svg>
-            </button>
-            <div className={`lg:flex flex-grow items-center ${isOpen ? 'flex' : 'hidden'}`}>
-              <Link to="/" className="text-white px-3 py-2 rounded-md text-sm font-medium">Home</Link>
-              <Link to="/credits-offers" className="text-white px-3 py-2 rounded-md text-sm font-medium">Credits Offers</Link>
-              {isAuthenticated && (
-                <>
-                  <Link to="/profile" className="text-white px-3 py-2 rounded-md text-sm font-medium">Profile</Link>
-                  <Link to="/dashboard" className="text-white px-3 py-2 rounded-md text-sm font-medium">Dashboard</Link>
-                  <Link to="/blast" className="text-white px-3 py-2 rounded-md text-sm font-medium">Request VM</Link>
-                </>
-              )}
-            </div>
-            <div className="flex space-x-4 items-center">
-              {isAuthenticated ? (
-                <>
-                  <Link to="/credits-offers" className="text-white px-3 py-2 rounded-md text-sm font-medium hover:underline">
-                    Credits: {userCredits}
-                  </Link>
-                  <button onClick={handleLogout} className="text-white px-3 py-2 rounded-md text-sm font-medium">Logout</button>
-                  <button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 mr-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Get Started</button>
-                </>
-              ) : (
-                <>
-                  <Link to="/login" className="text-white px-3 py-2 rounded-md text-sm font-medium">Login</Link>
-                  <Link to="/register" className="text-white px-3 py-2 rounded-md text-sm font-medium">Register</Link>
-                  <button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 mr-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Get Started</button>
-                </>
-              )}
+        <nav className="bg-white border-gray-200 dark:bg-gray-900 fixed top-0 left-0 right-0 z-20">
+          <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center py-2.5 lg:py-3">
+              <a href="/" className="flex items-center space-x-3">
+                <img src="https://flowbite.com/docs/images/logo.svg" className="h-8" alt="Flowbite Logo" />
+                <span className="self-center text-lg font-semibold whitespace-nowrap dark:text-white">BioCloudLabs</span>
+              </a>
+              <div className="flex items-center">
+                {/* Collapsible Section */}
+                <div className={`items-center justify-between w-full md:hidden ${isOpen ? 'block' : 'hidden'}`} id="navbar-sticky">
+                  <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+                    <li>
+                      <Link to="/" className="block py-2 px-3 text-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-blue-500" onClick={() => setIsOpen(false)}>Home</Link>
+                    </li>
+                    <li>
+                      <Link to="/credits-offers" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:text-blue-700 md:p-0 dark:text-white" onClick={() => setIsOpen(false)}>Credits Offers</Link>
+                    </li>
+                    {isAuthenticated && (
+                      <>
+                        <li>
+                          <Link to="/profile" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:text-blue-700 md:p-0 dark:text-white" onClick={() => setIsOpen(false)}>Profile</Link>
+                        </li>
+                        <li>
+                          <Link to="/dashboard" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:text-blue-700 md:p-0 dark:text-white" onClick={() => setIsOpen(false)}>Dashboard</Link>
+                        </li>
+                        <li>
+                          <Link to="/blast" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:text-blue-700 md:p-0 dark:text-white" onClick={() => setIsOpen(false)}>Request VM</Link>
+                        </li>
+                      </>
+                    )}
+                  </ul>
+                </div>
+
+                {/* Toggle Button */}
+                <button
+                  onClick={() => setIsOpen(!isOpen)}
+                  className="text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-600 rounded-lg md:hidden ml-auto" // Modified class: ml-auto
+                  aria-label="Toggle navigation"
+                  aria-expanded={isOpen}
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+                  </svg>
+                </button>
+
+                {/* User Controls */}
+                <div className="flex items-center space-x-4 ml-4">
+                  {isAuthenticated ? (
+                    <>
+                      <span className="text-white px-3 py-2 rounded-md">Credits: {userCredits}</span>
+                      <button onClick={handleLogout} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Logout</button>
+                    </>
+                  ) : (
+                    <>
+                      <Link to="/login" className="text-sm text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg px-3 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Login</Link>
+                      <Link to="/register" className="text-sm text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg px-3 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Register</Link>
+                    </>
+                  )}
+                  <button type="button" className="text-sm text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg px-3 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Get Started</button>
+                </div>
+              </div>
             </div>
           </div>
         </nav>
-
 
         <div className="flex-grow pt-8">
           <Routes>

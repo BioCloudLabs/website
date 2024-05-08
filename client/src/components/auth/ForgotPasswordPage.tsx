@@ -28,8 +28,8 @@ function ForgotPasswordPage() {
 
   return (
     <div className="flex flex-col items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md">
-      <h1 className="text-3xl font-bold text-center mb-6">Forgot Password</h1>
+      <div className="w-full max-w-md my-4">
+      <h1 className="text-3xl font-bold text-center my-12 mb-6">Forgot Password</h1>
         <div className="bg-white p-8 rounded-lg shadow-md">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>

@@ -86,3 +86,28 @@ class PowerOffMachine(MethodView):
             abort(400, message=f"An integrity error has ocurred.")
 
         return {"message": "VM Removed"}, 200
+    
+
+@blp.route("/history")
+class VirtualMachinesHistory(MethodView):
+
+    @jwt_required()
+    def get(self):
+        user_by_jwt = get_jwt_identity()
+
+        user = db.session.get(models.UserModel, user_by_jwt)
+
+        if user is None:
+            abort(404, message="User not found")
+
+        vms = models.VirtualMachineModel.query.filter_by(user_id=user_by_jwt).all()
+
+        vm_list = []
+
+        if not vms:
+            abort(404, message="No VMs found."), 
+
+        for i in vms:
+            vm_list.append({"name": i.name, "created_at": i.created_at, "poweredof_at": i.poweredof_at})
+
+        return {"vm_list": vm_list}, 200

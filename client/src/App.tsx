@@ -86,55 +86,66 @@ function App() {
       window.location.href = '/login';  // Redirect to login page
     } else {
       window.location.href = '/';  // Redirect to home page
+
     }
   };
 
   return (
     <Router>
       <div className="flex flex-col bg-gray-100 min-h-screen">
-        <nav className="bg-white border-gray-200 px-2 sm:px-4 py-2.5 dark:bg-gray-900 w-full z-10">
-          <div className="container flex flex-wrap justify-between items-center mx-auto">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-white mr-4 inline-flex lg:hidden"
-              aria-label="Toggle navigation" // Descriptive label for screen readers
-              aria-expanded={isOpen} // Communicates the expanded/collapsed state
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-              </svg>
-            </button>
-            <div className={`lg:flex flex-grow items-center ${isOpen ? 'flex' : 'hidden'}`}>
-              <Link to="/" className="text-white px-3 py-2 rounded-md text-sm font-medium">Home</Link>
-              <Link to="/credits-offers" className="text-white px-3 py-2 rounded-md text-sm font-medium">Credits Offers</Link>
-              {isAuthenticated && (
-                <>
-                  <Link to="/profile" className="text-white px-3 py-2 rounded-md text-sm font-medium">Profile</Link>
-                  <Link to="/dashboard" className="text-white px-3 py-2 rounded-md text-sm font-medium">Dashboard</Link>
-                  <Link to="/blast" className="text-white px-3 py-2 rounded-md text-sm font-medium">Request VM</Link>
-                </>
-              )}
+        <nav className="bg-blue dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
+          <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+            <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
+              <img src="/images/Brand/Brand_hero.webp" className="h-8" alt="BioCloudLabs Logo" />
+              <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white overflow-hidden text-ellipsis" style={{ maxWidth: '200px' }}>BioCloudLabs</span>
+            </a>
+
+            <div className="flex items-center space-x-3 md:space-x-0 rtl:space-x-reverse">
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                data-collapse-toggle="navbar-sticky"
+                type="button"
+                className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                aria-controls="navbar-sticky"
+                aria-expanded={isOpen}>
+                <span className="sr-only">Open main menu</span>
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 17 14" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M1 1h15M1 7h15M1 13h15" />
+                </svg>
+              </button>
             </div>
-            <div className="flex space-x-4 items-center">
-              {isAuthenticated ? (
-                <>
-                  <Link to="/credits-offers" className="text-white px-3 py-2 rounded-md text-sm font-medium hover:underline">
-                    Credits: {userCredits}
-                  </Link>
-                  <button onClick={handleLogout} className="text-white px-3 py-2 rounded-md text-sm font-medium">Logout</button>
-                  <button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 mr-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Get Started</button>
-                </>
-              ) : (
-                <>
-                  <Link to="/login" className="text-white px-3 py-2 rounded-md text-sm font-medium">Login</Link>
-                  <Link to="/register" className="text-white px-3 py-2 rounded-md text-sm font-medium">Register</Link>
-                  <button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 mr-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Get Started</button>
-                </>
-              )}
+
+            {/* User Controls - Improved Styling and Positioning */}
+            <div className={`${isOpen ? 'flex' : 'hidden'} md:flex items-center justify-between w-full md:w-auto`}>
+              {/* Navbar with unified item styling */}
+              {/* Navbar links adjusted for non-button appearance */}
+              <div className="flex items-center space-x-4">
+                <ul className="flex flex-col md:flex-row p-4 md:p-0 font-medium space-y-4 md:space-y-0 md:space-x-8 bg-gray-50 dark:bg-gray-900 md:bg-transparent rounded-lg md:rounded-none">
+                  <li><Link to="/" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Home</Link></li>
+                  <li><Link to="/credits-offers" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Credits Offers</Link></li>
+                  {isAuthenticated ? (
+                    <>
+                      <li><Link to="/profile" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Profile</Link></li>
+                      <li><Link to="/dashboard" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Dashboard</Link></li>
+                      <li><Link to="/blast" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Request VM</Link></li>
+                      <li><Link to="/credits-offers" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Credits: {userCredits}</Link></li>
+                      <li><button onClick={handleLogout} className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500">Logout</button></li>
+                    </>
+                  ) : (
+                    <>
+                      <li><Link to="/login" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Login</Link></li>
+                      <li><Link to="/register" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Register</Link></li>
+                    </>
+                  )}
+                </ul>
+              </div>
+
             </div>
+
+
+
           </div>
         </nav>
-
 
         <div className="flex-grow pt-8">
           <Routes>

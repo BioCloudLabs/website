@@ -95,3 +95,10 @@ def test_azurevm_history_no_machines_correct(client, payload):
 def test_azurevm_history_no_token(client):
     response = client.get('/azurevm/history')
     assert response.status_code == 401
+
+# Test azurevm history endpoint when the user token in the request it's expired
+def test_azurevm_history_token_expired(client, expired_token):
+    headers = {'Authorization': f'Bearer {expired_token}'}
+    response = client.get('/azurevm/history', headers=headers)
+    assert response.status_code == 401
+    assert response.json['msg'] == "Token has expired"

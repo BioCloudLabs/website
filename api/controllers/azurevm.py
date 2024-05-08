@@ -66,7 +66,7 @@ class PowerOffMachine(MethodView):
         if user is None:
             abort(404, message="User not found")
 
-        vm = models.VirtualMachineModel.query.filter_by(id=payload["id"]).one_or_404("VM not found")
+        vm = models.VirtualMachineModel.query.filter_by(id=payload["id"]).one_or_404(description="VM not found")
 
         vm_name = vm.name.split('.')[0]
 
@@ -108,6 +108,6 @@ class VirtualMachinesHistory(MethodView):
             abort(404, message="No VMs found."), 
 
         for i in vms:
-            vm_list.append({"name": i.name, "created_at": i.created_at, "poweredof_at": i.poweredof_at})
+            vm_list.append({"id": i.id, "name": i.name, "created_at": i.created_at, "poweredof_at": i.poweredof_at})
 
         return {"vm_list": vm_list}, 200

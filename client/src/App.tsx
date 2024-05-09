@@ -101,12 +101,20 @@ function App() {
             </a>
             {/*Toggle Button - Adjust the breakpoint for the toggle visibility */}
 
-            
             <div className="flex items-center space-x-3 md:space-x-0 rtl:space-x-reverse">
-            {isAuthenticated ? (
-            <Link to="/credits-offers" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Credits: {userCredits}</Link>
-            ) : null}
-            
+
+            </div>
+
+            <div className="flex items-center space-x-3 md:space-x-0 rtl:space-x-reverse">
+              {/* Move Credits Link Outside of the Button Div for Consistent Visibility */}
+              {isAuthenticated ? (
+                <Link to="/credits-offers" className="flex items-center mr-4 text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>
+                  {userCredits}
+                  <object type="image/svg+xml" data="/images/Credits/coin-2159.svg" className="filter w-8 h-8 ml-2" width="32" height="32"></object>
+                </Link>
+              ) : null}
+
+
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 data-collapse-toggle="navbar-sticky"
@@ -121,6 +129,7 @@ function App() {
               </button>
             </div>
 
+
             {/* User Controls - Improved Styling and Positioning */}
             <div className={`${isOpen ? 'flex' : 'hidden'} lg:flex items-center justify-between w-full lg:w-auto`}>
               <div className="flex items-center space-x-4">
@@ -129,7 +138,6 @@ function App() {
                     <>
                       <li><Link to="/dashboard" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Dashboard</Link></li>
                       <li><Link to="/blast" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Request VM</Link></li>
-                      <li><Link to="/credits-offers" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Credits: {userCredits}</Link></li>
                       <li><Link to="/profile" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Profile</Link></li>
                       <li><button onClick={handleLogout} className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500">Logout</button></li>
                     </>

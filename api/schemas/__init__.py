@@ -1,3 +1,4 @@
 from schemas.user_password_schema import UserPasswordSchema
 from schemas.user_schema import UserSchema
 from schemas.invoice_schema import InvoiceSchema
+from schemas.vm_schema import VmSchema

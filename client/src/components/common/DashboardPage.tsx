@@ -12,14 +12,12 @@ function DashboardPage() {
         }
     }, []);
 
-    <h1 className="text-3xl font-bold text-center my-12">Log in</h1>
-
     return (
         <div className="p-8">
             {userName ? (
-                <h2 className="text-3xl font-bold my-12">Welcome, {userName}!</h2>
+                <h2 className="text-3xl font-bold pt-4 my-12">Welcome, {userName}!</h2>
             ) : (
-                <h2 className="text-3xl font-bold my-12">Welcome!</h2>
+                <h2 className="text-3xl font-bold pt-4 my-12">Welcome!</h2>
             )}
             <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
 

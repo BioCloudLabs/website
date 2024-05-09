@@ -65,7 +65,7 @@ const CreditsOffersPage: React.FC = () => {
   return (
     <div className="credits-offers-page">
       <ToastContainer />
-      <h1 className="text-3xl font-bold text-center my-12">Available Credits Offers</h1>
+      <h1 className="text-3xl font-bold text-center  pt-4 my-12">Available Credits Offers</h1>
       <div className="flex justify-center flex-wrap gap-x-4 gap-y-1">
         {offers.length > 0 ? (
           offers.map((offer, index) => (

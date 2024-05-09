@@ -122,6 +122,7 @@ export const logoutUser = async (isTokenInvalid = false): Promise<void> => {
 
   logoutUserLocally(); // Then clear local storage
 
+
   if (isTokenInvalid) { // If at this point the token was found invalid, redirect to login page
     sessionStorage.setItem('postLogoutMessage', 'Session expired or token invalid. Please log in again.');
     window.location.href = '/login';  // Redirect to login page
@@ -137,7 +138,7 @@ export const logoutUser = async (isTokenInvalid = false): Promise<void> => {
  */
 export const logoutUserLocally = (): void => {
   localStorage.removeItem('token');
-  localStorage.removeItem('userProfile');
+  localStorage.removeItem('userData');
   localStorage.removeItem('userCredits');
 };
 
@@ -148,10 +149,9 @@ export const logoutUserLocally = (): void => {
 /****************** REGISTER SECTION START ******************/
 
 /**
- * Registers a new user with the provided details.
- * @param userDetails - An object containing user details like email, password, name, etc.
- * @returns A Promise that resolves to a boolean indicating whether the registration was successful.
- * If registration fails, throws an error with the backend message.
+ * Attempts to register a new user with the provided user details.
+ * @param userDetails An object containing the user's registration information.
+ * @returns A promise that resolves to true if registration is successful, or throws an error if not.
  */
 export const registerUser = async (userDetails: RegistrationForm): Promise<boolean> => {
   try {
@@ -161,22 +161,62 @@ export const registerUser = async (userDetails: RegistrationForm): Promise<boole
       body: JSON.stringify(userDetails),
     });
 
-    const data = await response.json(); // Parse JSON regardless of the response status
+    const data = await response.json() as { errors?: { json?: Record<string, string[]> }, message?: string };
 
     if (!response.ok) {
-      // Check if there are detailed field errors to be displayed
-      if (data.errors && data.errors.json) {
-        const fieldErrors = Object.entries(data.errors.json).map(([key, val]) => `${key}: ${(val as string[]).join(', ')}`).join('\n');
-        throw new Error(fieldErrors || 'Registration failed. Please try again.');
+      if (response.status === 422 && data.errors && data.errors.json) {
+        const fieldErrors = Object.entries(data.errors.json)
+          .map(([field, errors]) => `${capitalizeFirstLetter(field)}: ${errors.join(', ')}.`)
+          .join(' ');
+        notify(fieldErrors || 'Invalid input data provided.', 'error', 7000);
+        throw new Error(fieldErrors);
+      } else if (response.status === 409) {
+        notify(data.message || "Username already exists.", 'error', 7000);
+        throw new Error(data.message || "Username already exists.");
+      } else {
+        notify(data.message || 'Registration failed. Please try again.', 'error', 7000);
+        throw new Error(data.message || 'Registration failed. Please try again.');
       }
-      throw new Error(data.message || 'Registration failed. Please try again.');
     }
-
-    return true; // Indicate success
-  } catch (error: any) {
-    console.error('Registration error:', error.message);
-    throw new Error(error.message); // Re-throwing to be handled by the calling component
+    return true;
+  } catch (error) {
+    console.error('Registration error:', error);
+    throw error;
   }
+};
+
+
+/**
+ * Capitalizes the first letter of a string.
+ * @param string - The input string.
+ * @returns The input string with the first letter capitalized.
+ */
+function capitalizeFirstLetter(string: string): string {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+
+/**
+ * Validates a password based on certain criteria.
+ * @param password - The password to be validated.
+ * @returns An object containing the validation result and error message.
+ */
+export const validatePassword = (password: string) => {
+  const minLength = password.length >= 8;
+  const hasUpper = /[A-Z]/.test(password);
+  const hasLower = /[a-z]/.test(password);
+  const hasSpecial = /[!@#$%^&*]/.test(password);
+
+  let errorMessage = '';
+  if (!minLength) errorMessage += 'Password must be at least 8 characters long. ';
+  if (!hasUpper) errorMessage += 'Include at least one uppercase letter. ';
+  if (!hasLower) errorMessage += 'Include at least one lowercase letter. ';
+  if (!hasSpecial) errorMessage += 'Include at least one special character. ';
+
+  return {
+    isValid: minLength && hasUpper && hasLower && hasSpecial,
+    errorMessage
+  };
 };
 
 
@@ -184,45 +224,54 @@ export const registerUser = async (userDetails: RegistrationForm): Promise<boole
 
 /****************** LOGIN SECTION START ******************/
 
-  export const loginUser = async (email: string, password: string): Promise<LoginResponse | null> => {
-    try {
-      const response = await fetch('/user/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+/**
+ * Logs in a user with the provided email and password.
+ * 
+ * @param email - The user's email.
+ * @param password - The user's password.
+ * @returns A promise that resolves to a `LoginResponse` object if the login is successful, or `null` otherwise.
+ * @throws An error if the login fails.
+ */
+export const loginUser = async (email: string, password: string): Promise<LoginResponse | null> => {
+  try {
+    // Make a POST request to the server with the user's email and password
+    const response = await fetch('/user/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
+    // Check if the response was successful
+    if (!response.ok) {
+      // Parse the error response from the server
+      const errorData = await response.json();
+
+      // Specific handling for password and username errors
+      if (response.status === 422 && errorData.errors?.json?.password?.includes('Password is not strong enough.')) {
+        throw new Error('Invalid credentials. Please try again.'); // More specific for password strength issue
+      } else if (response.status === 401 && errorData.message === 'Invalid credentials.') {
+        throw new Error('Invalid credentials. Please try again.'); // Handling invalid credentials
       }
 
-      const data: LoginResponse = await response.json();
-
-      // Store the token in localStorage
-      localStorage.setItem('token', data.access_token);
-
-      // Fetch user credits and profile
-      const credits = await fetchUserCredits();
-      const userProfile = await fetchUserProfile();
-
-      if (credits !== null && userProfile !== null) {
-        // Store the user credits and profile in localStorage
-        localStorage.setItem('userCredits', credits.toString());
-        localStorage.setItem('userProfile', JSON.stringify(userProfile));
-      } else {
-        console.error('Failed to fetch user credits or profile');
-      }
-
-      // Redirect to home or wherever you need to go after login
-      // You can use React Router's history object to navigate programmatically
-
-      return data;
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error; // Re-throw the error with the message from the server
+      // Default to server-provided message or a generic error if not detailed
+      throw new Error(errorData.message || 'Login failed. Please try again.');
     }
-  };
+
+    // Parse the successful response and store the access token locally
+    const data: LoginResponse = await response.json();
+    localStorage.setItem('token', data.access_token);
+
+    // Successful login, return data
+    return data;
+  } catch (error) {
+    // Log the error to the console and rethrow to handle it appropriately elsewhere
+    console.error('Login error:', error);
+    throw error;
+  }
+};
+
+
+
 
 
 /****************** LOGIN SECTION END ******************/
@@ -298,8 +347,8 @@ export const updateUserProfile = async (user: User): Promise<void> => {
 
     // Uncomment the lines below to log the response data
 
-    // const responseData = await response.json();
-    // console.log('Profile update response:', responseData); // Log the response for debugging
+    const responseData = await response.json();
+    console.error('Profile update response:', responseData); // Log the response for debugging
 
   } catch (error) {
     console.error('Error updating user profile:', error);
@@ -312,7 +361,7 @@ export const updateUserProfile = async (user: User): Promise<void> => {
  * Fetches location options from the server and transforms them into the format required by the frontend.
  * @returns A Promise that resolves to an array of location objects containing id and display_name.
  */
-export const getLocationOptions = async (): Promise<{ id: number; display_name: string, name: string }[]> => {  
+export const getLocationOptions = async (): Promise<{ id: number; display_name: string, name: string }[]> => {
 
   try {
     const response = await fetch('/azuredata/locations', {
@@ -347,11 +396,16 @@ export const getLocationOptions = async (): Promise<{ id: number; display_name: 
 
 /****************** USER CREDITS SECTION START ******************/
 
+/**
+ * Fetches the user's credits from the server using the /user/credits endpoint.
+ * Ensures token is valid before making the request.
+ * Throws an error if the token is invalid or if the credits fetch fails.
+ * @returns A Promise that resolves to the user's credits if successful.
+ */
 export const fetchUserCredits = async (): Promise<number | null> => {
-  
-
+  const url = '/user/credits';
   try {
-    const response = await fetch('/user/credits', {
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -360,21 +414,31 @@ export const fetchUserCredits = async (): Promise<number | null> => {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch user credits');
-    }
+      const tokenStillValid = await isTokenValid();
+      if (!tokenStillValid) {
+        // If token is not valid, the function isTokenValid() will handle logout
+        return null;
+      }
 
-    if (!response.ok && response.status === 401) { // Using 401 is unauthorized due to invalid token
-
-      await logoutUser(true); // Log out the user if token is invalid
+      const errorData = await response.json();
+      console.error('Failed to fetch user credits:', errorData);
+      throw new Error(`Failed to fetch user credits with status: ${response.status}`);
     }
 
     const data = await response.json();
+    localStorage.setItem('userCredits', data.credits.toString());
     return data.credits;
   } catch (error) {
-    console.error('Error fetching user credits:', error);
-    throw error;
+    if (error instanceof Error) {
+      console.error('Error fetching user credits:', error.message);
+      throw new Error(`Error fetching user credits: ${error.message}`);
+    } else {
+      console.error('An unexpected error occurred:', error);
+      throw new Error('An unexpected error occurred');
+    }
   }
 };
+
 
 
 
@@ -390,38 +454,52 @@ export const fetchUserCredits = async (): Promise<number | null> => {
  * @param {string} newPassword - The new password to be set.
  * @returns {Promise<void>} - A promise that resolves when the password is changed successfully.
  */
-export const changeUserPassword = async (oldPassword: string, newPassword: string) => {
+export const changeUserPassword = async (oldPassword: string, newPassword: string): Promise<boolean> => {
   const token = localStorage.getItem('token');
   if (!token) {
-      notify('You are not logged in. Please log in to change your password.', 'error');
-      return Promise.reject(new Error('No authentication token found.'));
+    notify('You are not logged in. Please log in to change your password.', 'error');
+    return Promise.reject(new Error('No authentication token found.'));
   }
 
   try {
-      const response = await fetch('/user/change-password', {
-          method: 'PUT',
-          headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ old_password: oldPassword, new_password: newPassword })
-      });
+    const response = await fetch('/user/change-password', {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ old_password: oldPassword, new_password: newPassword })
+    });
 
-      if (!response.ok) {
-          const errorData = await response.json();
+    if (!response.ok) {
+      const errorData = await response.json();
+      switch (response.status) {
+        case 401:
+          notify(errorData.message || 'Invalid credentials.', 'error');
+          break;
+        case 422:
+          // Assume errorData.errors is an object with string keys and array of strings as values
+          const errors = Object.entries(errorData.errors || {})
+            .map(([field, errs]) => `${field}: ${(errs as string[]).join(', ')}`)
+            .join('. ');
+          notify(errors || 'Invalid input data provided.', 'error');
+          break;
+        default:
           notify(errorData.message || 'Failed to change password.', 'error');
-          return Promise.reject(new Error(errorData.message || 'Failed to change password.'));
       }
+      return Promise.reject(new Error(errorData.message || 'Failed to change password.'));
+    }
 
-      const data = await response.json();
-      notify(data.message, 'success');
-      return Promise.resolve();
+    const data = await response.json();
+    notify(data.message, 'success');
+    return Promise.resolve(true);  // Indicating success to the caller
   } catch (error) {
-      console.error('Error changing password:', error);
-      notify('An error occurred while changing your password. Please try again.', 'error');
-      return Promise.reject(error);
+    console.error('Error changing password:', error);
+    notify('An error occurred while changing your password. Please try again.', 'error');
+    return Promise.reject(error);
   }
 };
+
 
 
 /****************** CHANGE PASSWORD SECTION END ******************/
@@ -452,16 +530,26 @@ export const sendRecoverPasswordEmail = async (email: string): Promise<void> => 
   } catch (error: unknown) {
     console.error('Error sending recovery email:', error);
     if (error instanceof Error) {
-        notify(error.message || 'An error occurred while sending the recovery email. Please try again.', 'error');
+      notify(error.message || 'An error occurred while sending the recovery email. Please try again.', 'error');
     } else {
-        notify('An error occurred while sending the recovery email. Please try again.', 'error');
+      notify('An error occurred while sending the recovery email. Please try again.', 'error');
     }
     throw error;
-}
+  }
 };
 
 
 
+/**
+ * Recovers the user's password by sending a request to the server with a new password and a token.
+ * If the request is successful, the user's password is reset.
+ * If the request fails, specific errors are handled based on the backend response.
+ *
+ * @param newPassword - The new password to set for the user.
+ * @param token - The token used for authentication and authorization.
+ * @returns A promise that resolves with void when the password recovery is complete.
+ * @throws An error if the password recovery fails or if specific errors occur during the process.
+ */
 export const recoverPassword = async (newPassword: string, token: string): Promise<void> => {
   try {
     const response = await fetch('/user/recover-password', {
@@ -496,7 +584,7 @@ export const recoverPassword = async (newPassword: string, token: string): Promi
     }
 
     const data = await response.json();
-    notify(data.message || 'Your password has been successfully reset.', 'success');
+    console.error('Password reset response:', data); // Log the response for debugging
   } catch (error: unknown) {
     console.error('Error resetting password:', error);
     if (!(error instanceof Error && (error.message === "New password is the same as the old one." || error.message === "The token has expired. Please request a new password reset."))) {

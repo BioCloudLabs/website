@@ -9,6 +9,9 @@ export default defineConfig({
     port: 5173,
     strictPort: true
   },
+  optimizeDeps: {
+    exclude: ['package-name']
+  },
   server: {
     port: 5173,
     strictPort: true,
@@ -29,6 +32,11 @@ export default defineConfig({
         target: 'http://127.0.0.1:5000',
         changeOrigin: true,
       },
+      // Existing proxy for /user requests
+      '/azurevm': {
+        target: 'http://127.0.0.1:5000',
+        changeOrigin: true,
+      }
     }
   }
 })

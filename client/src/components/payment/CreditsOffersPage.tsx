@@ -65,19 +65,22 @@ const CreditsOffersPage: React.FC = () => {
   return (
     <div className="credits-offers-page">
       <ToastContainer />
-      <h1 className="text-center text-2xl font-bold my-2">Available Credit Offers</h1>
-      <div className="flex justify-center flex-wrap gap-x-6 gap-y-2">
+      <h1 className="text-3xl font-bold text-center  pt-4 my-12">Available Credits Offers</h1>
+      <div className="flex justify-center flex-wrap gap-x-4 gap-y-1">
         {offers.length > 0 ? (
           offers.map((offer, index) => (
             <div key={index} className="bg-white rounded-lg shadow-lg w-64 p-2 flex flex-col items-center text-center m-2">
-              <img src={offer.image} alt={offer.name} className="w-full h-auto rounded-lg mb-4" />
-              <h2 className="text-lg font-semibold text-gray-500">{offer.name}</h2>
+              <img src={offer.image} alt={`Offer: ${offer.name}`} className="w-5/6 h-auto rounded-lg mb-4" />              <h2 className="text-lg font-semibold text-gray-500">{offer.name}</h2>
               <p className="text-gray-600">{offer.price}</p>
               <button
                 onClick={() => handleCheckoutClick(offer.priceId, parseFloat(offer.price.replace('€', '').trim()))}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md cursor-pointer mt-3 transition-colors duration-300 hover:bg-blue-400">
+                className="bg-blue-500 text-white px-4 py-2 rounded-md cursor-pointer mt-3 transition-colors duration-300 hover:bg-blue-400"
+                style={{ backgroundColor: '#2563EB', color: '#FFFFFF' }} // Adjust contrast
+              >
                 Checkout
-              </button>            </div>
+              </button>
+
+            </div>
           ))
         ) : (
           <p className="text-center">No offers available at this time.</p>

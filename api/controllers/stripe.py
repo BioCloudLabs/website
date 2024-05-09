@@ -49,9 +49,10 @@ class PaymentIntent(MethodView):
 
         PRODUCTS = getProducts()
 
-        for i in PRODUCTS["products"]:
-            if i["price"] == f"{payload['price']} €":
-                credits += int(i["credits"])
+        for product in PRODUCTS["products"]:
+            price = "{:.2f} €".format(float(payload['price']))
+            if product["price"] == price:
+                credits += int(product["credits"])
 
         try:
             invoice = models.InvoiceModel(

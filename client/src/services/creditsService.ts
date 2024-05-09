@@ -65,7 +65,7 @@ export const checkout = async (price_id: string, price: number, _navigate: (path
   // // Uncomment below for debugging to check data types after interaction
   // console.log(`Sending payload:`, { price_id, price });
 
-  const response = await fetch('/stripe/create-checkout-session', {
+  const response = await fetch('/api/stripe/create-checkout-session', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -95,7 +95,7 @@ export const checkout = async (price_id: string, price: number, _navigate: (path
  */
 export const fetchProducts = async (): Promise<Offer[]> => {
   try {
-    const response = await fetch('/stripe/products', {
+    const response = await fetch('/api/stripe/products', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

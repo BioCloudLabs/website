@@ -59,7 +59,7 @@ export const isTokenValid = async (): Promise<boolean> => {
   const token = localStorage.getItem('token');
 
   try {
-    const response = await fetch('/user/validate-token', {
+    const response = await fetch('/api/user/validate-token', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -92,7 +92,7 @@ export const isTokenValid = async (): Promise<boolean> => {
  */
 export const invalidateToken = async (): Promise<void> => {
   const token = localStorage.getItem('token');
-  const response = await fetch('/user/logout', {
+  const response = await fetch('/api/user/logout', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -155,7 +155,7 @@ export const logoutUserLocally = (): void => {
  */
 export const registerUser = async (userDetails: RegistrationForm): Promise<boolean> => {
   try {
-    const response = await fetch('/user/register', {
+    const response = await fetch('/api/user/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userDetails),
@@ -235,7 +235,7 @@ export const validatePassword = (password: string) => {
 export const loginUser = async (email: string, password: string): Promise<LoginResponse | null> => {
   try {
     // Make a POST request to the server with the user's email and password
-    const response = await fetch('/user/login', {
+    const response = await fetch('/api/user/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
@@ -288,7 +288,7 @@ export const loginUser = async (email: string, password: string): Promise<LoginR
  * @returns A Promise that resolves to the user object if successful.
  */
 export const fetchUserProfile = async (): Promise<User | null> => {
-  const url = '/user/profile';
+  const url = '/api/user/profile';
   try {
     const response = await fetch(url, {
       method: 'GET',
@@ -336,7 +336,7 @@ export const updateUserProfile = async (user: User): Promise<void> => {
   const { name, surname, location_id } = user;
 
   try {
-    const response = await fetch('/user/profile', {
+    const response = await fetch('/api/user/profile', {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -364,7 +364,7 @@ export const updateUserProfile = async (user: User): Promise<void> => {
 export const getLocationOptions = async (): Promise<{ id: number; display_name: string, name: string }[]> => {
 
   try {
-    const response = await fetch('/azuredata/locations', {
+    const response = await fetch('/api/azuredata/locations', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -397,13 +397,13 @@ export const getLocationOptions = async (): Promise<{ id: number; display_name: 
 /****************** USER CREDITS SECTION START ******************/
 
 /**
- * Fetches the user's credits from the server using the /user/credits endpoint.
+ * Fetches the user's credits from the server using the /api/user/credits endpoint.
  * Ensures token is valid before making the request.
  * Throws an error if the token is invalid or if the credits fetch fails.
  * @returns A Promise that resolves to the user's credits if successful.
  */
 export const fetchUserCredits = async (): Promise<number | null> => {
-  const url = '/user/credits';
+  const url = '/api/user/credits';
   try {
     const response = await fetch(url, {
       method: 'GET',
@@ -462,7 +462,7 @@ export const changeUserPassword = async (oldPassword: string, newPassword: strin
   }
 
   try {
-    const response = await fetch('/user/change-password', {
+    const response = await fetch('/api/user/change-password', {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -513,7 +513,7 @@ export const changeUserPassword = async (oldPassword: string, newPassword: strin
  */
 export const sendRecoverPasswordEmail = async (email: string): Promise<void> => {
   try {
-    const response = await fetch('/user/recover-password-email', {
+    const response = await fetch('/api/user/recover-password-email', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -552,7 +552,7 @@ export const sendRecoverPasswordEmail = async (email: string): Promise<void> => 
  */
 export const recoverPassword = async (newPassword: string, token: string): Promise<void> => {
   try {
-    const response = await fetch('/user/recover-password', {
+    const response = await fetch('/api/user/recover-password', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -582,7 +582,6 @@ export const recoverPassword = async (newPassword: string, token: string): Promi
           throw new Error(errorData.message || 'Failed to reset password. Please try again.');
       }
     }
-
     const data = await response.json();
     console.error('Password reset response:', data); // Log the response for debugging
   } catch (error: unknown) {

@@ -1,7 +1,7 @@
 import { VirtualMachine } from './../models/VirtualMachines';
 
 export async function createVirtualMachine(selectedVM: string): Promise<VirtualMachine> {
-  const apiUrl = `/azurevm/setup`; // Adjust this URL based on where your service is hosted
+  const apiUrl = `api/azurevm/setup`; // Adjust this URL based on where the service is hosted
 
   try {
     const token = localStorage.getItem('token'); // Retrieve the JWT token from local storage
@@ -10,7 +10,7 @@ export async function createVirtualMachine(selectedVM: string): Promise<VirtualM
     }
 
     const response = await fetch(apiUrl, {
-      method: 'GET', // Or POST if your backend expects a POST request
+      method: 'GET', // Or POST backend expects a POST request
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -30,8 +30,8 @@ export async function createVirtualMachine(selectedVM: string): Promise<VirtualM
     }
 
     return {
-      ip: data.ip, // Add the missing 'ip' property
-      url: `https://${data.dns}`, // Assuming the DNS is what you use to connect to the VM
+      ip: data.ip, // Add the 'ip' property
+      url: `https://${data.dns}`, // Assuming the DNS to connect to the VM
       price: calculatePrice(selectedVM) // Continue using this function or adapt as needed
     };
   } catch (error) {

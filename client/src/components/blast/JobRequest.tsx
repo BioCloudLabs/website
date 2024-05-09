@@ -50,20 +50,20 @@ const JobRequest: React.FC = () => {
         It compares nucleotide or protein sequences to sequence databases and calculates the statistical significance.
       </p>
       <div className="mb-4">
-  <label htmlFor="vmSelect" className="block text-sm font-medium text-gray-700">Select VM</label>
-  <select
-    id="vmSelect"  // Ensure the ID matches the htmlFor attribute of the label
-    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-    value={selectedVM}
-    onChange={handleVMSelectChange}
-  >
-    {vmSpecs.map((vm) => (
-      <option key={vm.name} value={vm.name}>
-        {vm.name}
-      </option>
-    ))}
-  </select>
-</div>
+        <label htmlFor="vmSelect" className="block text-sm font-medium text-gray-700">Select VM</label>
+        <select
+          id="vmSelect"  // Ensure the ID matches the htmlFor attribute of the label
+          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+          value={selectedVM}
+          onChange={handleVMSelectChange}
+        >
+          {vmSpecs.map((vm) => (
+            <option key={vm.name} value={vm.name}>
+              {vm.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <div className="mb-4">
         <h2 className="text-lg font-semibold mb-2">Virtual Machine Specifications</h2>

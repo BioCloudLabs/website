@@ -2,7 +2,7 @@ from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 import models
 
-blp = Blueprint("azuredata", __name__, description="Azure data endpoint", url_prefix="/azuredata")
+blp = Blueprint("azuredata", __name__, description="Azure data endpoint", url_prefix="/api/azuredata")
     
 @blp.route("/locations")
 class Locations(MethodView):

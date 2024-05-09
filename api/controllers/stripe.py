@@ -8,7 +8,7 @@ from database import db
 from flask import request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-blp = Blueprint("stripe", __name__, description="Stripe endpoint", url_prefix="/stripe")
+blp = Blueprint("stripe", __name__, description="Stripe endpoint", url_prefix="/api/stripe")
 
 DOMAIN = os.getenv("DOMAIN_URL")
 stripe.api_key = os.getenv("STRIPE_KEY")

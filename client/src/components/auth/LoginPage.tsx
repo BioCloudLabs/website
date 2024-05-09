@@ -44,7 +44,7 @@ function LoginPage({ onLoginSuccess, setIsAuthenticated }: LoginPageProps) {
     return (
         <div className="flex flex-col items-center justify-center h-auto bg-gray-100 px-4">
             <div className="w-full max-w-md">
-                <h1 className="text-3xl font-bold text-center my-12">Log in</h1>
+                <h1 className="text-3xl font-bold text-center pt-4 my-12">Log in</h1>
                 <div className="bg-white p-4 rounded-lg shadow-md">
 
                     <form onSubmit={handleLogin} className="space-y-8">

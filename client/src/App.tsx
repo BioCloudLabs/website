@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-ro
 import './App.css';
 import Homepage from './components/common/Homepage';
 import JobRequest from './components/blast/JobRequest';
+import VMStatus from './components/blast/VMStatus';
 import DashboardPage from './components/common/DashboardPage';
 import LoginPage from './components/auth/LoginPage';
 import RegisterPage from './components/auth/RegisterPage';
@@ -137,7 +138,7 @@ function App() {
                   {isAuthenticated ? (
                     <>
                       <li><Link to="/dashboard" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Dashboard</Link></li>
-                      <li><Link to="/blast" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Request VM</Link></li>
+                      <li><Link to="/vm-request" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Request VM</Link></li>
                       <li><Link to="/profile" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Profile</Link></li>
                       <li><button onClick={handleLogout} className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500">Logout</button></li>
                     </>
@@ -159,7 +160,8 @@ function App() {
         <div className="flex-grow pt-8">
           <Routes>
             <Route path="/" element={<><Homepage /></>} /> {/* This is the default route, it will render Homepage component when the path is correct */}
-            <Route path="/blast" element={<ProtectedRoute isAuthenticated={isAuthenticated}><JobRequest /></ProtectedRoute>} />
+            <Route path="/vm-request" element={<ProtectedRoute isAuthenticated={isAuthenticated}><JobRequest /></ProtectedRoute>} />
+            <Route path="/vm-status" element={<ProtectedRoute isAuthenticated={isAuthenticated}><VMStatus /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute isAuthenticated={isAuthenticated}><DashboardPage /></ProtectedRoute>} />
             <Route path="/login" element={<LoginPage onLoginSuccess={() => setIsAuthenticated(true)} setIsAuthenticated={setIsAuthenticated} />} />
             <Route path="/register" element={<RegisterPage />} />
@@ -170,6 +172,7 @@ function App() {
             <Route path="/profile" element={<AuthGuard><ProfilePage /></AuthGuard>} />
             <Route path="/success" element={<ProtectedRoute isAuthenticated={isAuthenticated}><SuccessPage /> </ProtectedRoute>} />
             <Route path="/cancelled" element={<ProtectedRoute isAuthenticated={isAuthenticated}><CancelledPage /> </ProtectedRoute>} />Ç
+           
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

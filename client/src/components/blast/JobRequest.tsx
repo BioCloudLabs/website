@@ -3,6 +3,7 @@ import { createVirtualMachine } from './../../services/vmService';
 import { VirtualMachine } from './../../models/VirtualMachines';
 import { VMSpec } from '../../models/VMSpec';
 import { notify } from '../../utils/notificationUtils';
+import { useNavigate } from 'react-router-dom';
 
 const vmSpecs: VMSpec[] = [
   { name: 'VM1', cpu: '2 vCPUs', memory: '8 GB', credits: 0.0922, description: 'Basic VM for small BLAST jobs.' },
@@ -12,26 +13,28 @@ const vmSpecs: VMSpec[] = [
   { name: 'VM5', cpu: '32 vCPUs', memory: '128 GB', credits: 1.4748, description: 'Super VM for the most demanding BLAST jobs.' },
 ];
 
+
+
+
 const JobRequest: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [virtualMachine, setVirtualMachine] = useState<VirtualMachine | null>(null);
   const [selectedVM, setSelectedVM] = useState<string>(vmSpecs[0].name);
   const [estimatedCredits, setEstimatedCredits] = useState<number>(vmSpecs[0].credits);
+  const navigate = useNavigate();
+  const userCredits = parseFloat(localStorage.getItem('userCredits') || '0');
 
-  const handleCreateVirtualMachine = async () => {
-    setIsLoading(true);
-    try {
-      const vm = await createVirtualMachine(selectedVM);
-      setVirtualMachine(vm);
-      notify(`Virtual machine created successfully: IP ${vm.ip}, DNS ${vm.url}`, 'success');
-    } catch (error) {
-      console.error('Error creating virtual machine:', error);
-      notify(`Error creating virtual machine: ${(error as Error).message}`, 'error');
-    } finally {
-      setIsLoading(false);
+
+
+
+  const handleCreateVirtualMachine = () => {
+    if (userCredits > 20) {
+      navigate('/vm-status', { state: { vm: selectedVM } }); // Passing VM as a state object
+    } else {
+      notify('Insufficient credits to run this VM.', 'error');
     }
-
   };
+
 
   const handleVMSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedVM = e.target.value;
@@ -108,9 +111,8 @@ const JobRequest: React.FC = () => {
           ) : (
             <button
               className="inline-flex items-center justify-center bg-blue-700 text-white border-0 py-2 px-6 focus:outline-none hover:bg-blue-800 rounded text-lg transition duration-300 ease-in-out transform hover:-translate-y-1"
-
               onClick={handleCreateVirtualMachine}
-              disabled={!selectedVM || isLoading}
+              disabled={!selectedVM || isLoading || userCredits <= 20}
             >
               Run
             </button>

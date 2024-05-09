@@ -26,6 +26,9 @@ class SetupVirtualMachine(MethodView):
         if user is None:
             abort(404, message="User not found")
 
+        if user.credits <= 0:
+            abort(401, message="Not enough credits.")
+
         res = requests.get("http://localhost:4000/vm/setup")
         json_res = res.json()
 

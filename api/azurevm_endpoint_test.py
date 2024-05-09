@@ -72,6 +72,13 @@ def auth_token(client, payload):
     response = client.post('/user/login', json={"email": "test@example.com", "password": "Password123!"})
     return response.json['access_token']
 
+# Test azurevm setup endpoint when user credits = 0
+def test_azurevm_history_has_machines_correct(client, auth_token):
+    headers = {'Authorization': f'Bearer {auth_token}'}
+    response = client.get('/azurevm/setup', headers=headers)
+    assert response.status_code == 401
+    assert response.json['message'] == "Not enough credits."
+
 # Test azurevm history endpoint when everything it's correct 
 # and user has vms
 def test_azurevm_history_has_machines_correct(client, auth_token):

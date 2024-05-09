@@ -10,3 +10,4 @@ api/migrations/env.py
 api/migrations/README
 api/migrations/script.py.mako
 api/migrations/versions/e1fd59cfdb9f_.py
+dist/

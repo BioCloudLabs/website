@@ -120,22 +120,22 @@ function RegisterPage() {
                                     aria-describedby={passwordError ? 'password-error-info' : undefined}
                                     onBlur={handlePasswordBlur}
                                 />
-<button
-  type="button"
-  className="ml-2 p-2 text-gray-500 hover:text-gray-700 focus:outline-none"
-  onClick={() => setShowPassword(!showPassword)}
-  aria-label={showPassword ? "Hide password" : "Show password"}
->
-  {showPassword ? (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
-      <path d="M12 4.5c5 0 9 4.5 9 4.5s-4 4.5-9 4.5-9-4.5-9-4.5 4-4.5 9-4.5zm0 7.5a3 3 0 100-6 3 3 0 000 6zm0 2c-5 0-9 4.5-9 4.5s4 4.5 9 4.5 9-4.5 9-4.5-4-4.5-9-4.5zm0 7.5a3 3 0 100-6 3 3 0 000 6z" />
-    </svg>
-  ) : (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
-      <path d="M12 6.75c-2.9 0-5.25 2.354-5.25 5.25s2.35 5.25 5.25 5.25 5.25-2.354 5.25-5.25-2.35-5.25-5.25-5.25zm0 9a3.75 3.75 0 110-7.5 3.75 3.75 0 010 7.5zm5.25-9c.69 0 1.38.107 2.03.303a.75.75 0 00.67-1.336C18.33 5.917 15.35 4.5 12 4.5c-3.35 0-6.33 1.417-7.95 2.717a.75.75 0 10.67 1.336c.65-.196 1.34-.303 2.03-.303 0 2.9 2.35 5.25 5.25 5.25s5.25-2.35 5.25-5.25z" />
-    </svg>
-  )}
-</button>
+                                <button
+                                    type="button"
+                                    className="ml-2 p-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    aria-label={showPassword ? "Hide password" : "Show password"}
+                                >
+                                    {showPassword ? (
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
+                                            <path d="M12 4.5c5 0 9 4.5 9 4.5s-4 4.5-9 4.5-9-4.5-9-4.5 4-4.5 9-4.5zm0 7.5a3 3 0 100-6 3 3 0 000 6zm0 2c-5 0-9 4.5-9 4.5s4 4.5 9 4.5 9-4.5 9-4.5-4-4.5-9-4.5zm0 7.5a3 3 0 100-6 3 3 0 000 6z" />
+                                        </svg>
+                                    ) : (
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
+                                            <path d="M12 6.75c-2.9 0-5.25 2.354-5.25 5.25s2.35 5.25 5.25 5.25 5.25-2.354 5.25-5.25-2.35-5.25-5.25-5.25zm0 9a3.75 3.75 0 110-7.5 3.75 3.75 0 010 7.5zm5.25-9c.69 0 1.38.107 2.03.303a.75.75 0 00.67-1.336C18.33 5.917 15.35 4.5 12 4.5c-3.35 0-6.33 1.417-7.95 2.717a.75.75 0 10.67 1.336c.65-.196 1.34-.303 2.03-.303 0 2.9 2.35 5.25 5.25 5.25s5.25-2.35 5.25-5.25z" />
+                                        </svg>
+                                    )}
+                                </button>
 
 
 

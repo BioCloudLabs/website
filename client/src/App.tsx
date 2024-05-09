@@ -101,32 +101,36 @@ function App() {
             </a>
             {/*Toggle Button - Adjust the breakpoint for the toggle visibility */}
 
+            
             <div className="flex items-center space-x-3 md:space-x-0 rtl:space-x-reverse">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              data-collapse-toggle="navbar-sticky"
-              type="button"
-              className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg lg:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-              aria-controls="navbar-sticky"
-              aria-expanded={isOpen}>
-              <span className="sr-only">Open main menu</span>
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 17 14" xmlns="http://www.w3.org/2000/svg">
-                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M1 1h15M1 7h15M1 13h15" />
-              </svg>
-          </button>
+            {isAuthenticated ? (
+            <Link to="/credits-offers" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Credits: {userCredits}</Link>
+            ) : null}
+            
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                data-collapse-toggle="navbar-sticky"
+                type="button"
+                className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg lg:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                aria-controls="navbar-sticky"
+                aria-expanded={isOpen}>
+                <span className="sr-only">Open main menu</span>
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 17 14" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M1 1h15M1 7h15M1 13h15" />
+                </svg>
+              </button>
             </div>
 
             {/* User Controls - Improved Styling and Positioning */}
             <div className={`${isOpen ? 'flex' : 'hidden'} lg:flex items-center justify-between w-full lg:w-auto`}>
               <div className="flex items-center space-x-4">
-              <ul className="flex flex-col lg:flex-row p-4 lg:p-0 font-medium space-y-4 lg:space-y-0 lg:space-x-8 bg-gray-50 dark:bg-gray-900 lg:bg-transparent rounded-lg lg:rounded-none">                  <li><Link to="/" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Home</Link></li>
-                  <li><Link to="/credits-offers" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Credits Offers</Link></li>
+                <ul className="flex flex-col lg:flex-row p-4 lg:p-0 font-medium space-y-4 lg:space-y-0 lg:space-x-8 bg-gray-50 dark:bg-gray-900 lg:bg-transparent rounded-lg lg:rounded-none">                  <li><Link to="/" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Home</Link></li>
                   {isAuthenticated ? (
                     <>
-                      <li><Link to="/profile" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Profile</Link></li>
                       <li><Link to="/dashboard" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Dashboard</Link></li>
                       <li><Link to="/blast" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Request VM</Link></li>
                       <li><Link to="/credits-offers" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Credits: {userCredits}</Link></li>
+                      <li><Link to="/profile" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Profile</Link></li>
                       <li><button onClick={handleLogout} className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500">Logout</button></li>
                     </>
                   ) : (
@@ -154,8 +158,8 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/change-password" element={<ProtectedRoute isAuthenticated={isAuthenticated}><ChangePasswordPage /></ProtectedRoute>} />
             <Route path="/recoverpassword" element={<RecoverPasswordPage />} />
-            <Route path="/profile" element={<AuthGuard><ProfilePage /></AuthGuard>} />
             <Route path="/credits-offers" element={<CreditsOffersPage />} />
+            <Route path="/profile" element={<AuthGuard><ProfilePage /></AuthGuard>} />
             <Route path="/success" element={<ProtectedRoute isAuthenticated={isAuthenticated}><SuccessPage /> </ProtectedRoute>} />
             <Route path="/cancelled" element={<ProtectedRoute isAuthenticated={isAuthenticated}><CancelledPage /> </ProtectedRoute>} />Ç
             <Route path="*" element={<Navigate to="/" replace />} />

@@ -19,7 +19,7 @@ import os
 
 email_sender = EmailSender(os.getenv("EMAIL_API_KEY"))
 
-blp = Blueprint("users", __name__, description="Users endpoint", url_prefix="/user")
+blp = Blueprint("users", __name__, description="Users endpoint", url_prefix="/api/user")
 
 @blp.route("/login")
 class UserLogin(MethodView):

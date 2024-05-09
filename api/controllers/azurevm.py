@@ -11,7 +11,7 @@ import requests
 from database import db
 import schemas
 
-blp = Blueprint("azurevm", __name__, description="Azure virtual machines endpoint", url_prefix="/azurevm")
+blp = Blueprint("azurevm", __name__, description="Azure virtual machines endpoint", url_prefix="/api/azurevm")
     
 @blp.route("/setup")
 class SetupVirtualMachine(MethodView):

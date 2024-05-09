@@ -18,22 +18,22 @@ export default defineConfig({
     host: true,
     proxy: {
       // Proxying requests from /stripe to your Stripe backend
-      '/stripe': {
+      '/api/stripe': {
         target: 'http://127.0.0.1:5000',
         changeOrigin: true,
       },
       // Existing proxy for /user requests
-      '/user': {
+      '/api/user': {
         target: 'http://127.0.0.1:5000',
         changeOrigin: true,
       },
       // Existing proxy for /user requests
-      '/azuredata': {
+      '/api/azuredata': {
         target: 'http://127.0.0.1:5000',
         changeOrigin: true,
       },
       // Existing proxy for /user requests
-      '/azurevm': {
+      '/api/azurevm': {
         target: 'http://127.0.0.1:5000',
         changeOrigin: true,
       }

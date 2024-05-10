@@ -108,7 +108,7 @@ class VirtualMachinesHistory(MethodView):
         vm_list = []
 
         if not vms:
-            abort(404, message="No VMs found."), 
+            abort(404, message="No VMs found.")
 
         for i in vms:
             vm_list.append({"id": i.id, "name": i.name, "created_at": i.created_at, "poweredof_at": i.poweredof_at})

@@ -95,13 +95,15 @@ export async function getVirtualMachinesHistory(): Promise<VirtualMachineHistory
       id: vm.id,
       name: vm.name,
       created_at: vm.created_at,
-      powered_off_at: vm.poweredof_at
+      powered_off_at: vm.poweredof_at // ensure this typo is fixed in the backend (poweredof_at -> powered_off_at)
     }));
   } catch (error) {
     console.error("Failed to retrieve virtual machine history:", error);
     throw error;
   }
 }
+
+
 
 function calculatePrice(selectedVM: string): number {
   switch (selectedVM) {

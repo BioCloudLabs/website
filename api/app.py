@@ -11,6 +11,7 @@ from controllers.stripe import blp as StripeBlueprint
 from controllers.azuredata import blp as AzuredataBlueprint
 from controllers.azurevm import blp as AzureVmBlueprint
 from dotenv import load_dotenv
+from werkzeug.exceptions import HTTPException
 
 app: Flask = Flask(__name__, static_folder="dist", static_url_path="/")
 
@@ -173,13 +174,16 @@ def static_proxy(path):
     dir_name = os.path.join(app.static_folder, "/".join(path.split("/")[:-1]))
     return send_from_directory(dir_name, file_name)
 
-
 @app.errorhandler(404)
 def handle_404(e):
     if request.path.startswith("/api/"):
-        return {"message": "Resource not found"}, 404
+        # Check if there's a custom message in the response data
+        message = getattr(e, "data", {}).get("message", None)
+        if message:
+            return {"message": message, "status": "Not found", "code": 404}, 404
+        else:
+            return {"message": "Resource not found"}, 404
     return send_from_directory(app.static_folder, "index.html")
-
 
 @app.errorhandler(405)
 def handle_405(e):

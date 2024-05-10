@@ -1,7 +1,16 @@
 import { useEffect, useState } from 'react';
+import { getVirtualMachinesHistory } from './../../services/vmService'; // adjust the import path as needed
+
+interface VirtualMachineHistory {
+    id: string;
+    name: string;
+    created_at: string;
+    powered_off_at: string | null;
+}
 
 function DashboardPage() {
     const [userName, setUserName] = useState<string>('');
+    const [vmHistory, setVmHistory] = useState<VirtualMachineHistory[]>([]);
 
     useEffect(() => {
         // Retrieve user information from LocalStorage
@@ -10,6 +19,24 @@ function DashboardPage() {
             const userData = JSON.parse(user);
             setUserName(`${userData.name}`);
         }
+
+        // Fetch the history of virtual machines
+        const fetchVmHistory = async () => {
+            try {
+                const history = await getVirtualMachinesHistory();
+                const convertedHistory = history.map(vm => ({
+                    ...vm,
+                    id: vm.id.toString(),
+                    created_at: vm.created_at.toString(), // Convert created_at to string
+                    powered_off_at: vm.powered_off_at?.toString() ?? null // Convert powered_off_at to string or provide null if undefined
+                }));
+                setVmHistory(convertedHistory);
+            } catch (error) {
+                console.error("Error fetching VM history:", error);
+            }
+        };
+
+        fetchVmHistory();
     }, []);
 
     return (
@@ -21,96 +48,36 @@ function DashboardPage() {
             )}
             <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
 
-            {/* Simulated Recent Projects Section */}
             <div className="mb-6">
-                <h2 className="text-xl font-semibold mb-4">Recent Projects</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* Static example project for demonstration */}
-                    <div className="p-4 border rounded-lg shadow">
-                        <h3 className="font-semibold">Project A</h3>
-                        <p>Status: In Progress</p>
-                        <p>Sequences: 20</p>
-                        <p>Last Updated: 22/03/2024</p>
-                    </div>
-                    <div className="p-4 border rounded-lg shadow">
-                        <h3 className="font-semibold">Project A</h3>
-                        <p>Status: In Progress</p>
-                        <p>Sequences: 20</p>
-                        <p>Last Updated: 22/03/2024</p>
-                    </div>
-                    <div className="p-4 border rounded-lg shadow">
-                        <h3 className="font-semibold">Project A</h3>
-                        <p>Status: In Progress</p>
-                        <p>Sequences: 20</p>
-                        <p>Last Updated: 22/03/2024</p>
-                    </div>
-                </div>
-            </div>
-
-            {/* Simulated BLAST Analyses Section */}
-            <div className="mb-6">
-                <h2 className="text-xl font-semibold mb-4">Your BLAST Analyses</h2>
+                <h2 className="text-xl font-semibold mb-4">Your Virtual Machines History</h2>
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Name
+                                VM Name
                             </th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Status
+                                Created At
                             </th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Date Submitted
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Actions
+                                Powered Off At
                             </th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {/* Static example analysis for demonstration */}
-                        <tr>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                BLAST Analysis 1
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                Completed
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                24/03/2024
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="#" className="text-indigo-600 hover:text-indigo-900">View Results</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                BLAST Analysis 2
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                Cancelled
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                05/04/2024
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="#" className="text-indigo-600 hover:text-indigo-900">View Results</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                BLAST Analysis 3
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                Pending
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                12/04/2024
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="#" className="text-indigo-600 hover:text-indigo-900">View Results</a>
-                            </td>
-                        </tr>
+                        {vmHistory.map((vm) => (
+                            <tr key={vm.id}>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    {vm.name}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    {new Date(vm.created_at).toLocaleDateString()}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    {vm.powered_off_at ? new Date(vm.powered_off_at).toLocaleDateString() : "N/A"}
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>

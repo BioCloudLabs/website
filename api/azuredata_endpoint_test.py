@@ -37,6 +37,6 @@ def client():
 
 # Test locations endpoint when everything it's correct
 def test_locations_correct(client):
-    response = client.get('/azuredata/locations')
+    response = client.get('/api/azuredata/locations')
     assert response.status_code == 200
     assert 'locations' in response.json

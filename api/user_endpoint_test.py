@@ -66,19 +66,19 @@ def payload():
 # Create a fixture to get an auth token, used to test
 @pytest.fixture
 def auth_token(client, payload):
-    client.post('/user/register', json=payload)  # Register the test user
-    response = client.post('/user/login', json={"email": "test@example.com", "password": "Password123!"})
+    client.post('/api/user/register', json=payload)  # Register the test user
+    response = client.post('/api/user/login', json={"email": "test@example.com", "password": "Password123!"})
     return response.json['access_token']
 
 # Test register endpoint when everything it's correct
 def test_register_correct(client, payload):
-    response = client.post('/user/register', json=payload)
+    response = client.post('/api/user/register', json=payload)
     assert response.status_code == 201
 
 # Test register endpoint when there's alredy an user registered with that email in the database
 def test_register_alredy_exists(client, payload):
-    client.post('/user/register', json=payload)
-    response = client.post('/user/register', json=payload)
+    client.post('/api/user/register', json=payload)
+    response = client.post('/api/user/register', json=payload)
     assert response.status_code == 409
 
 # Test register endpoint when there are fields with incorrect format in the POST request
@@ -90,7 +90,7 @@ def test_register_failed_wrong_format(client, payload):
         "surname": "User",
         "location_id": 1
     }
-    response = client.post('/user/register', json=payload)
+    response = client.post('/api/user/register', json=payload)
 
     assert response.status_code == 422
 
@@ -100,7 +100,7 @@ def test_register_failed_missing_fields(client):
         "name": "Test",
         "surname": "User"
     }
-    response = client.post('/user/register', json=payload)
+    response = client.post('/api/user/register', json=payload)
 
     assert response.status_code == 422
 
@@ -114,7 +114,7 @@ def test_register_integrity_error(client):
         "surname": "User",
         "location_id": 1111
     }
-    response = client.post('/user/register', json=payload)
+    response = client.post('/api/user/register', json=payload)
 
     assert response.status_code == 400
 
@@ -127,14 +127,14 @@ def test_login_correct(client):
         "surname": "User",
         "location_id": 1
     }
-    client.post('/user/register', json=payload)
+    client.post('/api/user/register', json=payload)
 
     payload = {
         "email": "test@example.com",
         "password": "Password123!"
     }
 
-    response = client.post('/user/login', json=payload)
+    response = client.post('/api/user/login', json=payload)
     assert response.status_code == 200
     assert 'access_token' in response.json
 
@@ -145,7 +145,7 @@ def test_login_missing_fields(client):
         "email": "test2@example.com"
     }
 
-    response = client.post('/user/login', json=payload)
+    response = client.post('/api/user/login', json=payload)
     assert response.status_code == 422
 
 # Test login endpoint when there are no matching email and password on the database
@@ -156,7 +156,7 @@ def test_login_user_not_exist(client):
         "password": "Password123!"
     }
 
-    response = client.post('/user/login', json=payload)
+    response = client.post('/api/user/login', json=payload)
     assert response.status_code == 401
 
 # Test profile endpoint when there are missing fields in the PUT request
@@ -166,7 +166,7 @@ def test_profile_failed_missing_fields(client, auth_token):
         "surname": "User"
     }
     headers = {'Authorization': f'Bearer {auth_token}'}
-    response = client.put('/user/profile', json=payload, headers=headers)
+    response = client.put('/api/user/profile', json=payload, headers=headers)
     assert response.status_code == 422
 
 # Test profile endpoint when there are missing fields in the PUT request
@@ -176,7 +176,7 @@ def test_profile_failed_missing_token(client, auth_token):
         "surname": "User",
         "location_id": 1
     }
-    response = client.put('/user/profile', json=payload)
+    response = client.put('/api/user/profile', json=payload)
 
     assert response.status_code == 401
     assert response.json['msg'] == "Missing Authorization Header"
@@ -190,7 +190,7 @@ def test_profile_failed_integrity_error(client, auth_token):
     }
 
     headers = {'Authorization': f'Bearer {auth_token}'}
-    response = client.put('/user/profile', json=payload, headers=headers)
+    response = client.put('/api/user/profile', json=payload, headers=headers)
     assert response.status_code == 400
 
 # Test profile endpoint when the user token in the PUT request it's expired
@@ -203,7 +203,7 @@ def test_profile_failed_token_expired(client, expired_token):
     }
 
     headers = {'Authorization': f'Bearer {expired_token}'}
-    response = client.put('/user/profile', json=payload, headers=headers)
+    response = client.put('/api/user/profile', json=payload, headers=headers)
     assert response.status_code == 401
     assert response.json['msg'] == "Token has expired"
 
@@ -217,7 +217,7 @@ def test_profile_failed_token_wrong_format(client, auth_token):
     }
 
     headers = {'Authorization': f'Bearer {auth_token[2:]}'}
-    response = client.put('/user/profile', json=payload, headers=headers)
+    response = client.put('/api/user/profile', json=payload, headers=headers)
     assert response.status_code == 422
     assert response.json['msg'] == "Invalid header string: 'utf-8' codec can't decode byte 0xc6 in position 2: invalid continuation byte"
 
@@ -231,7 +231,7 @@ def test_profile_failed_invalid_token(client, auth_token):
     }
 
     headers = {'Authorization': f'Bearer a{auth_token[1:]}'}
-    response = client.put('/user/profile', json=payload, headers=headers)
+    response = client.put('/api/user/profile', json=payload, headers=headers)
     assert response.status_code == 422
     assert response.json['msg'] == "Invalid header string: Expecting value: line 1 column 1 (char 0)"
 
@@ -244,79 +244,79 @@ def test_profile_correct(client, auth_token):
     }
 
     headers = {'Authorization': f'Bearer {auth_token}'}
-    response = client.put('/user/profile', json=payload, headers=headers)
+    response = client.put('/api/user/profile', json=payload, headers=headers)
     assert response.status_code == 201
     assert response.json['message'] == "User profile edited successfully."
 
 # Test credits endpoint when everything is correct
 def test_credits_correct(client, auth_token):
     headers = {'Authorization': f'Bearer {auth_token}'}
-    response = client.get('/user/credits', headers=headers)
+    response = client.get('/api/user/credits', headers=headers)
     assert response.status_code == 200
     assert 'credits' in response.json
 
 # Test credits endpoint when the user token in the GET request is expired
 def test_credits_failed_token_expired(client, expired_token):
     headers = {'Authorization': f'Bearer {expired_token}'}
-    response = client.get('/user/credits', headers=headers)
+    response = client.get('/api/user/credits', headers=headers)
     assert response.status_code == 401
     assert response.json['msg'] == "Token has expired"
 
 # Test credits endpoint when the user token in the GET request is missing
 def test_credits_failed_token_missing(client):
-    response = client.get('/user/credits')
+    response = client.get('/api/user/credits')
     assert response.status_code == 401
     assert response.json['msg'] == "Missing Authorization Header"
     
 # Test verify token endpoint when the user token in the GET request is expired
 def test_verify_token_failed_token_expired(client, expired_token):
     headers = {'Authorization': f'Bearer {expired_token}'}
-    response = client.post('/user/validate-token', headers=headers)
+    response = client.post('/api/user/validate-token', headers=headers)
     assert response.status_code == 401
     assert response.json['msg'] == "Token has expired"
 
 # Test verify token endpoint when the user token in the GET request is missing
 def test_verify_token_failed_token_missing(client):
-    response = client.post('/user/validate-token')
+    response = client.post('/api/user/validate-token')
     assert response.status_code == 401
     assert response.json['msg'] == "Missing Authorization Header"
 
 # Test verify token endpoint when everything is correct
 def test_verify_token_correct(client, auth_token):
     headers = {'Authorization': f'Bearer {auth_token}'}
-    response = client.post('/user/validate-token', headers=headers)
+    response = client.post('/api/user/validate-token', headers=headers)
     assert response.status_code == 200
     assert response.json['message'] == "Token is valid."
 
 # Test logout endpoint when the user token in the POST request is missing
 def test_logout_failed_token_missing(client):
-    response = client.post('/user/logout')
+    response = client.post('/api/user/logout')
     assert response.status_code == 401
     assert response.json['msg'] == "Missing Authorization Header"
 
 # Test logout endpoint when the user token in the POST request is alredy logged out
 def test_logout_correct(client, auth_token):
     headers = {'Authorization': f'Bearer {auth_token}'}
-    response = client.post('/user/logout', headers=headers)
+    response = client.post('/api/user/logout', headers=headers)
     assert response.status_code == 200
     assert response.json['message'] == "Successfully logged out"
 
 # Test recover password email endpoint when everything it's correct
 def test_recover_password_email_correct(client):
-    response = client.post('/user/recover-password-email', json={"email": "test@example.com"})
+    response = client.post('/api/user/recover-password-email', json={"email": "test@example.com"})
     assert response.status_code == 201
     assert "message" in response.json
 
 # Test recover password email endpoint when email format isn't correct
 def test_recover_password_email_wrong_format(client):
-    response = client.post('/user/recover-password-email', json={"email": "test@example"})
+    response = client.post('/api/user/recover-password-email', json={"email": "test@example"})
     print(response.json)
     assert response.status_code == 422
     assert "email" in response.json["errors"]["json"]
 
 # Test recover password email endpoint when email not in the POST request
 def test_recover_password_email_missing_data(client):
-    response = client.post('/user/recover-password-email')
+    response = client.post('/api/user/recover-password-email')
     print(response.json)
     assert response.status_code == 422
     assert "email" in response.json["errors"]["json"]
@@ -324,21 +324,21 @@ def test_recover_password_email_missing_data(client):
 # Test recover password endpoint when everything it's correct
 def test_recover_password_correct(client, auth_token):
     headers = {'Authorization': f'Bearer {auth_token}'}
-    client.post('/user/recover-password', json={"password": "Password123!!"}, headers=headers)
-    response = client.post('/user/recover-password', json={"password": "Password123!"}, headers=headers)
+    client.post('/api/user/recover-password', json={"password": "Password123!!"}, headers=headers)
+    response = client.post('/api/user/recover-password', json={"password": "Password123!"}, headers=headers)
     assert response.status_code == 201
     assert "message" in response.json
 
 # Test recover password endpoint when password is not strong enough
 def test_recover_password_not_strong(client, auth_token):
     headers = {'Authorization': f'Bearer {auth_token}'}
-    response = client.post('/user/recover-password', json={"password": "Contrasena"}, headers=headers)
+    response = client.post('/api/user/recover-password', json={"password": "Contrasena"}, headers=headers)
     assert response.status_code == 422
     assert "password" in response.json["errors"]["json"]
 
 # Test recover password endpoint when password is the same as the old one
 def test_recover_password_same_old(client, auth_token):
     headers = {'Authorization': f'Bearer {auth_token}'}
-    response = client.post('/user/recover-password', json={"password": "Password123!"}, headers=headers)
+    response = client.post('/api/user/recover-password', json={"password": "Password123!"}, headers=headers)
     assert response.status_code == 409
     assert "message" in response.json

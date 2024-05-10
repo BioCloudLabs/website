@@ -68,14 +68,14 @@ def payload():
 # Create a fixture to get an auth token, used to test
 @pytest.fixture
 def auth_token(client, payload):
-    client.post('/user/register', json=payload)  # Register the test user
-    response = client.post('/user/login', json={"email": "test@example.com", "password": "Password123!"})
+    client.post('/api/user/register', json=payload)  # Register the test user
+    response = client.post('/api/user/login', json={"email": "test@example.com", "password": "Password123!"})
     return response.json['access_token']
 
 # Test azurevm setup endpoint when user credits = 0
 def test_azurevm_history_has_machines_correct(client, auth_token):
     headers = {'Authorization': f'Bearer {auth_token}'}
-    response = client.get('/azurevm/setup', headers=headers)
+    response = client.get('/api/azurevm/setup', headers=headers)
     assert response.status_code == 401
     assert response.json['message'] == "Not enough credits."
 
@@ -83,29 +83,29 @@ def test_azurevm_history_has_machines_correct(client, auth_token):
 # and user has vms
 def test_azurevm_history_has_machines_correct(client, auth_token):
     headers = {'Authorization': f'Bearer {auth_token}'}
-    response = client.get('/azurevm/history', headers=headers)
+    response = client.get('/api/azurevm/history', headers=headers)
     assert response.status_code == 200
     assert 'vm_list' in response.json
 
 # Test azurevm history endpoint when everything it's correct 
 # but the user doesn't have vms
 def test_azurevm_history_no_machines_correct(client, payload):
-    client.post("/user/register", json=payload)
-    response = client.post("/user/login", json={"email": "test2@example.com", "password": "Password123!"})
+    client.post("/api/user/register", json=payload)
+    response = client.post("/api/user/login", json={"email": "test2@example.com", "password": "Password123!"})
 
     headers = {'Authorization': f'Bearer {response.json["access_token"]}'}
-    response = client.get('/azurevm/history', headers=headers)
+    response = client.get('/api/azurevm/history', headers=headers)
     assert response.status_code == 404
     assert response.json["message"] == "No VMs found."
 
 # Test azurevm history endpoint when no token in the GET
 def test_azurevm_history_no_token(client):
-    response = client.get('/azurevm/history')
+    response = client.get('/api/azurevm/history')
     assert response.status_code == 401
 
 # Test azurevm history endpoint when the user token in the request it's expired
 def test_azurevm_history_token_expired(client, expired_token):
     headers = {'Authorization': f'Bearer {expired_token}'}
-    response = client.get('/azurevm/history', headers=headers)
+    response = client.get('/api/azurevm/history', headers=headers)
     assert response.status_code == 401
     assert response.json['msg'] == "Token has expired"

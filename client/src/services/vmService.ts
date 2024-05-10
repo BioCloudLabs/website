@@ -26,6 +26,7 @@ export async function createVirtualMachine(selectedVM: string): Promise<VirtualM
     }
 
     return {
+      dns: data.dns,
       ip: data.ip,
       url: `https://${data.dns}`,
       price: calculatePrice(selectedVM)

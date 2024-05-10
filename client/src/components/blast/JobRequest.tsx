@@ -5,6 +5,7 @@ import { VMSpec } from '../../models/VMSpec';
 import { notify } from '../../utils/notificationUtils';
 import { useNavigate } from 'react-router-dom';
 
+
 const vmSpecs: VMSpec[] = [
   { name: 'VM1', cpu: '2 vCPUs', memory: '8 GB', credits: 0.0922, description: 'Basic VM for small BLAST jobs.' },
   { name: 'VM2', cpu: '4 vCPUs', memory: '16 GB', credits: 0.1847, description: 'Intermediate VM for medium-sized BLAST jobs.' },
@@ -12,9 +13,6 @@ const vmSpecs: VMSpec[] = [
   { name: 'VM4', cpu: '16 vCPUs', memory: '64 GB', credits: 0.7369, description: 'High-performance VM for large BLAST jobs.' },
   { name: 'VM5', cpu: '32 vCPUs', memory: '128 GB', credits: 1.4748, description: 'Super VM for the most demanding BLAST jobs.' },
 ];
-
-
-
 
 const JobRequest: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -25,15 +23,34 @@ const JobRequest: React.FC = () => {
   const userCredits = parseFloat(localStorage.getItem('userCredits') || '0');
 
 
-
-
-  const handleCreateVirtualMachine = () => {
-    if (userCredits > 20) {
-      navigate('/vm-status', { state: { vm: selectedVM } }); // Passing VM as a state object
-    } else {
-      notify('Insufficient credits to run this VM.', 'error');
+  const handleCreateVirtualMachine = async () => {
+    if (userCredits <= 20) {
+        notify('Insufficient credits to run this VM.', 'error');
+        return;
     }
-  };
+
+    // Notify the user that the process is about to start
+    notify('Preparing to initiate VM creation...', 'info', 3000);
+
+    // Navigate after 3 seconds irrespective of the VM creation status
+    setTimeout(() => {
+        navigate('/vm-status', { state: { vm: selectedVM } });
+    }, 3000);
+
+    setIsLoading(true);
+
+    try {
+      const vm = await createVirtualMachine(selectedVM);
+      notify(`Virtual machine created successfully: IP ${vm.ip}, DNS ${vm.url}`, 'success');
+      setVirtualMachine(vm);
+    } catch (error) {
+      console.error('Error creating virtual machine:', error);
+      notify(`Error creating virtual machine: ${(error as Error).message}`, 'error');
+    } finally {
+      setIsLoading(false);
+    }
+};
+
 
 
   const handleVMSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -111,8 +128,9 @@ const JobRequest: React.FC = () => {
           ) : (
             <button
               className="inline-flex items-center justify-center bg-blue-700 text-white border-0 py-2 px-6 focus:outline-none hover:bg-blue-800 rounded text-lg transition duration-300 ease-in-out transform hover:-translate-y-1"
+
               onClick={handleCreateVirtualMachine}
-              disabled={!selectedVM || isLoading || userCredits <= 20}
+              disabled={!selectedVM || isLoading}
             >
               Run
             </button>

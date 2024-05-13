@@ -7,31 +7,43 @@ const VMStatus: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Mock function to simulate fetching VM status
         const checkVMStatus = async () => {
-            try {
-                // Simulate API call delay
-                setTimeout(() => {
-                    // Simulate successful fetch from the API
-                    const fetchedVM = {
-                        ip: '192.168.1.1',
-                        url: 'vm.example.com',
-                        price: 0.0922,
-                        dns: 'vm.example.com'
-                    };
-                    setVm(fetchedVM);
+            setIsLoading(true); // Set loading state initially
+    
+            // Check local storage for existing VM details
+            const storedVm = localStorage.getItem('vmDetails');
+            const vmDetails = storedVm ? JSON.parse(storedVm) : null;
+    
+            // Allow some time to potentially fetch new data if needed
+            setTimeout(() => {
+                if (vmDetails && vmDetails.ip && vmDetails.dns) {
+                    setVm({
+                        ip: vmDetails.ip,
+                        url: `https://${vmDetails.dns}`,
+                        price: vmDetails.price || 0.0350, // Default price if not specified
+                        dns: vmDetails.dns
+                    });
                     notify('Virtual machine is ready!', 'success');
-                    setIsLoading(false);
-                }, 3000);
-            } catch (error) {
-                notify('Failed to fetch VM status.', 'error');
-                setIsLoading(false);
-                setVm(null); // Ensure the state is cleared on error
-            }
+                } else {
+                    // If no VM details are stored, use placeholder
+                    setVm({
+                        ip: '192.168.1.1', // Placeholder IP
+                        url: 'https://placeholder-vm.example.com',
+                        price: 0.0350,
+                        dns: 'placeholder-vm.example.com'
+                    });
+                    notify('Using placeholder VM details.', 'info');
+                }
+                setIsLoading(false); // Reset loading state after checking or using placeholder
+            }, 1000); // Simulate a delay for fetching or determining the status
         };
-
+    
         checkVMStatus();
     }, []);
+    
+    
+    
+
 
     return (
         <div className="container mx-auto px-4 py-8 pt-20">

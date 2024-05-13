@@ -25,31 +25,40 @@ const JobRequest: React.FC = () => {
 
   const handleCreateVirtualMachine = async () => {
     if (userCredits <= 20) {
-        notify('Insufficient credits to run this VM.', 'error');
-        return;
+      notify('Insufficient credits to run this VM.', 'error');
+      return;
     }
 
-    // Notify the user that the process is about to start
-    notify('Preparing to initiate VM creation...', 'info', 3000);
+    notify('Preparing to initiate VM creation...', 'info');
 
-    // Navigate after 3 seconds irrespective of the VM creation status
+    // Navigate after notifying the user
     setTimeout(() => {
-        navigate('/vm-status', { state: { vm: selectedVM } });
-    }, 3000);
+      navigate('/vm-status', { state: { vmName: selectedVM } });
+    }, 3000); // Navigate to VM status page after a delay
 
     setIsLoading(true);
 
-    try {
-      const vm = await createVirtualMachine(selectedVM);
-      notify(`Virtual machine created successfully: IP ${vm.ip}, DNS ${vm.url}`, 'success');
-      setVirtualMachine(vm);
-    } catch (error) {
-      console.error('Error creating virtual machine:', error);
-      notify(`Error creating virtual machine: ${(error as Error).message}`, 'error');
-    } finally {
-      setIsLoading(false);
-    }
-};
+    // Continue to try creating the VM in the background
+    createVirtualMachine(selectedVM)
+      .then(vm => {
+        localStorage.setItem('vmDetails', JSON.stringify({
+          ip: vm.ip,
+          dns: vm.dns,
+          price: vm.price, // Assuming 'price' is part of the response object
+          url: vm.url
+        }));
+        notify(`Virtual machine created successfully: IP ${vm.ip}, DNS ${vm.url}`, 'success');
+        setVirtualMachine(vm);
+      })
+      .catch(error => {
+        console.error('Error creating virtual machine:', error);
+        notify(`Error creating virtual machine: ${(error as Error).message}`, 'error');
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
 
 
 

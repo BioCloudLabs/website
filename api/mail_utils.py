@@ -16,6 +16,7 @@ class EmailSender():
 
 			r = resend.Emails.send({
 				"from": "noreply@biocloudlabs.es",
+				"sender": "noreply@biocloudlabs.es",
 				"to": user,
 				"subject": "Password recovery",
 				"html": replaced_html

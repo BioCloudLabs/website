@@ -1,6 +1,6 @@
 export interface VirtualMachineHistory {
-    id: number;
-    name: string;
-    created_at: Date;
-    powered_off_at?: Date;
-  }
+  id: string;
+  name: string;
+  created_at: string;
+  powered_off_at: Date | string | null;
+}

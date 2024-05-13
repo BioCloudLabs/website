@@ -69,12 +69,6 @@ export async function powerOffVirtualMachine(vmId: number): Promise<string> {
   }
 }
 
-/**
- * Fetches the history of virtual machines for the logged-in user.
- *
- * @returns A promise that resolves to an array of `VirtualMachineHistory` objects if the fetch is successful.
- * @throws An error with a user-friendly message if the fetch fails.
- */
 export async function getVirtualMachinesHistory(): Promise<VirtualMachineHistory[]> {
   const apiUrl = `/api/azurevm/history`;
 
@@ -114,16 +108,17 @@ export async function getVirtualMachinesHistory(): Promise<VirtualMachineHistory
     // If response is OK, parse the successful response
     const data = await response.json();
     return data.vm_list.map((vm: any) => ({
-      id: vm.id,
+      id: vm.id.toString(), // Convert id to string
       name: vm.name,
-      created_at: vm.created_at,
-      powered_off_at: vm.powered_off_at // Assuming typo fix in backend: 'poweredof_at' to 'powered_off_at'
+      created_at: new Date(vm.created_at).toLocaleString('en-US', { timeZone: 'UTC' }), // Format created_at as string
+      powered_off_at: vm.powered_off_at ? new Date(vm.powered_off_at).toLocaleString('en-US', { timeZone: 'UTC' }) : 'Power Off' // Format powered_off_at as string or 'Power Off' if null
     }));
   } catch (error) {
     console.error('Failed to retrieve virtual machine history:', error);
     throw error; // Rethrow the error to handle it appropriately elsewhere
   }
 }
+
 
 
 function calculatePrice(selectedVM: string): number {
@@ -136,7 +131,7 @@ function calculatePrice(selectedVM: string): number {
       return 20.99;
     default:
       return 0;
-      // This can be trigerred if the returneed value is not the machine price
+    // This can be trigerred if the returneed value is not the machine price
     //   throw new Error('Unknown virtual machine type');
   }
 }

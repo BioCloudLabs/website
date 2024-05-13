@@ -7,6 +7,54 @@ function DashboardPage() {
     const [vmHistory, setVmHistory] = useState<VirtualMachineHistory[]>([]);
 
     const [loading, setLoading] = useState<boolean>(true);  // State to track loading status
+    const [currentPage, setCurrentPage] = useState(0);
+    const ITEMS_PER_PAGE = 5;
+
+    // Function to go to the next page
+    const nextPage = () => {
+        setCurrentPage((prev) => prev + 1);
+    };
+
+    // Function to go to the previous page
+    const prevPage = () => {
+        setCurrentPage((prev) => (prev > 0 ? prev - 1 : 0));
+    };
+
+    // Calculate number of pages
+    const numPages = Math.ceil(vmHistory.length / ITEMS_PER_PAGE);
+
+    // Slice the data for the current page
+    const currentData = vmHistory.slice(
+        currentPage * ITEMS_PER_PAGE,
+        (currentPage + 1) * ITEMS_PER_PAGE
+    );
+
+    // Pagination Component
+    const Pagination = () => (
+        <div className="flex flex-col items-center my-6 text-gray-900">
+            <span className="text-sm text-gray-900 dark:text-gray-400">
+                Showing <span className="font-semibold text-gray-900 dark:text-blak">{currentPage * ITEMS_PER_PAGE + 1}</span> to <span className="font-semibold text-gray-700 dark:text-gray-400">{vmHistory.length}</span> Entries
+            </span>
+            <div className="inline-flex mt-2">
+                <button
+                    onClick={prevPage}
+                    className="px-4 h-10 text-base font-medium text-white bg-gray-800 rounded-l hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                    disabled={currentPage === 0}
+                >
+                    Prev
+                </button>
+                <button
+                    onClick={nextPage}
+                    className="px-4 h-10 text-base font-medium text-white bg-gray-800 rounded-r hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                    disabled={currentPage >= numPages - 1}
+                >
+                    Next
+                </button>
+            </div>
+        </div>
+    );
+
+
 
     useEffect(() => {
         // Retrieve user information from LocalStorage
@@ -64,71 +112,55 @@ function DashboardPage() {
             console.error("Error powering off virtual machine:", error);
         }
     };
+
+
+    const VirtualMachineCard = ({ vm }: { vm: any }) => {
+        return (
+            <div className="bg-white shadow-lg rounded-lg p-4 mb-4 flex flex-col items-center text-center">
+                <h3 className="text-lg font-semibold">{vm.name}</h3>
+                <p className="text-sm text-gray-600">Created at: {vm.created_at}</p>
+                <p className="text-sm text-gray-600">Powered off at: {vm.powered_off_at || 'Still Running'}</p>
+                {!vm.powered_off_at && (
+                    <button
+                        onClick={() => handlePowerOffClick(vm.id)}
+                        className="mt-2 flex items-center justify-center p-2 bg-red-500 hover:bg-red-700 rounded"
+                    >
+                        <img src="/images/Blast/turn-off-4783.svg" alt="Power Off" className="w-6 h-6" />
+                    </button>
+                )}
+
+            </div>
+        );
+    };
+
+
+
+
     return (
-        <div className="px-4 sm:px-6 lg:px-8 py-8"> 
+        <div className="px-4 sm:px-6 lg:px-8 py-8">
             {userName ? (
-                <h2 className="text-2xl sm:text-3xl font-bold pt-4 mb-8 text-center">Welcome back, {userName}!</h2> // Adjusted text size and margin for mobile, added text-center for centering
+                <h2 className="text-2xl sm:text-3xl font-bold pt-4 mb-8 text-center">Welcome back, {userName}!</h2>
             ) : (
-                <h2 className="text-2xl sm:text-3xl font-bold pt-4 mb-8 text-center">Welcome to BioCloudLabs!</h2> // Adjusted text size and margin for mobile, added text-center for centering
+                <h2 className="text-2xl sm:text-3xl font-bold pt-4 mb-8 text-center">Welcome to BioCloudLabs!</h2>
             )}
 
-            <div className="mb-6">
-                <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center">Your Virtual Machines History</h2> 
-                <table className="min-w-full divide-y divide-gray-200 pt-4 mb-12"> 
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th scope="col" className="px-3 sm:px-6 py-3 text-center text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
-                                VM Name
-                            </th>
-                            <th scope="col" className="px-3 sm:px-6 py-3 text-center text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
-                                Created At
-                            </th>
-                            <th scope="col" className="px-3 sm:px-6 py-3 text-center text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
-                                Powered off at
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {loading ? (
-                            <tr>
-                                <td colSpan={3} className="px-6 py-10 text-center">
-                                    Loading virtual machines history...
-                                </td>
-                            </tr>
-                        ) : vmHistory.length > 0 ? (
-                            vmHistory.map((vm) => (
-                                <tr key={vm.id} className="text-center">
-                                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
-                                        {vm.name}
-                                    </td>
-                                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
-                                        {new Date(vm.created_at).toLocaleString('en-US', { timeZone: 'CET' })}
-                                    </td>
-                                    <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
-                                        {vm.powered_off_at && new Date(vm.powered_off_at).toString() === 'Invalid Date' ? (
-                                            <button onClick={() => handlePowerOffClick(vm.id)} // Call handlePowerOffClick function on button click
-                                                className="text-red-500 hover:text-red-700 transition-colors duration-200">
-                                                <img src="/images/Blast/turn-off-4783.svg" alt="Power Off" className="w-6 h-6" />
-                                            </button>
-                                        ) : (
-                                            vm.powered_off_at ? new Date(vm.powered_off_at).toLocaleString('en-US', { timeZone: 'CET' }) : ''
-                                        )}
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan={3} className="px-6 py-10 text-center text-gray-500">
-                                    No virtual machines have been launched yet.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+            <div className="mb-12 mt-12">
+                <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center">Your Virtual Machines History</h2>
+                {loading ? (
+                    <div className="text-center">Loading virtual machines history...</div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {currentData.map((vm) => (
+                            <VirtualMachineCard key={vm.id} vm={vm} />
+                        ))}
+                    </div>
+                )}
+                <Pagination />
             </div>
 
 
-            <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center">Quick actions</h2> 
+
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center">Quick actions</h2>
             <div className="flex flex-wrap justify-center gap-4 mt-6">
                 <div className="flex flex-col items-center w-full md:w-1/3 p-5 bg-white shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
                     <a href="/vm-request" className="flex flex-col items-center">

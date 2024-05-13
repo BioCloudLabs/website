@@ -5,162 +5,176 @@ import { VirtualMachineHistory } from './../../models/VirtualMachineHistory';
 function DashboardPage() {
     const [userName, setUserName] = useState<string>('');
     const [vmHistory, setVmHistory] = useState<VirtualMachineHistory[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [currentPage, setCurrentPage] = useState(0);
+    const ITEMS_PER_PAGE = 6;
 
-    const [loading, setLoading] = useState<boolean>(true);  // State to track loading status
+    const nextPage = () => {
+        setCurrentPage((prev) => prev + 1);
+    };
+
+    const prevPage = () => {
+        setCurrentPage((prev) => (prev > 0 ? prev - 1 : 0));
+    };
+
+    const numPages = Math.ceil(vmHistory.length / ITEMS_PER_PAGE);
+
+    const currentData = vmHistory.slice(
+        currentPage * ITEMS_PER_PAGE,
+        (currentPage + 1) * ITEMS_PER_PAGE
+    );
+
+    const Pagination = () => (
+        <div className="flex flex-col items-center my-6 text-gray-900">
+            <span className="text-sm text-gray-900 dark:text-gray-400">
+                Showing <span className="font-semibold text-gray-900 dark:text-black">{currentPage * ITEMS_PER_PAGE + 1}</span> to <span className="font-semibold text-gray-700 dark:text-gray-400">{Math.min((currentPage + 1) * ITEMS_PER_PAGE, vmHistory.length)}</span> of <span className="font-semibold text-gray-900 dark:text-black">{vmHistory.length}</span> Entries
+            </span>
+            <div className="inline-flex mt-2">
+                <button
+                    onClick={prevPage}
+                    className="px-4 h-10 text-base font-medium text-white bg-gray-800 rounded-l hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                    disabled={currentPage === 0}
+                >
+                    Prev
+                </button>
+                <button
+                    onClick={nextPage}
+                    className="px-4 h-10 text-base font-medium text-white bg-gray-800 rounded-r hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                    disabled={currentPage >= numPages - 1}
+                >
+                    Next
+                </button>
+            </div>
+        </div>
+    );
 
     useEffect(() => {
-        // Retrieve user information from LocalStorage
         const user = localStorage.getItem('userProfile');
         if (user) {
             const userData = JSON.parse(user);
             setUserName(`${userData.name}`);
         }
 
-        // Fetch the history of virtual machines
         const fetchVmHistory = async () => {
             try {
                 const history = await getVirtualMachinesHistory();
                 setVmHistory(history.map(vm => ({
                     ...vm,
-                    id: vm.id.toString(), // Convert the id to a string
-                    created_at: new Date(vm.created_at).toLocaleString('en-US', { timeZone: 'CET' }), // Format created_at as string
-                    powered_off_at: vm.powered_off_at ? new Date(vm.powered_off_at).toLocaleString('en-US', { timeZone: 'CET' }) : '' // Format powered_off_at as string or set it to an empty string if null
+                    id: vm.id.toString(),
+                    created_at: new Date(vm.created_at).toLocaleString('en-US', { timeZone: 'CET' }),
+                    powered_off_at: vm.powered_off_at ? new Date(vm.powered_off_at).toLocaleString('en-US', { timeZone: 'CET' }) : null,
+                    cost: vm.cost
                 })));
             } catch (error) {
                 console.error("Error fetching VM history:", error);
             } finally {
-                setLoading(false);  // Set loading to false regardless of the oCETome
+                setLoading(false);
             }
         };
 
         fetchVmHistory();
     }, []);
 
-    // Define a new function to fetch VM history
     const fetchVmHistory = async () => {
         try {
             const history = await getVirtualMachinesHistory();
             setVmHistory(history.map(vm => ({
                 ...vm,
-                id: vm.id.toString(), // Convert the id to a string
-                created_at: new Date(vm.created_at).toLocaleString('en-US', { timeZone: 'CET' }), // Format created_at as string
-                powered_off_at: vm.powered_off_at ? new Date(vm.powered_off_at).toLocaleString('en-US', { timeZone: 'CET' }) : '' // Format powered_off_at as string or set it to an empty string if null
+                id: vm.id.toString(),
+                created_at: new Date(vm.created_at).toLocaleString('en-US', { timeZone: 'CET' }),
+                powered_off_at: vm.powered_off_at ? new Date(vm.powered_off_at).toLocaleString('en-US', { timeZone: 'CET' }) : null,
+                cost: vm.cost
             })));
         } catch (error) {
             console.error("Error fetching VM history:", error);
         } finally {
-            setLoading(false);  // Set loading to false regardless of the oCETome
+            setLoading(false);
         }
     };
 
-    // Function to handle powering off a virtual machine and then fetching updated history
     const handlePowerOffClick = async (vmId: string) => {
         try {
-            // Call the powerOffVirtualMachine function
             await powerOffVirtualMachine(parseInt(vmId));
-            // After powering off, fetch the updated virtual machine history
             await fetchVmHistory();
         } catch (error) {
             console.error("Error powering off virtual machine:", error);
         }
     };
-    return (
-        <div className="p-8">
-            {userName ? (
-                <h2 className="text-3xl font-bold pt-4 my-12">Welcome back, {userName}!</h2>
-            ) : (
-                <h2 className="text-3xl font-bold pt-4 my-12">Welcome to BioCloudLabs!</h2>
+
+    const VirtualMachineCard = ({ vm }: { vm: any }) => (
+        <div className="bg-white shadow-lg rounded-lg p-4 mb-4 flex flex-col items-center text-center">
+            <h3 className="text-lg font-semibold">{vm.name}</h3>
+            <p className="text-sm text-gray-600">Created at: {vm.created_at}</p>
+            <p className="text-sm text-gray-600">Powered off at: {vm.powered_off_at || 'Still Running'}</p>
+            <p className="text-sm text-gray-600">Cost: {vm.cost} credits</p>
+            {!vm.powered_off_at && (
+                <button
+                    onClick={() => handlePowerOffClick(vm.id)}
+                    className="mt-2 flex items-center justify-center p-2 bg-red-500 hover:bg-red-700 rounded"
+                >
+                    <img src="/images/Blast/turn-off-4783.svg" alt="Power Off" className="w-6 h-6" />
+                </button>
             )}
+        </div>
+    );
 
+    return (
+        <div className="px-4 sm:px-6 lg:px-8 py-8 bg-gray-100 min-h-screen">
+            {userName ? (
+                <h2 className="text-2xl sm:text-3xl font-bold pt-4 mb-8 text-center">Welcome back, {userName}!</h2>
+            ) : (
+                <h2 className="text-2xl sm:text-3xl font-bold pt-4 mb-8 text-center">Welcome to BioCloudLabs!</h2>
+            )}
             <div className="mb-6">
-                <h2 className="text-xl font-semibold mb-4">Your Virtual Machines History</h2>
-                <table className="min-w-full divide-y divide-gray-200 pt-4 my-12">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                VM Name
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Created At
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Powered off at
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {loading ? (
-                            <tr>
-                                <td colSpan={3} className="px-6 py-10 text-center">
-                                    Loading virtual machines history...
-                                </td>
-                            </tr>
-                        ) : vmHistory.length > 0 ? (
-                            vmHistory.map((vm) => (
-                                <tr key={vm.id} className="text-center">
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {vm.name}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {new Date(vm.created_at).toLocaleString('en-US', { timeZone: 'CET' })}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {vm.powered_off_at && new Date(vm.powered_off_at).toString() === 'Invalid Date' ? (
-                                            <button onClick={() => handlePowerOffClick(vm.id)} // Call handlePowerOffClick function on button click
-                                                className="text-red-500 hover:text-red-700 transition-colors duration-200">
-                                                <img src="/images/Blast/turn-off-4783.svg" alt="Power Off" className="w-6 h-6" />
-                                            </button>
-                                        ) : (
-                                            vm.powered_off_at ? new Date(vm.powered_off_at).toLocaleString('en-US', { timeZone: 'CET' }) : ''
-                                        )}
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan={3} className="px-6 py-10 text-center text-gray-500">
-                                    No virtual machines have been launched yet.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center">Your Virtual Machines History</h2>
+                {loading ? (
+                    <div className="text-center">Loading virtual machines history...</div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 py-4">
+                        {currentData.map((vm) => (
+                            <VirtualMachineCard key={vm.id} vm={vm} />
+                        ))}
+                    </div>
+                )}
+                <Pagination />
             </div>
 
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center">Quick actions</h2>
             <div className="flex flex-wrap justify-center gap-4 mt-6">
-    <div className="flex flex-col items-center w-full md:w-1/3 p-5 bg-white shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
-        <a href="/vm-request">
-            <div className="h-12 w-12 mb-3">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 10V13H17V10H14V8H17V5H19V8H22V10H19ZM6 19C4.89 19 4 18.1 4 17V9C4 7.89 4.89 7 6 7H11V9H6V17H18V9H13V7H18C19.1 7 20 7.89 20 9V17C20 18.1 19.1 19 18 19H6Z" fill="#4A5568" /></svg>
+                <div className="flex flex-col items-center w-full md:w-1/3 p-5 bg-white shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+                    <a href="/vm-request" className="flex flex-col items-center">
+                        <div className="h-12 w-12 mb-3 flex justify-center">
+                            <img src="/images/Blast/rocket-launch-9978.svg" alt="Request VM" className="h-full w-full" />
+                        </div>
+                        <div className="flex-1 flex flex-col justify-center">
+                            <h3 className="text-lg font-semibold text-center">Request VM</h3>
+                            <p className="text-sm text-gray-600 text-center">Start a new virtual machine tailored to your needs.</p>
+                        </div>
+                    </a>
+                </div>
+                <div className="flex flex-col items-center w-full md:w-1/3 p-5 bg-white shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+                    <a href="/credits-offers" className="flex flex-col items-center">
+                        <div className="h-12 w-12 mb-3 flex justify-center">
+                            <img src="/images/Blast/profit-coin-2967.svg" alt="Add Credits" className="h-full w-full" />
+                        </div>
+                        <div className="flex-1 flex flex-col justify-center">
+                            <h3 className="text-lg font-semibold text-center">Add Credits</h3>
+                            <p className="text-sm text-gray-600 text-center">Add credits to your account to use for various services.</p>
+                        </div>
+                    </a>
+                </div>
+                <div className="flex flex-col items-center w-full md:w-1/3 p-5 bg-white shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+                    <a href="/profile" className="flex flex-col items-center">
+                        <div className="h-12 w-12 mb-3 flex justify-center">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 12C13.1 12 14 11.1 14 10C14 8.9 13.1 8 12 8C10.9 8 10 8.9 10 10C10 11.1 10.9 12 12 12ZM12 14C10.67 14 7 14.92 7 16.25V18H17V16.25C17 14.92 13.33 14 12 14ZM12 6C10.34 6 9 7.34 9 9C9 10.66 10.34 12 12 12C13.66 12 15 10.66 15 9C15 7.34 13.66 6 12 6ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#9F7AEA" /></svg>
+                        </div>
+                        <div className="flex-1 flex flex-col justify-center">
+                            <h3 className="text-lg font-semibold text-center">Profile</h3>
+                            <p className="text-sm text-gray-600 text-center">Manage your profile settings and configurations.</p>
+                        </div>
+                    </a>
+                </div>
             </div>
-            <h3 className="text-lg font-semibold text-center">Request VM</h3>
-        </a>
-        <p className="text-sm text-gray-600 text-center px-3">Start a new virtual machine tailored to your needs.</p>
-    </div>
-    <div className="flex flex-col items-center w-full md:w-1/3 p-5 bg-white shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
-        <a href="/credits-offers">
-            <div className="h-12 w-12 mb-3">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M21 8H3c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2v-6c0-1.1-.9-2-2-2zm0 8H3v-6h18v6zm-1-5H4v2h16v-2z" fill="#48BB78" />
-                </svg>
-            </div>
-            <h3 className="text-lg font-semibold text-center">Add Credits</h3>
-        </a>
-        <p className="text-sm text-gray-600 text-center px-3">Add credits to your account to use for various services.</p>
-    </div>
-    <div className="flex flex-col items-center w-full md:w-1/3 p-5 bg-white shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
-        <a href="/profile">
-            <div className="h-12 w-12 mb-3">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 12C13.1 12 14 11.1 14 10C14 8.9 13.1 8 12 8C10.9 8 10 8.9 10 10C10 11.1 10.9 12 12 12ZM12 14C10.67 14 7 14.92 7 16.25V18H17V16.25C17 14.92 13.33 14 12 14ZM12 6C10.34 6 9 7.34 9 9C9 10.66 10.34 12 12 12C13.66 12 15 10.66 15 9C15 7.34 13.66 6 12 6ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#9F7AEA" /></svg>
-            </div>
-            <h3 className="text-lg font-semibold text-center">Profile</h3>
-        </a>
-        <p className="text-sm text-gray-600 text-center px-3">Manage your profile settings and configurations.</p>
-    </div>
-</div>
-
-
-
         </div>
     );
 }

@@ -40,9 +40,6 @@ const VMStatus: React.FC = () => {
     
         checkVMStatus();
     }, []);
-    
-    
-    
 
 
     return (

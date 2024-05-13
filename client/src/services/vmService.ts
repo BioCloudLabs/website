@@ -135,6 +135,8 @@ function calculatePrice(selectedVM: string): number {
     case 'vm3':
       return 20.99;
     default:
-      throw new Error('Unknown virtual machine type');
+      return 0;
+      // This can be trigerred if the returneed value is not the machine price
+    //   throw new Error('Unknown virtual machine type');
   }
 }

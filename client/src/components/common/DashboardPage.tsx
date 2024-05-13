@@ -96,7 +96,12 @@ function DashboardPage() {
                     </tbody>
                 </table>
             </div>
+
+
+
+            {/* Shortcut section at the dashboard page */}
             <div className="flex flex-wrap justify-center gap-4 mt-6">
+            <a href="/vm-request">
                 <div className="flex flex-col items-center w-full md:w-1/3 p-5 bg-white shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
                     <div className="h-12 w-12 mb-3">
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 10V13H17V10H14V8H17V5H19V8H22V10H19ZM6 19C4.89 19 4 18.1 4 17V9C4 7.89 4.89 7 6 7H11V9H6V17H18V9H13V7H18C19.1 7 20 7.89 20 9V17C20 18.1 19.1 19 18 19H6Z" fill="#4A5568" /></svg>
@@ -104,13 +109,20 @@ function DashboardPage() {
                     <h3 className="text-lg font-semibold text-center">Request VM</h3>
                     <p className="text-sm text-gray-600 text-center px-3">Start a new virtual machine tailored to your needs.</p>
                 </div>
+            </a>
+            <a href="/credits-offers">
+
                 <div className="flex flex-col items-center w-full md:w-1/3 p-5 bg-white shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
                     <div className="h-12 w-12 mb-3">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.25 16.15L17 14.92L12.5 12.25V7Z" fill="#48BB78" /></svg>
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 8H3c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2v-6c0-1.1-.9-2-2-2zm0 8H3v-6h18v6zm-1-5H4v2h16v-2z" fill="#48BB78" />
+                        </svg>
                     </div>
                     <h3 className="text-lg font-semibold text-center">Add Credits</h3>
                     <p className="text-sm text-gray-600 text-center px-3">Add credits to your account to use for various services.</p>
                 </div>
+                </a>
+                <a href="/profile">
                 <div className="flex flex-col items-center w-full md:w-1/3 p-5 bg-white shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
                     <div className="h-12 w-12 mb-3">
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 12C13.1 12 14 11.1 14 10C14 8.9 13.1 8 12 8C10.9 8 10 8.9 10 10C10 11.1 10.9 12 12 12ZM12 14C10.67 14 7 14.92 7 16.25V18H17V16.25C17 14.92 13.33 14 12 14ZM12 6C10.34 6 9 7.34 9 9C9 10.66 10.34 12 12 12C13.66 12 15 10.66 15 9C15 7.34 13.66 6 12 6ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#9F7AEA" /></svg>
@@ -118,6 +130,8 @@ function DashboardPage() {
                     <h3 className="text-lg font-semibold text-center">Profile</h3>
                     <p className="text-sm text-gray-600 text-center px-3">Manage your profile settings and configurations.</p>
                 </div>
+                </a>
+
             </div>
         </div>
     );

@@ -31,6 +31,7 @@ class SetupVirtualMachine(MethodView):
 
         res = requests.get("http://localhost:4000/vm/setup")
         json_res = res.json()
+        print(json_res)
 
         if "code" in json_res:
             if json_res["code"] == 500:
@@ -81,7 +82,7 @@ class PowerOffMachine(MethodView):
                 abort(500, message="Error trying to power off a VM, please try again.")
 
         try:
-            vm.poweredof_at = datetime.now()
+            vm.powered_off_at = datetime.now()
 
             db.session.commit()
         except IntegrityError:

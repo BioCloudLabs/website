@@ -86,11 +86,9 @@ export async function getVirtualMachinesHistory(): Promise<VirtualMachineHistory
       }
     });
 
-    // Handle non-OK responses by parsing error data
     if (!response.ok) {
       const errorData = await response.json();
 
-      // Specific checks for different backend messages
       if (response.status === 404) {
         if (errorData.message === "User not found") {
           throw new Error('User account not found. Please log in again.');
@@ -101,24 +99,22 @@ export async function getVirtualMachinesHistory(): Promise<VirtualMachineHistory
         throw new Error('Your session has expired. Please log in again.');
       }
 
-      // Generic error message for other cases
       throw new Error(errorData.message || 'Failed to retrieve virtual machine history. Please try again later.');
     }
 
-    // If response is OK, parse the successful response
     const data = await response.json();
     return data.vm_list.map((vm: any) => ({
-      id: vm.id.toString(), // Convert id to string
+      id: vm.id.toString(),
       name: vm.name,
-      created_at: new Date(vm.created_at).toLocaleString('en-US', { timeZone: 'UTC' }), // Format created_at as string
-      powered_off_at: vm.powered_off_at ? new Date(vm.powered_off_at).toLocaleString('en-US', { timeZone: 'UTC' }) : 'Power Off' // Format powered_off_at as string or 'Power Off' if null
+      created_at: new Date(vm.created_at).toLocaleString('en-US', { timeZone: 'UTC' }),
+      powered_off_at: vm.powered_off_at ? new Date(vm.powered_off_at).toLocaleString('en-US', { timeZone: 'UTC' }) : 'Power Off',
+      cost: vm.cost
     }));
   } catch (error) {
     console.error('Failed to retrieve virtual machine history:', error);
-    throw error; // Rethrow the error to handle it appropriately elsewhere
+    throw error;
   }
 }
-
 
 
 function calculatePrice(selectedVM: string): number {

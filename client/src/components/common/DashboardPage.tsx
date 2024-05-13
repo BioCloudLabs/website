@@ -5,35 +5,29 @@ import { VirtualMachineHistory } from './../../models/VirtualMachineHistory';
 function DashboardPage() {
     const [userName, setUserName] = useState<string>('');
     const [vmHistory, setVmHistory] = useState<VirtualMachineHistory[]>([]);
-
-    const [loading, setLoading] = useState<boolean>(true);  // State to track loading status
+    const [loading, setLoading] = useState<boolean>(true);
     const [currentPage, setCurrentPage] = useState(0);
-    const ITEMS_PER_PAGE = 5;
+    const ITEMS_PER_PAGE = 6;
 
-    // Function to go to the next page
     const nextPage = () => {
         setCurrentPage((prev) => prev + 1);
     };
 
-    // Function to go to the previous page
     const prevPage = () => {
         setCurrentPage((prev) => (prev > 0 ? prev - 1 : 0));
     };
 
-    // Calculate number of pages
     const numPages = Math.ceil(vmHistory.length / ITEMS_PER_PAGE);
 
-    // Slice the data for the current page
     const currentData = vmHistory.slice(
         currentPage * ITEMS_PER_PAGE,
         (currentPage + 1) * ITEMS_PER_PAGE
     );
 
-    // Pagination Component
     const Pagination = () => (
         <div className="flex flex-col items-center my-6 text-gray-900">
             <span className="text-sm text-gray-900 dark:text-gray-400">
-                Showing <span className="font-semibold text-gray-900 dark:text-blak">{currentPage * ITEMS_PER_PAGE + 1}</span> to <span className="font-semibold text-gray-700 dark:text-gray-400">{vmHistory.length}</span> Entries
+                Showing <span className="font-semibold text-gray-900 dark:text-black">{currentPage * ITEMS_PER_PAGE + 1}</span> to <span className="font-semibold text-gray-700 dark:text-gray-400">{Math.min((currentPage + 1) * ITEMS_PER_PAGE, vmHistory.length)}</span> of <span className="font-semibold text-gray-900 dark:text-black">{vmHistory.length}</span> Entries
             </span>
             <div className="inline-flex mt-2">
                 <button
@@ -54,102 +48,89 @@ function DashboardPage() {
         </div>
     );
 
-
-
     useEffect(() => {
-        // Retrieve user information from LocalStorage
         const user = localStorage.getItem('userProfile');
         if (user) {
             const userData = JSON.parse(user);
             setUserName(`${userData.name}`);
         }
 
-        // Fetch the history of virtual machines
         const fetchVmHistory = async () => {
             try {
                 const history = await getVirtualMachinesHistory();
                 setVmHistory(history.map(vm => ({
                     ...vm,
-                    id: vm.id.toString(), // Convert the id to a string
-                    created_at: new Date(vm.created_at).toLocaleString('en-US', { timeZone: 'CET' }), // Format created_at as string
-                    powered_off_at: vm.powered_off_at ? new Date(vm.powered_off_at).toLocaleString('en-US', { timeZone: 'CET' }) : '' // Format powered_off_at as string or set it to an empty string if null
+                    id: vm.id.toString(),
+                    created_at: new Date(vm.created_at).toLocaleString('en-US', { timeZone: 'CET' }),
+                    powered_off_at: vm.powered_off_at ? new Date(vm.powered_off_at).toLocaleString('en-US', { timeZone: 'CET' }) : null,
+                    cost: vm.cost
                 })));
             } catch (error) {
                 console.error("Error fetching VM history:", error);
             } finally {
-                setLoading(false);  // Set loading to false regardless of the oCETome
+                setLoading(false);
             }
         };
 
         fetchVmHistory();
     }, []);
 
-    // Define a new function to fetch VM history
     const fetchVmHistory = async () => {
         try {
             const history = await getVirtualMachinesHistory();
             setVmHistory(history.map(vm => ({
                 ...vm,
-                id: vm.id.toString(), // Convert the id to a string
-                created_at: new Date(vm.created_at).toLocaleString('en-US', { timeZone: 'CET' }), // Format created_at as string
-                powered_off_at: vm.powered_off_at ? new Date(vm.powered_off_at).toLocaleString('en-US', { timeZone: 'CET' }) : '' // Format powered_off_at as string or set it to an empty string if null
+                id: vm.id.toString(),
+                created_at: new Date(vm.created_at).toLocaleString('en-US', { timeZone: 'CET' }),
+                powered_off_at: vm.powered_off_at ? new Date(vm.powered_off_at).toLocaleString('en-US', { timeZone: 'CET' }) : null,
+                cost: vm.cost
             })));
         } catch (error) {
             console.error("Error fetching VM history:", error);
         } finally {
-            setLoading(false);  // Set loading to false regardless of the oCETome
+            setLoading(false);
         }
     };
 
-    // Function to handle powering off a virtual machine and then fetching updated history
     const handlePowerOffClick = async (vmId: string) => {
         try {
-            // Call the powerOffVirtualMachine function
             await powerOffVirtualMachine(parseInt(vmId));
-            // After powering off, fetch the updated virtual machine history
             await fetchVmHistory();
         } catch (error) {
             console.error("Error powering off virtual machine:", error);
         }
     };
 
-
-    const VirtualMachineCard = ({ vm }: { vm: any }) => {
-        return (
-            <div className="bg-white shadow-lg rounded-lg p-4 mb-4 flex flex-col items-center text-center">
-                <h3 className="text-lg font-semibold">{vm.name}</h3>
-                <p className="text-sm text-gray-600">Created at: {vm.created_at}</p>
-                <p className="text-sm text-gray-600">Powered off at: {vm.powered_off_at || 'Still Running'}</p>
-                {!vm.powered_off_at && (
-                    <button
-                        onClick={() => handlePowerOffClick(vm.id)}
-                        className="mt-2 flex items-center justify-center p-2 bg-red-500 hover:bg-red-700 rounded"
-                    >
-                        <img src="/images/Blast/turn-off-4783.svg" alt="Power Off" className="w-6 h-6" />
-                    </button>
-                )}
-
-            </div>
-        );
-    };
-
-
-
+    const VirtualMachineCard = ({ vm }: { vm: any }) => (
+        <div className="bg-white shadow-lg rounded-lg p-4 mb-4 flex flex-col items-center text-center">
+            <h3 className="text-lg font-semibold">{vm.name}</h3>
+            <p className="text-sm text-gray-600">Created at: {vm.created_at}</p>
+            <p className="text-sm text-gray-600">Powered off at: {vm.powered_off_at || 'Still Running'}</p>
+            <p className="text-sm text-gray-600">Cost: {vm.cost} credits</p>
+            {!vm.powered_off_at && (
+                <button
+                    onClick={() => handlePowerOffClick(vm.id)}
+                    className="mt-2 flex items-center justify-center p-2 bg-red-500 hover:bg-red-700 rounded"
+                >
+                    <img src="/images/Blast/turn-off-4783.svg" alt="Power Off" className="w-6 h-6" />
+                </button>
+            )}
+        </div>
+    );
 
     return (
-        <div className="px-4 sm:px-6 lg:px-8 py-8">
+        <div className="px-4 sm:px-6 lg:px-8 py-8 bg-gray-100 min-h-screen">
             {userName ? (
                 <h2 className="text-2xl sm:text-3xl font-bold pt-4 mb-8 text-center">Welcome back, {userName}!</h2>
             ) : (
                 <h2 className="text-2xl sm:text-3xl font-bold pt-4 mb-8 text-center">Welcome to BioCloudLabs!</h2>
             )}
-
-            <div className="mb-12 mt-12">
+            <div className="mb-6">
                 <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center">Your Virtual Machines History</h2>
                 {loading ? (
                     <div className="text-center">Loading virtual machines history...</div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 py-4">
                         {currentData.map((vm) => (
                             <VirtualMachineCard key={vm.id} vm={vm} />
                         ))}
@@ -157,8 +138,6 @@ function DashboardPage() {
                 )}
                 <Pagination />
             </div>
-
-
 
             <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center">Quick actions</h2>
             <div className="flex flex-wrap justify-center gap-4 mt-6">
@@ -195,12 +174,7 @@ function DashboardPage() {
                         </div>
                     </a>
                 </div>
-
-
             </div>
-
-
-
         </div>
     );
 }

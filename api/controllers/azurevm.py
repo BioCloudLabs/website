@@ -2,7 +2,7 @@ from flask_jwt_extended import (
     jwt_required, 
     get_jwt_identity
 )
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from sqlalchemy.exc import IntegrityError
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
@@ -32,17 +32,15 @@ def calc_vm_credits_costs(vm):
 
     TOTAL_CREDITS_MINUTE = VM_CREDITS_MINUTE + IP_CREDITS_MINUTE + DISK_CREDITS_MINUTE 
 
-    powered_off_time = vm.powered_off_at
+    if vm.powered_off_at is None:
+        powered_off_time = datetime.now(timezone.utc) + timedelta(hours=2)
+    else:
+        powered_off_time = vm.powered_off_at.replace(tzinfo=timezone.utc)
 
-    if powered_off_time is None:
-        powered_off_time = datetime.now(timezone.utc)
 
     created_at_time = vm.created_at.replace(tzinfo=timezone.utc)
-    print(f"created at: {created_at_time}")
-    print(f"poweredof_at at: {powered_off_time}")
 
     vm_total_minutes = (powered_off_time - created_at_time).total_seconds() / 60.0
-    print(f"Minutos: {vm_total_minutes}")
     return round(vm_total_minutes * TOTAL_CREDITS_MINUTE)
 
 @blp.route("/setup")

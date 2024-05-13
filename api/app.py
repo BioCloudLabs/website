@@ -11,7 +11,6 @@ from controllers.stripe import blp as StripeBlueprint
 from controllers.azuredata import blp as AzuredataBlueprint
 from controllers.azurevm import blp as AzureVmBlueprint
 from dotenv import load_dotenv
-from werkzeug.exceptions import HTTPException
 
 app: Flask = Flask(__name__, static_folder="dist", static_url_path="/")
 

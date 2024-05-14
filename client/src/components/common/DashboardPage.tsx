@@ -100,7 +100,7 @@ function DashboardPage() {
     };
 
     const VirtualMachineCard = ({ vm }: { vm: VirtualMachineHistory }) => (
-        <div className="bg-white shadow-lg rounded-lg py-6 px-4 mb-4 flex flex-col justify-between min-h-[80px] mx-4">
+        <div className="bg-white shadow-lg rounded-lg py-6 px-4 mb-4 flex flex-col justify-between mx-4">
             <h3 className="text-lg font-semibold text-center">{vm.name}</h3>
             <div className="flex flex-col items-center space-y-2 mt-4 flex-grow">
                 <p className="text-sm text-gray-600">Cost: {vm.cost} credits</p>

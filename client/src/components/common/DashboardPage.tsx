@@ -56,19 +56,24 @@ function DashboardPage() {
         const fetchVmHistory = async () => {
             try {
                 const history = await getVirtualMachinesHistory();
-                setVmHistory(history.map(vm => ({
-                    ...vm,
-                    id: vm.id.toString(),
-                    created_at: new Date(Date.parse(vm.created_at)).toLocaleString('en-US', { timeZone: 'UTC' }),
-                    powered_off_at: vm.powered_off_at ? new Date(Date.parse(vm.powered_off_at)).toLocaleString('en-US', { timeZone: 'UTC' }) : 'Still Running',
-                    cost: vm.cost
-                })));
+                setVmHistory(
+                    history
+                        .map(vm => ({
+                            ...vm,
+                            id: vm.id.toString(),
+                            created_at: new Date(Date.parse(vm.created_at)).toLocaleString('en-US', { timeZone: 'UTC' }),
+                            powered_off_at: vm.powered_off_at ? new Date(Date.parse(vm.powered_off_at)).toLocaleString('en-US', { timeZone: 'UTC' }) : 'Still Running',
+                            cost: vm.cost
+                        }))
+                        .reverse() // Reverse the order to show the newest first
+                );
             } catch (error) {
                 console.error("Error fetching VM history:", error);
             } finally {
                 setLoading(false);
             }
         };
+        
 
         fetchVmHistory();
     }, []);
@@ -159,7 +164,7 @@ function DashboardPage() {
             <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center">Quick actions</h2>
             <div className="flex flex-wrap justify-center gap-4 mt-6">
                 <div className="flex flex-col items-center w-full md:w-1/3 p-5 bg-white shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
-                    <a href="/vm-request" className="flex flex-col items-center">
+                    <a href="/launch-vm" className="flex flex-col items-center">
                         <div className="h-12 w-12 mb-3 flex justify-center">
                             <img src="/images/Blast/rocket-launch-9978.svg" alt="Request VM" className="h-full w-full" />
                         </div>

@@ -100,26 +100,33 @@ function DashboardPage() {
     };
 
     const VirtualMachineCard = ({ vm }: { vm: VirtualMachineHistory }) => (
-        <div className="bg-white shadow-lg rounded-lg p-4 mb-4 flex flex-col items-center justify-between h-full mx-4">
+        <div className="bg-white shadow-lg rounded-lg py-6 px-4 mb-4 flex flex-col justify-between min-h-[80px] mx-4">
             <h3 className="text-lg font-semibold text-center">{vm.name}</h3>
-            <p className="text-sm text-gray-600 text-center">Cost: {vm.cost} credits</p>
-            <p className="text-sm text-gray-600 text-center">Created at: {vm.created_at}</p>
-            {vm.powered_off_at !== 'Still Running' ? (
-                <p className="text-sm text-gray-600 text-center h-16">Powered off at: {vm.powered_off_at as string}</p>
-            ) : (
-                <div className="flex flex-col items-center mt-2">
-                    <p className="text-sm text-gray-600 text-center h-8">This VM is currently running.</p>
-                    <button
-                        onClick={() => handlePowerOffClick(vm.id)}
-                        className="flex items-center justify-center p-2 bg-red-500 text-white hover:bg-red-700 rounded"
-                    >
-                        <img src="/images/Blast/turn-off-4783.svg" alt="Power Off" className="w-6 h-6 mr-2" />
-                        <span>Power Off</span>
-                    </button>
-                </div>
-            )}
+            <div className="flex flex-col items-center space-y-2 mt-4 flex-grow">
+                <p className="text-sm text-gray-600">Cost: {vm.cost} credits</p>
+                <p className="text-sm text-gray-600">Created at: {vm.created_at}</p>
+                {vm.powered_off_at !== 'Still Running' ? (
+                    <p className="text-sm text-gray-600">Powered off at: {vm.powered_off_at as string}</p>
+                ) : (
+                    <>
+                        <p className="text-sm text-gray-600">This VM is currently running.</p>
+                        <button
+                            onClick={() => handlePowerOffClick(vm.id)}
+                            className="flex items-center justify-center p-2 bg-red-500 text-white hover:bg-red-700 rounded mt-2"
+                        >
+                            <img src="/images/Blast/turn-off-4783.svg" alt="Power Off" className="w-6 h-6 mr-2" />
+                            <span>Power Off</span>
+                        </button>
+                    </>
+                )}
+            </div>
         </div>
     );
+    
+
+
+
+
 
 
     return (

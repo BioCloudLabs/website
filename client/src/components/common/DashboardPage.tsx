@@ -3,7 +3,6 @@ import { getVirtualMachinesHistory, powerOffVirtualMachine } from './../../servi
 import { VirtualMachineHistory } from './../../models/VirtualMachineHistory';
 
 function DashboardPage() {
-    const [userName, setUserName] = useState<string>('');
     const [vmHistory, setVmHistory] = useState<VirtualMachineHistory[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [currentPage, setCurrentPage] = useState(0);
@@ -25,36 +24,35 @@ function DashboardPage() {
     );
 
     const Pagination = () => (
-        <div className="flex flex-col items-center my-6 text-gray-900">
-            <span className="text-sm text-gray-900 dark:text-gray-500">
-                Showing <span className="font-semibold text-gray-900 dark:text-black">{currentPage * ITEMS_PER_PAGE + 1}</span> to <span className="font-semibold text-gray-900 dark:text-black">{Math.min((currentPage + 1) * ITEMS_PER_PAGE, vmHistory.length)}</span> of <span className="font-semibold text-gray-900 dark:text-black">{vmHistory.length}</span> Entries
-            </span>
-            <div className="inline-flex mt-2">
-                <button
-                    onClick={prevPage}
-                    className="px-4 h-10 text-base font-medium text-white bg-gray-800 rounded-l hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700 dark:hover:text-white"
-                    disabled={currentPage === 0}
-                >
-                    Prev
-                </button>
-                <button
-                    onClick={nextPage}
-                    className="px-4 h-10 text-base font-medium text-white bg-gray-200 rounded-r hover:bg-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700 dark:hover:text-white"
-                    disabled={currentPage >= numPages - 1}
-                >
-                    Next
-                </button>
-            </div>
-        </div>
+        <>
+            {vmHistory.length > 0 && (
+                <div className="flex flex-col items-center my-6 text-gray-900">
+                    <span className="text-sm text-gray-900 dark:text-gray-500">
+                        Showing <span className="font-semibold text-gray-900 dark:text-black">{currentPage * ITEMS_PER_PAGE + 1}</span> to <span className="font-semibold text-gray-900 dark:text-black">{Math.min((currentPage + 1) * ITEMS_PER_PAGE, vmHistory.length)}</span> of <span className="font-semibold text-gray-900 dark:text-black">{vmHistory.length}</span> Entries
+                    </span>
+                    <div className="inline-flex mt-2">
+                        <button
+                            onClick={prevPage}
+                            className="px-4 h-10 text-base font-medium text-white bg-gray-800 rounded-l hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700 dark:hover:text-white"
+                            disabled={currentPage === 0}
+                        >
+                            Prev
+                        </button>
+                        <button
+                            onClick={nextPage}
+                            className="px-4 h-10 text-base font-medium text-white bg-gray-200 rounded-r hover:bg-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700 dark:hover:text-white"
+                            disabled={currentPage >= numPages - 1}
+                        >
+                            Next
+                        </button>
+                    </div>
+                </div>
+            )}
+        </>
     );
 
-    useEffect(() => {
-        const user = localStorage.getItem('userProfile');
-        if (user) {
-            const userData = JSON.parse(user);
-            setUserName(`${userData.name}`);
-        }
 
+    useEffect(() => {
         const fetchVmHistory = async () => {
             try {
                 const history = await getVirtualMachinesHistory();
@@ -104,39 +102,48 @@ function DashboardPage() {
     const VirtualMachineCard = ({ vm }: { vm: VirtualMachineHistory }) => (
         <div className="bg-white shadow-lg rounded-lg p-4 mb-4 flex flex-col items-center text-center mx-4">
             <h3 className="text-lg font-semibold">{vm.name}</h3>
+            <p className="text-sm text-gray-600">Cost: {vm.cost} credits</p>
             <p className="text-sm text-gray-600">Created at: {vm.created_at}</p>
             {vm.powered_off_at !== 'Still Running' ? (
                 <p className="text-sm text-gray-600">Powered off at: {vm.powered_off_at as string}</p>
             ) : (
-                <button
-                    onClick={() => handlePowerOffClick(vm.id)}
-                    className="mt-2 flex items-center justify-center p-2 hover:bg-red-200 rounded"
-                >
-                    <img src="/images/Blast/turn-off-4783.svg" alt="Power Off" className="w-6 h-6" />
-                </button>
+                <div className="flex flex-col items-center mt-2">
+                    <p className="text-sm text-gray-600 mb-2">This VM is currently running.</p>
+                    <button
+                        onClick={() => handlePowerOffClick(vm.id)}
+                        className="flex items-center justify-center p-2 bg-red-300 text-black hover:bg-red-700 rounded"
+                    >
+                        <img src="/images/Blast/turn-off-4783.svg" alt="Power Off" className="w-6 h-6 mr-2" />
+                        <span>Power Off</span>
+                    </button>
+                </div>
             )}
 
-
-            <p className="text-sm text-gray-600">Cost: {vm.cost} credits</p>
         </div>
     );
 
     return (
-        <div className="px-4 sm:px-6 lg:px-8 py-8 bg-gray-100 min-h-screen">
-            {userName ? (
-                <h2 className="text-2xl sm:text-3xl font-bold pt-8 mb-8 text-center">Welcome back, {userName}!</h2>
-            ) : (
-                <h2 className="text-2xl sm:text-2xl font-bold pt-9 mb-8 text-center">Welcome to BioCloudLabs!</h2>
-            )}
+        <div className="px-4  lg:px-8 py-8 bg-gray-100 min-h-screen">
+            <h2 className="text-2xl sm:text-3xl font-bold pt-4 my-4 mb-8 text-center">Welcome to BioCloudLabs!</h2>
             <div className="mb-6">
-                <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center">Your Virtual Machines History</h2>
+                <h2 className="text-lg sm:text-x1 font-semibold mb-4 my-y text-center">Your Virtual Machines History</h2>
                 {loading ? (
                     <div className="text-center">Loading virtual machines history...</div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 py-4">
-                        {currentData.map((vm) => (
-                            <VirtualMachineCard key={vm.id} vm={vm} />
-                        ))}
+                        {vmHistory.length === 0 ? (
+                            <div className="col-span-full flex justify-center mt-4">
+                                <div className="text-center text-gray-600 border border-gray-200 rounded-lg p-4 max-w-md">
+                                    No virtual machines have been launched yet.
+                                </div>
+                            </div>
+
+                        ) : (
+                            currentData.map((vm) => (
+                                <VirtualMachineCard key={vm.id} vm={vm} />
+                            ))
+                        )}
+
                     </div>
                 )}
                 <Pagination />
@@ -150,7 +157,7 @@ function DashboardPage() {
                             <img src="/images/Blast/rocket-launch-9978.svg" alt="Request VM" className="h-full w-full" />
                         </div>
                         <div className="flex-1 flex flex-col justify-center">
-                            <h3 className="text-lg font-semibold text-center">Request VM</h3>
+                            <h3 className="text-lg font-semibold text-center">Launch VM</h3>
                             <p className="text-sm text-gray-600 text-center">Start a new virtual machine tailored to your needs.</p>
                         </div>
                     </a>

@@ -106,8 +106,8 @@ export async function getVirtualMachinesHistory(): Promise<VirtualMachineHistory
     return data.vm_list.map((vm: any) => ({
       id: vm.id.toString(),
       name: vm.name,
-      created_at: new Date(vm.created_at).toLocaleString('en-US', { timeZone: 'UTC' }),
-      powered_off_at: vm.powered_off_at ? new Date(vm.powered_off_at).toLocaleString('en-US', { timeZone: 'UTC' }) : 'Power Off',
+      created_at: new Date(Date.parse(vm.created_at)).toLocaleString('en-US', { timeZone: 'UTC' }),
+      powered_off_at: vm.powered_off_at ? new Date(Date.parse(vm.powered_off_at)).toLocaleString('en-US', { timeZone: 'UTC' }) : null,
       cost: vm.cost
     }));
   } catch (error) {
@@ -115,6 +115,9 @@ export async function getVirtualMachinesHistory(): Promise<VirtualMachineHistory
     throw error;
   }
 }
+
+
+
 
 
 function calculatePrice(selectedVM: string): number {

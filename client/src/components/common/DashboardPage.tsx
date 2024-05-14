@@ -26,20 +26,20 @@ function DashboardPage() {
 
     const Pagination = () => (
         <div className="flex flex-col items-center my-6 text-gray-900">
-            <span className="text-sm text-gray-900 dark:text-gray-400">
-                Showing <span className="font-semibold text-gray-900 dark:text-black">{currentPage * ITEMS_PER_PAGE + 1}</span> to <span className="font-semibold text-gray-700 dark:text-gray-400">{Math.min((currentPage + 1) * ITEMS_PER_PAGE, vmHistory.length)}</span> of <span className="font-semibold text-gray-900 dark:text-black">{vmHistory.length}</span> Entries
+            <span className="text-sm text-gray-900 dark:text-gray-500">
+                Showing <span className="font-semibold text-gray-900 dark:text-black">{currentPage * ITEMS_PER_PAGE + 1}</span> to <span className="font-semibold text-gray-900 dark:text-black">{Math.min((currentPage + 1) * ITEMS_PER_PAGE, vmHistory.length)}</span> of <span className="font-semibold text-gray-900 dark:text-black">{vmHistory.length}</span> Entries
             </span>
             <div className="inline-flex mt-2">
                 <button
                     onClick={prevPage}
-                    className="px-4 h-10 text-base font-medium text-white bg-gray-800 rounded-l hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                    className="px-4 h-10 text-base font-medium text-white bg-gray-800 rounded-l hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700 dark:hover:text-white"
                     disabled={currentPage === 0}
                 >
                     Prev
                 </button>
                 <button
                     onClick={nextPage}
-                    className="px-4 h-10 text-base font-medium text-white bg-gray-800 rounded-r hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                    className="px-4 h-10 text-base font-medium text-white bg-gray-200 rounded-r hover:bg-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700 dark:hover:text-white"
                     disabled={currentPage >= numPages - 1}
                 >
                     Next
@@ -61,8 +61,8 @@ function DashboardPage() {
                 setVmHistory(history.map(vm => ({
                     ...vm,
                     id: vm.id.toString(),
-                    created_at: new Date(vm.created_at).toLocaleString('en-US', { timeZone: 'CET' }),
-                    powered_off_at: vm.powered_off_at ? new Date(vm.powered_off_at).toLocaleString('en-US', { timeZone: 'CET' }) : null,
+                    created_at: new Date(Date.parse(vm.created_at)).toLocaleString('en-US', { timeZone: 'UTC' }),
+                    powered_off_at: vm.powered_off_at ? new Date(Date.parse(vm.powered_off_at)).toLocaleString('en-US', { timeZone: 'UTC' }) : 'Still Running',
                     cost: vm.cost
                 })));
             } catch (error) {
@@ -81,8 +81,8 @@ function DashboardPage() {
             setVmHistory(history.map(vm => ({
                 ...vm,
                 id: vm.id.toString(),
-                created_at: new Date(vm.created_at).toLocaleString('en-US', { timeZone: 'CET' }),
-                powered_off_at: vm.powered_off_at ? new Date(vm.powered_off_at).toLocaleString('en-US', { timeZone: 'CET' }) : null,
+                created_at: new Date(Date.parse(vm.created_at)).toLocaleString('en-US', { timeZone: 'UTC' }),
+                powered_off_at: vm.powered_off_at ? new Date(Date.parse(vm.powered_off_at)).toLocaleString('en-US', { timeZone: 'UTC' }) : 'Still Running',
                 cost: vm.cost
             })));
         } catch (error) {
@@ -101,29 +101,32 @@ function DashboardPage() {
         }
     };
 
-    const VirtualMachineCard = ({ vm }: { vm: any }) => (
-        <div className="bg-white shadow-lg rounded-lg p-4 mb-4 flex flex-col items-center text-center">
+    const VirtualMachineCard = ({ vm }: { vm: VirtualMachineHistory }) => (
+        <div className="bg-white shadow-lg rounded-lg p-4 mb-4 flex flex-col items-center text-center mx-4">
             <h3 className="text-lg font-semibold">{vm.name}</h3>
             <p className="text-sm text-gray-600">Created at: {vm.created_at}</p>
-            <p className="text-sm text-gray-600">Powered off at: {vm.powered_off_at || 'Still Running'}</p>
-            <p className="text-sm text-gray-600">Cost: {vm.cost} credits</p>
-            {!vm.powered_off_at && (
+            {vm.powered_off_at !== 'Still Running' ? (
+                <p className="text-sm text-gray-600">Powered off at: {vm.powered_off_at as string}</p>
+            ) : (
                 <button
                     onClick={() => handlePowerOffClick(vm.id)}
-                    className="mt-2 flex items-center justify-center p-2 bg-red-500 hover:bg-red-700 rounded"
+                    className="mt-2 flex items-center justify-center p-2 hover:bg-red-200 rounded"
                 >
                     <img src="/images/Blast/turn-off-4783.svg" alt="Power Off" className="w-6 h-6" />
                 </button>
             )}
+
+
+            <p className="text-sm text-gray-600">Cost: {vm.cost} credits</p>
         </div>
     );
 
     return (
         <div className="px-4 sm:px-6 lg:px-8 py-8 bg-gray-100 min-h-screen">
             {userName ? (
-                <h2 className="text-2xl sm:text-3xl font-bold pt-4 mb-8 text-center">Welcome back, {userName}!</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold pt-8 mb-8 text-center">Welcome back, {userName}!</h2>
             ) : (
-                <h2 className="text-2xl sm:text-3xl font-bold pt-4 mb-8 text-center">Welcome to BioCloudLabs!</h2>
+                <h2 className="text-2xl sm:text-2xl font-bold pt-9 mb-8 text-center">Welcome to BioCloudLabs!</h2>
             )}
             <div className="mb-6">
                 <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center">Your Virtual Machines History</h2>

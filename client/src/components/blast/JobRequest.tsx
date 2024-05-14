@@ -1,27 +1,22 @@
 import React, { useState } from 'react';
 import { createVirtualMachine } from './../../services/vmService';
 import { VirtualMachine } from './../../models/VirtualMachines';
-import { VMSpec } from '../../models/VMSpec';
 import { notify } from '../../utils/notificationUtils';
 import { useNavigate } from 'react-router-dom';
 
-
-const vmSpecs: VMSpec[] = [
-  { name: 'VM1', cpu: '2 vCPUs', memory: '8 GB', credits: 0.0922, description: 'Basic VM for small BLAST jobs.' },
-  { name: 'VM2', cpu: '4 vCPUs', memory: '16 GB', credits: 0.1847, description: 'Intermediate VM for medium-sized BLAST jobs.' },
-  { name: 'VM3', cpu: '8 vCPUs', memory: '32 GB', credits: 0.3685, description: 'Advanced VM for complex BLAST jobs.' },
-  { name: 'VM4', cpu: '16 vCPUs', memory: '64 GB', credits: 0.7369, description: 'High-performance VM for large BLAST jobs.' },
-  { name: 'VM5', cpu: '32 vCPUs', memory: '128 GB', credits: 1.4748, description: 'Super VM for the most demanding BLAST jobs.' },
-];
+const vmSpec = {
+  name: 'Standard B2S',
+  cpu: '2 vCPUs',
+  memory: '4 GB',
+  credits: 0.00399,
+  description: 'Standard VM for small to medium BLAST jobs.'
+};
 
 const JobRequest: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [virtualMachine, setVirtualMachine] = useState<VirtualMachine | null>(null);
-  const [selectedVM, setSelectedVM] = useState<string>(vmSpecs[0].name);
-  const [estimatedCredits, setEstimatedCredits] = useState<number>(vmSpecs[0].credits);
   const navigate = useNavigate();
   const userCredits = parseFloat(localStorage.getItem('userCredits') || '0');
-
 
   const handleCreateVirtualMachine = async () => {
     if (userCredits <= 20) {
@@ -33,13 +28,13 @@ const JobRequest: React.FC = () => {
 
     // Navigate after notifying the user
     setTimeout(() => {
-      navigate('/vm-status', { state: { vmName: selectedVM } });
+      navigate('/status-vm', { state: { vmName: vmSpec.name } });
     }, 3000); // Navigate to VM status page after a delay
 
     setIsLoading(true);
 
     // Continue to try creating the VM in the background
-    createVirtualMachine(selectedVM)
+    createVirtualMachine(vmSpec.name)
       .then(vm => {
         localStorage.setItem('vmDetails', JSON.stringify({
           ip: vm.ip,
@@ -59,93 +54,56 @@ const JobRequest: React.FC = () => {
       });
   };
 
-
-
-
-  const handleVMSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedVM = e.target.value;
-    setSelectedVM(selectedVM);
-    const selectedVMSpec = vmSpecs.find((vm) => vm.name === selectedVM);
-    if (selectedVMSpec) {
-      setEstimatedCredits(selectedVMSpec.credits);
-    }
-  };
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-4 my-12">BLAST Job Request</h1>
-      <p className="mb-4">
-        BLAST (Basic Local Alignment Search Tool) is a tool that finds regions of similarity between biological sequences.
-        It compares nucleotide or protein sequences to sequence databases and calculates the statistical significance.
-      </p>
-      <div className="mb-4">
-        <label htmlFor="vmSelect" className="block text-sm font-medium text-gray-700">Select VM</label>
-        <select
-          id="vmSelect"  // Ensure the ID matches the htmlFor attribute of the label
-          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-          value={selectedVM}
-          onChange={handleVMSelectChange}
-        >
-          {vmSpecs.map((vm) => (
-            <option key={vm.name} value={vm.name}>
-              {vm.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold mb-2">Virtual Machine Specifications</h2>
-        <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-          <thead className="text-xs uppercase bg-gray-50 dark:bg-gray-700 dark:text-white">
-            <tr>
-              <th scope="col" className="py-3 px-6">VM</th>
-              <th scope="col" className="py-3 px-6">CPU</th>
-              <th scope="col" className="py-3 px-6">Memory</th>
-              <th scope="col" className="py-3 px-6">€/hour</th>
-              <th scope="col" className="py-3 px-6">Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {vmSpecs.map((vm) => (
-              <tr key={vm.name} className={`border-b ${vm.name === selectedVM ? 'bg-blue-100' : 'bg-white hover:bg-gray-50'}`}>
-                <td className="py-4 px-6 text-gray-900">{vm.name}</td>
-                <td className="py-4 px-6 text-gray-900">{vm.cpu}</td>
-                <td className="py-4 px-6 text-gray-900">{vm.memory}</td>
-                <td className="py-4 px-6 text-gray-900">{vm.credits}</td>
-                <td className="py-4 px-6 text-gray-900">{vm.description}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <p className="text-gray-600 mb-4">Estimated Credits per hour: {estimatedCredits}</p>
-      {isLoading ? (
-        <div className="flex justify-center items-center">
-          <div className="flex flex-col items-center">
-            <h1 className="text-lg font-semibold text-blue-500 mb-4">Loading...</h1>
-            <div className="loader animate-spin rounded-full border-t-4 border-b-4 border-blue-500 w-12 h-12"></div>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="w-full max-w-2xl bg-white shadow-md rounded-lg p-6 mx-4">
+        <h1 className="text-4xl font-bold text-blue-700 mb-6 my-8 text-center">Launch Virtual Machine</h1>
+        <p className="text-lg text-gray-700 mb-4">
+          BLAST (Basic Local Alignment Search Tool) is a powerful tool used to find regions of similarity between biological sequences. It compares nucleotide or protein sequences to sequence databases and calculates the statistical significance of the matches.
+        </p>
+        <p className="text-lg text-gray-700 mb-6">
+          Our service provides a virtual machine pre-configured with BLAST tools, enabling you to perform complex sequence analysis tasks efficiently. The selected VM is designed to handle small to medium BLAST jobs, offering a balanced combination of processing power and memory.
+        </p>
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold text-blue-600 mb-4">Virtual Machine Specifications</h2>
+          <div className="bg-blue-100 p-4 rounded-lg">
+            <ul className="list-disc pl-5 text-lg text-gray-800">
+              <li><strong>VM Name:</strong> {vmSpec.name}</li>
+              <li><strong>CPU:</strong> {vmSpec.cpu}</li>
+              <li><strong>Memory:</strong> {vmSpec.memory}</li>
+              <li><strong>Estimated cost €/hour:</strong> {vmSpec.credits}</li>
+              <li><strong>Description:</strong> {vmSpec.description}</li>
+            </ul>
           </div>
         </div>
-      ) : (
-        <>
-          {virtualMachine ? (
-            <div className="text-green-500 mb-4">
-              <p>Virtual machine created successfully.</p>
-              <p>Redirecting to: <a href={virtualMachine.url} className="text-blue-600 hover:underline">{virtualMachine.url}</a></p>
+        {isLoading ? (
+          <div className="flex justify-center items-center">
+            <div className="flex flex-col items-center">
+              <h1 className="text-lg font-semibold text-blue-500 mb-4">Loading...</h1>
+              <div className="loader animate-spin rounded-full border-t-4 border-b-4 border-blue-500 w-12 h-12"></div>
             </div>
-          ) : (
-            <button
-              className="inline-flex items-center justify-center bg-blue-700 text-white border-0 py-2 px-6 focus:outline-none hover:bg-blue-800 rounded text-lg transition duration-300 ease-in-out transform hover:-translate-y-1"
-
-              onClick={handleCreateVirtualMachine}
-              disabled={!selectedVM || isLoading}
-            >
-              Run
-            </button>
-          )}
-        </>
-      )}
+          </div>
+        ) : (
+          <>
+            {virtualMachine ? (
+              <div className="text-green-500 mb-4 text-center">
+                <p>Virtual machine created successfully.</p>
+                <p>Redirecting to: <a href={virtualMachine.url} className="text-blue-600 hover:underline">{virtualMachine.url}</a></p>
+              </div>
+            ) : (
+              <div className="text-center">
+                <button
+                  className="inline-flex items-center justify-center bg-blue-700 text-white border-0 py-3 px-8 focus:outline-none hover:bg-blue-800 rounded-lg text-lg transition duration-300 ease-in-out transform hover:-translate-y-1"
+                  onClick={handleCreateVirtualMachine}
+                  disabled={isLoading}
+                >
+                  Run
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };

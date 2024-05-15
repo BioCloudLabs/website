@@ -23,26 +23,23 @@ const JobRequest: React.FC = () => {
       notify('Insufficient credits to run this VM.', 'error');
       return;
     }
-
-    notify('Preparing to initiate VM creation...', 'info');
-
-    // Navigate after notifying the user
-    setTimeout(() => {
-      navigate('/status-vm', { state: { vmName: vmSpec.name } });
-    }, 3000); // Navigate to VM status page after a delay
-
+  
+    notify('Initiating VM creation process...', 'info');
+  
     setIsLoading(true);
-
-    // Continue to try creating the VM in the background
+  
+    // Proceed to attempt VM creation
     createVirtualMachine(vmSpec.name)
       .then(vm => {
         localStorage.setItem('vmDetails', JSON.stringify({
           ip: vm.ip,
           dns: vm.dns,
-          price: vm.price, // Assuming 'price' is part of the response object
+          price: vm.price,
           url: vm.url
         }));
-        notify(`Virtual machine created successfully: IP ${vm.ip}, DNS ${vm.url}`, 'success');
+        sessionStorage.setItem('vmSetupInProgress', 'false');
+        notify('Virtual machine creation process initiated.', 'info');
+        navigate('/status-vm', { state: { vmName: vmSpec.name } });
         setVirtualMachine(vm);
       })
       .catch(error => {
@@ -53,6 +50,8 @@ const JobRequest: React.FC = () => {
         setIsLoading(false);
       });
   };
+  
+  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">

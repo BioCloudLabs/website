@@ -7,46 +7,39 @@ const VMStatus: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const checkVMStatus = async () => {
-            // Immediately set loading to true
-            setIsLoading(true);
-    
-            // Check if there's an ongoing VM setup process
-            const ongoingSetup = sessionStorage.getItem('vmSetupInProgress');
-            if (ongoingSetup) {
-                notify('Virtual machine setup is still in progress...', 'info');
-            }
-    
-            // Simulated fetch call to check stored VM data
-            const storedVm = localStorage.getItem('vmDetails');
-            const vmDetails = storedVm ? JSON.parse(storedVm) : null;
-    
-            if (vmDetails && vmDetails.ip && vmDetails.dns) {
-                setVm({
-                    ip: vmDetails.ip,
-                    url: `https://${vmDetails.dns}`,
-                    price: vmDetails.price || 3, // Default price if not specified
-                    dns: vmDetails.dns
-                });
-                // Clear the session storage to prevent repeated notifications on refresh
-                sessionStorage.removeItem('vmSetupInProgress');
-            } else {
-                // Use a placeholder if no data is found
-                setVm({
-                    ip: '192.168.1.1',
-                    url: 'https://placeholder-vm.example.com',
-                    price: 3,
-                    dns: 'placeholder-vm.example.com'
-                });
-                notify('Using placeholder VM details.', 'info');
-            }
-    
-            setIsLoading(false);
-        };
-    
-        checkVMStatus();
-    }, []);
-    
+  const checkVMStatus = async () => {
+    setIsLoading(true);
+
+    const ongoingSetup = sessionStorage.getItem('vmSetupInProgress') === 'true';
+    if (ongoingSetup) {
+      notify('VM setup in progress...', 'info');
+    }
+
+    // Perform a check for VM details after a slight delay
+    setTimeout(() => {
+      const storedVm = localStorage.getItem('vmDetails');
+      const vmDetails = storedVm ? JSON.parse(storedVm) : null;
+
+      if (vmDetails && vmDetails.ip && vmDetails.dns && !ongoingSetup) {
+        setVm({
+          ip: vmDetails.ip,
+          url: `https://${vmDetails.dns}`,
+          price: vmDetails.price || 3,
+          dns: vmDetails.dns
+        });
+        sessionStorage.removeItem('vmSetupInProgress');
+        notify('Virtual machine is ready!', 'success');
+      } else {
+        // Handle no VM details found
+        notify('No VM details available. Waiting for VM setup to complete.', 'info');
+      }
+      setIsLoading(false);
+    }, 1000);
+  };
+
+  checkVMStatus();
+}, []);
+
 
 
     return (

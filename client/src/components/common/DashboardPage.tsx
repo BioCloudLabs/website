@@ -13,6 +13,23 @@ function DashboardPage() {
     const [loadingVms, setLoadingVms] = useState<{ [key: string]: boolean }>({});
     const [loadingText, setLoadingText] = useState<string>('Powering off');
 
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (Object.values(loadingVms).includes(true)) {
+            interval = setInterval(() => {
+                setLoadingText((prev) => {
+                    if (prev.endsWith('...')) return 'Powering off';
+                    return prev + '.';
+                });
+            }, 500);
+        } else {
+            setLoadingText('Powering off');
+        }
+
+        return () => clearInterval(interval);
+    }, [loadingVms]);
+
+
 
 
     const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -35,39 +52,42 @@ function DashboardPage() {
         setCurrentPage((prev) => (prev > 0 ? prev - 1 : 0));
     };
 
-    const numPages = Math.ceil(vmHistory.length / ITEMS_PER_PAGE);
-
     const currentData = filteredData.slice(
         currentPage * ITEMS_PER_PAGE,
         (currentPage + 1) * ITEMS_PER_PAGE
     );
-    const Pagination = () => (
-        <>
-            {vmHistory.length > 0 && (
-                <div className="flex flex-col items-center my-6 text-gray-900">
-                    <span className="text-sm text-gray-900 dark:text-gray-500">
-                        Showing <span className="font-semibold text-gray-900 dark:text-black">{currentPage * ITEMS_PER_PAGE + 1}</span> to <span className="font-semibold text-gray-900 dark:text-black">{Math.min((currentPage + 1) * ITEMS_PER_PAGE, filteredData.length)}</span> of <span className="font-semibold text-gray-900 dark:text-black">{filteredData.length}</span> Entries
-                    </span>
-                    <div className="inline-flex mt-2">
-                        <button
-                            onClick={prevPage}
-                            className="px-4 h-10 text-base font-medium text-white bg-gray-800 rounded-l hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700 dark:hover:text-white"
-                            disabled={currentPage === 0}
-                        >
-                            Prev
-                        </button>
-                        <button
-                            onClick={nextPage}
-                            className="px-4 h-10 text-base font-medium text-white bg-gray-200 rounded-r hover:bg-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700 dark:hover:text-white"
-                            disabled={currentPage >= numPages - 1}
-                        >
-                            Next
-                        </button>
+
+    const Pagination = () => {
+        const numPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+        return (
+            <>
+                {filteredData.length > 0 && (
+                    <div className="flex flex-col items-center my-6 text-gray-900">
+                        <span className="text-sm text-gray-900 dark:text-gray-500">
+                            Showing <span className="font-semibold text-gray-900 dark:text-black">{currentPage * ITEMS_PER_PAGE + 1}</span> to <span className="font-semibold text-gray-900 dark:text-black">{Math.min((currentPage + 1) * ITEMS_PER_PAGE, filteredData.length)}</span> of <span className="font-semibold text-gray-900 dark:text-black">{filteredData.length}</span> Entries
+                        </span>
+                        <div className="inline-flex mt-2">
+                            <button
+                                onClick={prevPage}
+                                className="px-4 h-10 text-base font-medium text-white bg-gray-800 rounded-l hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700 dark:hover:text-white"
+                                disabled={currentPage === 0}
+                            >
+                                Prev
+                            </button>
+                            <button
+                                onClick={nextPage}
+                                className="px-4 h-10 text-base font-medium text-white bg-gray-200 rounded-r hover:bg-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700 dark:hover:text-white"
+                                disabled={currentPage >= numPages - 1}
+                            >
+                                Next
+                            </button>
+                        </div>
                     </div>
-                </div>
-            )}
-        </>
-    );
+                )}
+            </>
+        );
+    };
+
 
     const fetchVmHistory = async () => {
         try {
@@ -109,22 +129,6 @@ function DashboardPage() {
         }
     };
 
-    useEffect(() => {
-        let interval: NodeJS.Timeout;
-        if (Object.values(loadingVms).includes(true)) {
-            interval = setInterval(() => {
-                setLoadingText((prev) => {
-                    if (prev.endsWith('...')) return 'Powering off';
-                    return prev + '.';
-                });
-            }, 500);
-        } else {
-            setLoadingText('Powering off');
-        }
-
-        return () => clearInterval(interval);
-    }, [loadingVms]);
-
 
     const VirtualMachineCard = ({ vm }: { vm: VirtualMachineHistory }) => (
         <div className="bg-white shadow-lg rounded-lg py-6 px-4 mb-4 flex flex-col justify-between mx-4">
@@ -140,13 +144,13 @@ function DashboardPage() {
                     <>
                         <p className="text-sm text-gray-600">This VM is currently running.</p>
                         {loadingVms[vm.id] ? (
-                            <button className="flex items-center justify-center p-2 bg-blue-500 text-white rounded mt-2" disabled>
-                                <span>{loadingText}</span>
+                            <button className="flex items-center justify-center p-2 bg-blue-500 text-white rounded mt-2 w-36 h-10" disabled>
+                                <span className="text-center">{loadingText}</span>
                             </button>
                         ) : (
                             <button
                                 onClick={() => handlePowerOffClick(vm.id)}
-                                className="flex items-center justify-center p-2 bg-red-500 text-white hover:bg-red-700 rounded mt-2"
+                                className="flex items-center justify-center p-2 bg-red-500 text-white hover:bg-red-700 rounded mt-2 w-36 h-10"
                             >
                                 <img src="/images/Blast/turn-off-4783.svg" alt="Power Off" className="w-6 h-6 mr-2" />
                                 <span>Power Off</span>

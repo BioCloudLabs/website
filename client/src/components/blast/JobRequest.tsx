@@ -8,7 +8,7 @@ const vmSpec = {
   name: 'Standard B2S',
   cpu: '2 vCPUs',
   memory: '4 GB',
-  credits: 0.00399,
+  credits: 3,
   description: 'Standard VM for small to medium BLAST jobs.'
 };
 
@@ -71,7 +71,7 @@ const JobRequest: React.FC = () => {
               <li><strong>VM Name:</strong> {vmSpec.name}</li>
               <li><strong>CPU:</strong> {vmSpec.cpu}</li>
               <li><strong>Memory:</strong> {vmSpec.memory}</li>
-              <li><strong>Estimated cost €/hour:</strong> {vmSpec.credits}</li>
+              <li><strong>Estimated cost:</strong> {vmSpec.credits} Credits/hour.</li>
               <li><strong>Description:</strong> {vmSpec.description}</li>
             </ul>
           </div>

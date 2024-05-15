@@ -8,38 +8,45 @@ const VMStatus: React.FC = () => {
 
     useEffect(() => {
         const checkVMStatus = async () => {
-            setIsLoading(true); // Set loading state initially
+            // Immediately set loading to true
+            setIsLoading(true);
     
-            // Check local storage for existing VM details
+            // Check if there's an ongoing VM setup process
+            const ongoingSetup = sessionStorage.getItem('vmSetupInProgress');
+            if (ongoingSetup) {
+                notify('Virtual machine setup is still in progress...', 'info');
+            }
+    
+            // Simulated fetch call to check stored VM data
             const storedVm = localStorage.getItem('vmDetails');
             const vmDetails = storedVm ? JSON.parse(storedVm) : null;
     
-            // Allow some time to potentially fetch new data if needed
-            setTimeout(() => {
-                if (vmDetails && vmDetails.ip && vmDetails.dns) {
-                    setVm({
-                        ip: vmDetails.ip,
-                        url: `https://${vmDetails.dns}`,
-                        price: vmDetails.price || 3, // Default price if not specified
-                        dns: vmDetails.dns
-                    });
-                    notify('Virtual machine is ready!', 'success');
-                } else {
-                    // If no VM details are stored, use placeholder
-                    setVm({
-                        ip: '192.168.1.1', // Placeholder IP
-                        url: 'https://placeholder-vm.example.com',
-                        price: 3,
-                        dns: 'placeholder-vm.example.com'
-                    });
-                    notify('Using placeholder VM details.', 'info');
-                }
-                setIsLoading(false); 
-            }, 1000); // 
+            if (vmDetails && vmDetails.ip && vmDetails.dns) {
+                setVm({
+                    ip: vmDetails.ip,
+                    url: `https://${vmDetails.dns}`,
+                    price: vmDetails.price || 3, // Default price if not specified
+                    dns: vmDetails.dns
+                });
+                // Clear the session storage to prevent repeated notifications on refresh
+                sessionStorage.removeItem('vmSetupInProgress');
+            } else {
+                // Use a placeholder if no data is found
+                setVm({
+                    ip: '192.168.1.1',
+                    url: 'https://placeholder-vm.example.com',
+                    price: 3,
+                    dns: 'placeholder-vm.example.com'
+                });
+                notify('Using placeholder VM details.', 'info');
+            }
+    
+            setIsLoading(false);
         };
     
         checkVMStatus();
     }, []);
+    
 
 
     return (
@@ -50,7 +57,6 @@ const VMStatus: React.FC = () => {
                     <h2 className="text-xl font-semibold text-blue-500 mb-4">Checking VM status...</h2>
                     <div className="loader animate-spin rounded-full border-t-4 border-b-4 border-blue-500 w-12 h-12"></div>
                 </div>
-
 
             ) : vm ? (
                 <div className="bg-white shadow overflow-hidden sm:rounded-lg">
@@ -68,10 +74,6 @@ const VMStatus: React.FC = () => {
                                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                                     <a href={`https://${vm.dns}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">{vm.dns}</a>
                                 </dd>
-                            </div>
-                            <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                <dt className="text-sm font-medium text-gray-500">Estimated price</dt>
-                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{vm.price}</dd>
                             </div>
                         </dl>
                     </div>

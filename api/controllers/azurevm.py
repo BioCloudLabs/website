@@ -24,7 +24,7 @@ def calc_vm_credits_costs(vm):
 
     VM_EUROS_MINUTE = 0.001625
     IP_EUROS_MINUTE = 0.00015625
-    DISK_EUROS_MINUTE = 0.00755555554
+    DISK_EUROS_MINUTE = 0.00012592592 
 
     VM_CREDITS_MINUTE = VM_EUROS_MINUTE * 25.06
     IP_CREDITS_MINUTE = IP_EUROS_MINUTE * 25.06
@@ -60,7 +60,6 @@ class SetupVirtualMachine(MethodView):
 
         res = requests.get("http://localhost:4000/vm/setup")
         json_res = res.json()
-        print(json_res)
 
         if "code" in json_res:
             if json_res["code"] == 500:
@@ -110,8 +109,11 @@ class PowerOffMachine(MethodView):
             if json_res["code"] == 500:
                 abort(500, message="Error trying to power off a VM, please try again.")
 
+        vm_total_credits = calc_vm_credits_costs(vm)
+
         try:
             vm.powered_off_at = datetime.now()
+            user.credits -= vm_total_credits
 
             db.session.commit()
         except IntegrityError:

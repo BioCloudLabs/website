@@ -29,13 +29,13 @@ const VMStatus: React.FC = () => {
                     setVm({
                         ip: '192.168.1.1', // Placeholder IP
                         url: 'https://placeholder-vm.example.com',
-                        price: 0.0350,
+                        price: 3,
                         dns: 'placeholder-vm.example.com'
                     });
                     notify('Using placeholder VM details.', 'info');
                 }
-                setIsLoading(false); // Reset loading state after checking or using placeholder
-            }, 1000); // Simulate a delay for fetching or determining the status
+                setIsLoading(false); 
+            }, 1000); // 
         };
     
         checkVMStatus();
@@ -71,7 +71,7 @@ const VMStatus: React.FC = () => {
                             </div>
                             <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                                 <dt className="text-sm font-medium text-gray-500">Estimated price</dt>
-                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{vm.price} credits per hour</dd>
+                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{vm.price}</dd>
                             </div>
                         </dl>
                     </div>

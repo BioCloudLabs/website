@@ -110,7 +110,7 @@ function App() {
               {/* Move Credits Link Outside of the Button Div for Consistent Visibility */}
               {isAuthenticated ? (
                 <Link to="/credits-offers" className="flex items-center mr-4 text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>
-                  {userCredits}
+                  {userCredits} credits
                   <object type="image/svg+xml" data="/images/Credits/coin-2159.svg" className="filter w-8 h-8 ml-2" width="32" height="32"></object>
                 </Link>
               ) : null}
@@ -144,6 +144,7 @@ function App() {
                     </>
                   ) : (
                     <>
+                      <li><Link to="/credits-offers" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Credits Offers</Link></li>
                       <li><Link to="/login" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Login</Link></li>
                       <li><Link to="/register" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Register</Link></li>
                     </>

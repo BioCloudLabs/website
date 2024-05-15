@@ -1,12 +1,25 @@
 import { useEffect, useState } from 'react';
 import { getVirtualMachinesHistory, powerOffVirtualMachine } from './../../services/vmService'; // Ensure the path matches your project structure
 import { VirtualMachineHistory } from './../../models/VirtualMachineHistory';
+import { notify } from './../../utils/notificationUtils'; // Ensure the path matches your project structure
+
 
 function DashboardPage() {
     const [vmHistory, setVmHistory] = useState<VirtualMachineHistory[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [currentPage, setCurrentPage] = useState(0);
     const ITEMS_PER_PAGE = 6;
+    const [filter, setFilter] = useState<string>('ALL');
+
+    const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setFilter(event.target.value);
+    };
+
+    const filteredData = vmHistory.filter((vm) => {
+        if (filter === 'ON') return vm.powered_off_at === 'Still Running';
+        if (filter === 'OFF') return vm.powered_off_at !== 'Still Running';
+        return true;
+    });
 
     const nextPage = () => {
         setCurrentPage((prev) => prev + 1);
@@ -73,7 +86,7 @@ function DashboardPage() {
                 setLoading(false);
             }
         };
-        
+
 
         fetchVmHistory();
     }, []);
@@ -99,14 +112,19 @@ function DashboardPage() {
         try {
             await powerOffVirtualMachine(parseInt(vmId));
             await fetchVmHistory();
+            notify('VM has been powered off successfully', 'success');
         } catch (error) {
             console.error("Error powering off virtual machine:", error);
+            notify('Failed to power off the VM', 'error');
         }
     };
 
+
     const VirtualMachineCard = ({ vm }: { vm: VirtualMachineHistory }) => (
         <div className="bg-white shadow-lg rounded-lg py-6 px-4 mb-4 flex flex-col justify-between mx-4">
-            <h3 className="text-lg font-semibold text-center">{vm.name}</h3>
+            <a href={`/vm/${vm.id}`} className="text-lg font-semibold text-center text-blue-600 hover:underline">
+                {vm.name}
+            </a>
             <div className="flex flex-col items-center space-y-2 mt-4 flex-grow">
                 <p className="text-sm text-gray-600">Cost: {vm.cost} credits</p>
                 <p className="text-sm text-gray-600">Created at: {vm.created_at}</p>
@@ -127,7 +145,8 @@ function DashboardPage() {
             </div>
         </div>
     );
-    
+
+
 
 
 
@@ -139,11 +158,20 @@ function DashboardPage() {
             <h2 className="text-2xl sm:text-3xl font-bold pt-4 my-4 mb-8 text-center">Welcome to BioCloudLabs!</h2>
             <div className="mb-6">
                 <h2 className="text-lg sm:text-x1 font-semibold mb-4 my-y text-center">Your Virtual Machines History</h2>
+                <div className="mb-6 flex justify-center">
+                    <label htmlFor="filter" className="mr-2">Filter VMs: </label>
+                    <select id="filter" value={filter} onChange={handleFilterChange} className="border rounded p-2">
+                        <option value="ALL">All</option>
+                        <option value="ON">ON</option>
+                        <option value="OFF">OFF</option>
+                    </select>
+                </div>
+
                 {loading ? (
                     <div className="text-center">Loading virtual machines history...</div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 py-4">
-                        {vmHistory.length === 0 ? (
+                        {filteredData.length === 0 ? (
                             <div className="col-span-full flex justify-center mt-4">
                                 <div className="text-center text-gray-600 border border-gray-200 rounded-lg p-4 max-w-md">
                                     No virtual machines have been launched yet.

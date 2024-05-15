@@ -10,10 +10,33 @@ function DashboardPage() {
     const [currentPage, setCurrentPage] = useState(0);
     const ITEMS_PER_PAGE = 6;
     const [filter, setFilter] = useState<string>('ALL');
+    const [loadingVms, setLoadingVms] = useState<{ [key: string]: boolean }>({});
+    const [loadingText, setLoadingText] = useState<string>('Powering off');
+
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (Object.values(loadingVms).includes(true)) {
+            interval = setInterval(() => {
+                setLoadingText((prev) => {
+                    if (prev.endsWith('...')) return 'Powering off';
+                    return prev + '.';
+                });
+            }, 500);
+        } else {
+            setLoadingText('Powering off');
+        }
+
+        return () => clearInterval(interval);
+    }, [loadingVms]);
+
+
+
 
     const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setFilter(event.target.value);
+        setCurrentPage(0); // Reset to the first page on filter change
     };
+
 
     const filteredData = vmHistory.filter((vm) => {
         if (filter === 'ON') return vm.powered_off_at === 'Still Running';
@@ -29,78 +52,57 @@ function DashboardPage() {
         setCurrentPage((prev) => (prev > 0 ? prev - 1 : 0));
     };
 
-    const numPages = Math.ceil(vmHistory.length / ITEMS_PER_PAGE);
-
-    const currentData = vmHistory.slice(
+    const currentData = filteredData.slice(
         currentPage * ITEMS_PER_PAGE,
         (currentPage + 1) * ITEMS_PER_PAGE
     );
 
-    const Pagination = () => (
-        <>
-            {vmHistory.length > 0 && (
-                <div className="flex flex-col items-center my-6 text-gray-900">
-                    <span className="text-sm text-gray-900 dark:text-gray-500">
-                        Showing <span className="font-semibold text-gray-900 dark:text-black">{currentPage * ITEMS_PER_PAGE + 1}</span> to <span className="font-semibold text-gray-900 dark:text-black">{Math.min((currentPage + 1) * ITEMS_PER_PAGE, vmHistory.length)}</span> of <span className="font-semibold text-gray-900 dark:text-black">{vmHistory.length}</span> Entries
-                    </span>
-                    <div className="inline-flex mt-2">
-                        <button
-                            onClick={prevPage}
-                            className="px-4 h-10 text-base font-medium text-white bg-gray-800 rounded-l hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700 dark:hover:text-white"
-                            disabled={currentPage === 0}
-                        >
-                            Prev
-                        </button>
-                        <button
-                            onClick={nextPage}
-                            className="px-4 h-10 text-base font-medium text-white bg-gray-200 rounded-r hover:bg-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700 dark:hover:text-white"
-                            disabled={currentPage >= numPages - 1}
-                        >
-                            Next
-                        </button>
+    const Pagination = () => {
+        const numPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+        return (
+            <>
+                {filteredData.length > 0 && (
+                    <div className="flex flex-col items-center my-6 text-gray-900">
+                        <span className="text-sm text-gray-900 dark:text-gray-500">
+                            Showing <span className="font-semibold text-gray-900 dark:text-black">{currentPage * ITEMS_PER_PAGE + 1}</span> to <span className="font-semibold text-gray-900 dark:text-black">{Math.min((currentPage + 1) * ITEMS_PER_PAGE, filteredData.length)}</span> of <span className="font-semibold text-gray-900 dark:text-black">{filteredData.length}</span> Entries
+                        </span>
+                        <div className="inline-flex mt-2">
+                            <button
+                                onClick={prevPage}
+                                className="px-4 h-10 text-base font-medium text-white bg-gray-800 rounded-l hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700 dark:hover:text-white"
+                                disabled={currentPage === 0}
+                            >
+                                Prev
+                            </button>
+                            <button
+                                onClick={nextPage}
+                                className="px-4 h-10 text-base font-medium text-white bg-gray-200 rounded-r hover:bg-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700 dark:hover:text-white"
+                                disabled={currentPage >= numPages - 1}
+                            >
+                                Next
+                            </button>
+                        </div>
                     </div>
-                </div>
-            )}
-        </>
-    );
+                )}
+            </>
+        );
+    };
 
-
-    useEffect(() => {
-        const fetchVmHistory = async () => {
-            try {
-                const history = await getVirtualMachinesHistory();
-                setVmHistory(
-                    history
-                        .map(vm => ({
-                            ...vm,
-                            id: vm.id.toString(),
-                            created_at: new Date(Date.parse(vm.created_at)).toLocaleString('en-US', { timeZone: 'UTC' }),
-                            powered_off_at: vm.powered_off_at ? new Date(Date.parse(vm.powered_off_at)).toLocaleString('en-US', { timeZone: 'UTC' }) : 'Still Running',
-                            cost: vm.cost
-                        }))
-                        .reverse() // Reverse the order to show the newest first
-                );
-            } catch (error) {
-                console.error("Error fetching VM history:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-
-        fetchVmHistory();
-    }, []);
 
     const fetchVmHistory = async () => {
         try {
             const history = await getVirtualMachinesHistory();
-            setVmHistory(history.map(vm => ({
-                ...vm,
-                id: vm.id.toString(),
-                created_at: new Date(Date.parse(vm.created_at)).toLocaleString('en-US', { timeZone: 'UTC' }),
-                powered_off_at: vm.powered_off_at ? new Date(Date.parse(vm.powered_off_at)).toLocaleString('en-US', { timeZone: 'UTC' }) : 'Still Running',
-                cost: vm.cost
-            })));
+            setVmHistory(
+                history
+                    .map(vm => ({
+                        ...vm,
+                        id: vm.id.toString(),
+                        created_at: new Date(Date.parse(vm.created_at)).toLocaleString('en-US', { timeZone: 'UTC' }),
+                        powered_off_at: vm.powered_off_at ? new Date(Date.parse(vm.powered_off_at)).toLocaleString('en-US', { timeZone: 'UTC' }) : 'Still Running',
+                        cost: vm.cost
+                    }))
+                    .reverse() // Reverse the order to show the newest first
+            );
         } catch (error) {
             console.error("Error fetching VM history:", error);
         } finally {
@@ -108,7 +110,13 @@ function DashboardPage() {
         }
     };
 
+    useEffect(() => {
+        fetchVmHistory();
+    }, []);
+
     const handlePowerOffClick = async (vmId: string) => {
+        setLoadingVms((prev) => ({ ...prev, [vmId]: true }));
+        notify('Powering off VM...', 'info');
         try {
             await powerOffVirtualMachine(parseInt(vmId));
             await fetchVmHistory();
@@ -116,6 +124,8 @@ function DashboardPage() {
         } catch (error) {
             console.error("Error powering off virtual machine:", error);
             notify('Failed to power off the VM', 'error');
+        } finally {
+            setLoadingVms((prev) => ({ ...prev, [vmId]: false }));
         }
     };
 
@@ -133,13 +143,19 @@ function DashboardPage() {
                 ) : (
                     <>
                         <p className="text-sm text-gray-600">This VM is currently running.</p>
-                        <button
-                            onClick={() => handlePowerOffClick(vm.id)}
-                            className="flex items-center justify-center p-2 bg-red-500 text-white hover:bg-red-700 rounded mt-2"
-                        >
-                            <img src="/images/Blast/turn-off-4783.svg" alt="Power Off" className="w-6 h-6 mr-2" />
-                            <span>Power Off</span>
-                        </button>
+                        {loadingVms[vm.id] ? (
+                            <button className="flex items-center justify-center p-2 bg-blue-500 text-white rounded mt-2 w-36 h-10" disabled>
+                                <span className="text-center">{loadingText}</span>
+                            </button>
+                        ) : (
+                            <button
+                                onClick={() => handlePowerOffClick(vm.id)}
+                                className="flex items-center justify-center p-2 bg-red-500 text-white hover:bg-red-700 rounded mt-2 w-36 h-10"
+                            >
+                                <img src="/images/Blast/turn-off-4783.svg" alt="Power Off" className="w-6 h-6 mr-2" />
+                                <span>Power Off</span>
+                            </button>
+                        )}
                     </>
                 )}
             </div>
@@ -147,26 +163,21 @@ function DashboardPage() {
     );
 
 
-
-
-
-
-
-
     return (
-        <div className="px-4  lg:px-8 py-8 bg-gray-100 min-h-screen">
+        <div className="px-4 lg:px-8 py-8 bg-gray-100 min-h-screen">
             <h2 className="text-2xl sm:text-3xl font-bold pt-4 my-4 mb-8 text-center">Welcome to BioCloudLabs!</h2>
             <div className="mb-6">
-                <h2 className="text-lg sm:text-x1 font-semibold mb-4 my-y text-center">Your Virtual Machines History</h2>
-                <div className="mb-6 flex justify-center">
-                    <label htmlFor="filter" className="mr-2">Filter VMs: </label>
-                    <select id="filter" value={filter} onChange={handleFilterChange} className="border rounded p-2">
-                        <option value="ALL">All</option>
-                        <option value="ON">ON</option>
-                        <option value="OFF">OFF</option>
-                    </select>
+                <div className="flex flex-col items-center justify-center mb-6">
+                    <h2 className="text-lg sm:text-xl font-semibold mb-4">Your Virtual Machines History</h2>
+                    <div className="flex items-center">
+                        <label htmlFor="filter" className="mr-2">Filter by VM status:</label>
+                        <select id="filter" value={filter} onChange={handleFilterChange} className="border rounded p-2">
+                            <option value="ALL">All</option>
+                            <option value="ON">ON</option>
+                            <option value="OFF">OFF</option>
+                        </select>
+                    </div>
                 </div>
-
                 {loading ? (
                     <div className="text-center">Loading virtual machines history...</div>
                 ) : (
@@ -177,13 +188,11 @@ function DashboardPage() {
                                     No virtual machines have been launched yet.
                                 </div>
                             </div>
-
                         ) : (
                             currentData.map((vm) => (
                                 <VirtualMachineCard key={vm.id} vm={vm} />
                             ))
                         )}
-
                     </div>
                 )}
                 <Pagination />
@@ -227,6 +236,7 @@ function DashboardPage() {
             </div>
         </div>
     );
+
 }
 
 export default DashboardPage;

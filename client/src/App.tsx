@@ -100,7 +100,7 @@ function App() {
               <img src="/images/Brand/Brand_hero.webp" className="h-8" alt="BioCloudLabs Logo" />
               <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white overflow-hidden text-ellipsis" style={{ maxWidth: '200px' }}>BioCloudLabs</span>
             </a>
-            {/*Toggle Button - Adjust the breakpoint for the toggle visibility */}
+            {}
 
             <div className="flex items-center space-x-3 md:space-x-0 rtl:space-x-reverse">
 
@@ -110,7 +110,7 @@ function App() {
               {/* Move Credits Link Outside of the Button Div for Consistent Visibility */}
               {isAuthenticated ? (
                 <Link to="/credits-offers" className="flex items-center mr-4 text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>
-                  {userCredits} credits
+                  {userCredits}
                   <object type="image/svg+xml" data="/images/Credits/coin-2159.svg" className="filter w-8 h-8 ml-2" width="32" height="32"></object>
                 </Link>
               ) : null}

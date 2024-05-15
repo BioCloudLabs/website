@@ -109,8 +109,11 @@ class PowerOffMachine(MethodView):
             if json_res["code"] == 500:
                 abort(500, message="Error trying to power off a VM, please try again.")
 
+        vm_total_credits = calc_vm_credits_costs(vm)
+
         try:
             vm.powered_off_at = datetime.now()
+            user.credits -= vm_total_credits
 
             db.session.commit()
         except IntegrityError:

@@ -70,8 +70,8 @@ const VMStatus: React.FC = () => {
                                 </dd>
                             </div>
                             <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                <dt className="text-sm font-medium text-gray-500">Estimated credits per hour</dt>
-                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{vm.price} for VM specs + 1 credit/machine created</dd>
+                                <dt className="text-sm font-medium text-gray-500">Estimated price</dt>
+                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{vm.price} credits per hour</dd>
                             </div>
                         </dl>
                     </div>

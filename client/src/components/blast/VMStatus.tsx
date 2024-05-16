@@ -21,7 +21,7 @@ const VMStatus: React.FC = () => {
       const vmDetails = storedVm ? JSON.parse(storedVm) : null;
 
       if (vmDetails && vmDetails.ip && vmDetails.dns && !ongoingSetup) {
-        setVm({
+        setVm({ // Set the VM details
           ip: vmDetails.ip,
           url: `https://${vmDetails.dns}`,
           price: vmDetails.price || 3,

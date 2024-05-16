@@ -1,35 +1,54 @@
 import React, { useState } from 'react';
 import { createVirtualMachine } from './../../services/vmService';
-import { VirtualMachine } from './../../models/VirtualMachines';
 import { notify } from '../../utils/notificationUtils';
 import { useNavigate } from 'react-router-dom';
 
-const vmSpec = {
-  name: 'Standard B2S',
-  cpu: '2 vCPUs',
-  memory: '4 GB',
-  credits: 3,
-  description: 'Standard VM for small to medium BLAST jobs.'
-};
+const vmSpecs = [
+  {
+    name: 'Standard B2S',
+    cpu: '2 vCPUs',
+    memory: '4 GB',
+    credits: 3,
+    description: 'Standard VM for small to medium BLAST jobs.'
+  },
+  {
+    name: 'Standard B2pls v2 - Medium performance',
+    cpu: '2 vCPUs',
+    memory: '4 GB',
+    credits: 6,
+    description: 'Economical VM for development, test servers, and low traffic web servers.'
+  },
+  {
+    name: 'Standard B4pls v2 - High performance',
+    cpu: '4 vCPUs',
+    memory: '8 GB',
+    credits: 10,
+    description: 'Economical VM for medium traffic web servers and small databases.'
+  },
+  {
+    name: 'Standard B8pls v2 - Top performance',
+    cpu: '8 vCPUs',
+    memory: '16 GB',
+    credits: 20,
+    description: 'High-performance VM for large applications and microservices.'
+  }
+];
 
 const JobRequest: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [virtualMachine, setVirtualMachine] = useState<VirtualMachine | null>(null);
+  const [selectedVM, setSelectedVM] = useState(vmSpecs[0]);
   const navigate = useNavigate();
   const userCredits = parseFloat(localStorage.getItem('userCredits') || '0');
 
   const handleCreateVirtualMachine = async () => {
-    if (userCredits <= 20) {
+    if (userCredits <= selectedVM.credits) {
       notify('Insufficient credits to run this VM.', 'error');
       return;
     }
-  
     notify('Initiating VM creation process...', 'info');
-  
     setIsLoading(true);
-  
     // Proceed to attempt VM creation
-    createVirtualMachine(vmSpec.name)
+    createVirtualMachine(selectedVM.name)
       .then(vm => {
         localStorage.setItem('vmDetails', JSON.stringify({
           ip: vm.ip,
@@ -39,8 +58,7 @@ const JobRequest: React.FC = () => {
         }));
         sessionStorage.setItem('vmSetupInProgress', 'false');
         notify('Virtual machine creation process initiated.', 'info');
-        navigate('/status-vm', { state: { vmName: vmSpec.name } });
-        setVirtualMachine(vm);
+        navigate('/status-vm', { state: { vmName: selectedVM.name } });
       })
       .catch(error => {
         console.error('Error creating virtual machine:', error);
@@ -50,13 +68,18 @@ const JobRequest: React.FC = () => {
         setIsLoading(false);
       });
   };
-  
-  
+
+  const handleVMSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedVM = vmSpecs.find(vm => vm.name === e.target.value);
+    if (selectedVM) {
+      setSelectedVM(selectedVM);
+    }
+  };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <h1 className="text-3xl font-bold text-blue-700 mb-6 my-8 text-center">Launch Virtual Machine</h1>
       <div className="w-full max-w-2xl bg-white shadow-md rounded-lg p-6 mx-4">
-        <h1 className="text-4xl font-bold text-blue-700 mb-6 my-8 text-center">Launch Virtual Machine</h1>
         <p className="text-lg text-gray-700 mb-4">
           BLAST (Basic Local Alignment Search Tool) is a powerful tool used to find regions of similarity between biological sequences. It compares nucleotide or protein sequences to sequence databases and calculates the statistical significance of the matches.
         </p>
@@ -64,14 +87,29 @@ const JobRequest: React.FC = () => {
           Our service provides a virtual machine pre-configured with BLAST tools, enabling you to perform complex sequence analysis tasks efficiently. The selected VM is designed to handle small to medium BLAST jobs, offering a balanced combination of processing power and memory.
         </p>
         <div className="mb-6">
+          <label htmlFor="vmSelect" className="block text-sm font-medium text-gray-700">Select VM</label>
+          <select
+            id="vmSelect"
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+            value={selectedVM.name}
+            onChange={handleVMSelectChange}
+          >
+            {vmSpecs.map((vm) => (
+              <option key={vm.name} value={vm.name}>
+                {vm.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="mb-6">
           <h2 className="text-2xl font-semibold text-blue-600 mb-4">Virtual Machine Specifications</h2>
           <div className="bg-blue-100 p-4 rounded-lg">
             <ul className="list-disc pl-5 text-lg text-gray-800">
-              <li><strong>VM Name:</strong> {vmSpec.name}</li>
-              <li><strong>CPU:</strong> {vmSpec.cpu}</li>
-              <li><strong>Memory:</strong> {vmSpec.memory}</li>
-              <li><strong>Estimated cost:</strong> {vmSpec.credits} Credits/hour</li>
-              <li><strong>Description:</strong> {vmSpec.description}</li>
+              <li><strong>VM Name:</strong> {selectedVM.name}</li>
+              <li><strong>CPU:</strong> {selectedVM.cpu}</li>
+              <li><strong>Memory:</strong> {selectedVM.memory}</li>
+              <li><strong>Estimated cost:</strong> {selectedVM.credits} Credits/hour.</li>
+              <li><strong>Description:</strong> {selectedVM.description}</li>
             </ul>
           </div>
         </div>
@@ -83,24 +121,15 @@ const JobRequest: React.FC = () => {
             </div>
           </div>
         ) : (
-          <>
-            {virtualMachine ? (
-              <div className="text-green-500 mb-4 text-center">
-                <p>Virtual machine created successfully.</p>
-                <p>Redirecting to: <a href={virtualMachine.url} className="text-blue-600 hover:underline">{virtualMachine.url}</a></p>
-              </div>
-            ) : (
-              <div className="text-center">
-                <button
-                  className="inline-flex items-center justify-center bg-blue-700 text-white border-0 py-3 px-8 focus:outline-none hover:bg-blue-800 rounded-lg text-lg transition duration-300 ease-in-out transform hover:-translate-y-1"
-                  onClick={handleCreateVirtualMachine}
-                  disabled={isLoading}
-                >
-                  Run
-                </button>
-              </div>
-            )}
-          </>
+          <div className="text-center">
+            <button
+              className="inline-flex items-center justify-center bg-blue-700 text-white border-0 py-3 px-8 focus:outline-none hover:bg-blue-800 rounded-lg text-lg transition duration-300 ease-in-out transform hover:-translate-y-1"
+              onClick={handleCreateVirtualMachine}
+              disabled={isLoading}
+            >
+              Run
+            </button>
+          </div>
         )}
       </div>
     </div>

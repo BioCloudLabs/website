@@ -41,7 +41,7 @@ const JobRequest: React.FC = () => {
   const userCredits = parseFloat(localStorage.getItem('userCredits') || '0');
 
   const handleCreateVirtualMachine = async () => {
-    if (userCredits < 1) {
+    if (userCredits < 1) { // Check if user has enough credits, it requires at least 1 credit to run a VM
       notify('Insufficient credits to run this VM.', 'error');
       return;
     }

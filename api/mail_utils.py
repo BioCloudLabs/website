@@ -21,5 +21,18 @@ class EmailSender():
 				"subject": "Password recovery",
 				"html": replaced_html
 			})
+			
+	def poweroff_machine(self, machine_name, user, name):
+		with open("poweroff_machine.html", "r") as file:
+			template_html = file.read()
 
+			replaced_html = template_html.format(machine_name=machine_name, user=user, name=name)
+
+			r = resend.Emails.send({
+				"from": "noreply@biocloudlabs.es",
+				"sender": "noreply@biocloudlabs.es",
+				"to": user,
+				"subject": "Machine powered off",
+				"html": replaced_html
+			})
 

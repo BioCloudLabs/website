@@ -2,6 +2,7 @@ from flask_jwt_extended import (
     jwt_required, 
     get_jwt_identity
 )
+from mail_utils import EmailSender
 from datetime import datetime, timezone, timedelta
 from sqlalchemy.exc import IntegrityError
 from flask.views import MethodView
@@ -10,6 +11,9 @@ import models
 import requests
 from database import db
 import schemas
+import os
+
+email_sender = EmailSender(os.getenv("EMAIL_API_KEY"))
 
 blp = Blueprint("azurevm", __name__, description="Azure virtual machines endpoint", url_prefix="/api/azurevm")
     
@@ -84,7 +88,7 @@ class SetupVirtualMachine(MethodView):
 
         return {"ip": ip, "dns": dns}, 200
 
-        
+
 @blp.route("/poweroff")
 class PowerOffMachine(MethodView):
 
@@ -121,6 +125,35 @@ class PowerOffMachine(MethodView):
             abort(400, message=f"An integrity error has ocurred.")
 
         return {"message": "VM Removed"}, 200
+
+        
+@blp.route("/check/<vm_name>")
+class CheckCredits(MethodView):
+
+    def get(self, vm_name):
+
+        vm = models.VirtualMachineModel.query.filter_by(name=vm_name).one_or_404(description="VM not found")
+        user = models.UserModel.query.filter_by(id=vm.user_id).one_or_404(description="User not found")
+        user_credits = user.credits
+
+        vm_actual_cost = calc_vm_credits_costs(vm)
+
+        credits_left = user_credits - vm_actual_cost
+
+        if credits_left <= 0:
+            requests.get(f"http://localhost:4000/vm/poweroff/{vm_name}")
+
+            vm.powered_off_at = datetime.now()
+            user.credits = 0
+            db.session.commit()
+
+            username = user.name + " " + user.surname
+
+            email_sender.poweroff_machine(vm_name, user.email, username)
+
+            return {"message": "VM Powered off"}, 200
+
+        return {"message": "VM Checked"}, 200
     
 
 @blp.route("/history")

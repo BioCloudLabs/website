@@ -9,7 +9,7 @@ const vmSpecs = [
     cpu: '2 vCPUs',
     memory: '4 GB',
     credits: 3,
-    description: 'Standard VM for small to medium BLAST jobs.'
+    description: 'Standard VM for small to medium BLAST jobs. Minimum requirements for BLAST analysis.'
   },
   {
     name: 'Standard B2pls v2 - Medium performance',
@@ -41,13 +41,13 @@ const JobRequest: React.FC = () => {
   const userCredits = parseFloat(localStorage.getItem('userCredits') || '0');
 
   const handleCreateVirtualMachine = async () => {
-    if (userCredits <= selectedVM.credits) {
+    if (userCredits < 1) {
       notify('Insufficient credits to run this VM.', 'error');
       return;
     }
     notify('Initiating VM creation process...', 'info');
     setIsLoading(true);
-    // Proceed to attempt VM creation
+    sessionStorage.setItem('vmSetupInProgress', 'true'); // Indicate that VM setup is in progress
     createVirtualMachine(selectedVM.name)
       .then(vm => {
         localStorage.setItem('vmDetails', JSON.stringify({
@@ -63,6 +63,7 @@ const JobRequest: React.FC = () => {
       .catch(error => {
         console.error('Error creating virtual machine:', error);
         notify(`Error creating virtual machine: ${(error as Error).message}`, 'error');
+        sessionStorage.setItem('vmSetupInProgress', 'false');
       })
       .finally(() => {
         setIsLoading(false);

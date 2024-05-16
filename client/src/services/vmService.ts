@@ -1,9 +1,48 @@
 import { VirtualMachine } from './../models/VirtualMachines';
 import { VirtualMachineHistory } from './../models/VirtualMachineHistory';
 
+// Mock VM specifications
+const vmSpecs = [
+  {
+    name: 'Standard B2S',
+    cpu: '2 vCPUs',
+    memory: '4 GB',
+    credits: 3,
+    description: 'Standard VM for small to medium BLAST jobs. Minimum requirements for BLAST analysis.'
+  },
+  {
+    name: 'Standard B2pls v2 - Medium performance',
+    cpu: '2 vCPUs',
+    memory: '4 GB',
+    credits: 6,
+    description: 'Economical VM for development, test servers, and low traffic web servers.'
+  },
+  {
+    name: 'Standard B4pls v2 - High performance',
+    cpu: '4 vCPUs',
+    memory: '8 GB',
+    credits: 10,
+    description: 'Economical VM for medium traffic web servers and small databases.'
+  },
+  {
+    name: 'Standard B8pls v2 - Top performance',
+    cpu: '8 vCPUs',
+    memory: '16 GB',
+    credits: 20,
+    description: 'High-performance VM for large applications and microservices.'
+  }
+];
 
+// Fetch VM specifications
+export const fetchVMSpecs = (): Promise<any[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(vmSpecs);
+    }, 100);
+  });
+};
 
-export async function createVirtualMachine(selectedVM: string): Promise<VirtualMachine> {
+export async function createVirtualMachine(): Promise<VirtualMachine> { // Removed selectedVM
   const apiUrl = `/api/azurevm/setup`;
 
   try {
@@ -30,7 +69,7 @@ export async function createVirtualMachine(selectedVM: string): Promise<VirtualM
       dns: data.dns,
       ip: data.ip,
       url: `https://${data.dns}`,
-      price: calculatePrice(selectedVM)
+      price: data.price // Assuming the API response includes the price
     };
   } catch (error) {
     console.error("Failed to create virtual machine:", error);
@@ -113,24 +152,5 @@ export async function getVirtualMachinesHistory(): Promise<VirtualMachineHistory
   } catch (error) {
     console.error('Failed to retrieve virtual machine history:', error);
     throw error;
-  }
-}
-
-
-
-
-
-function calculatePrice(selectedVM: string): number {
-  switch (selectedVM) {
-    case 'vm1':
-      return 10.99;
-    case 'vm2':
-      return 15.99;
-    case 'vm3':
-      return 20.99;
-    default:
-      return 0;
-    // This can be trigerred if the returneed value is not the machine price
-    //   throw new Error('Unknown virtual machine type');
   }
 }

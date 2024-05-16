@@ -180,10 +180,10 @@ function App() {
           </Routes>
         </div>
       </div>
+      
       <ToastContainer />
-
       <footer className="bg-white rounded-lg shadow mt-0 mb-4 mx-4 light:bg-gray-100">
-        <div className="w-full mx-auto max-w-screen-xl p-4 flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
+        <div className="w-full mx-auto max-w-screen-xl p-4 flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0 border-b border-gray-200 dark:border-gray-600">
           <div className="flex flex-col md:flex-row justify-between items-center w-full space-y-2 md:space-y-0">
             <span className="text-sm text-gray-700 dark:text-gray-400 md:text-left flex-grow md:flex-grow-0">
               © {new Date().getFullYear()} <a href="/" className="hover:underline">BioCloudLabs™</a>. All Rights Reserved.
@@ -195,7 +195,6 @@ function App() {
                 </svg>
                 <span className="sr-only">GitHub account</span>
               </a>
-
               <a href="/about-us" className="font-bold hover:underline">About us</a>
               <a href="mailto:info@biocloudlabs.es" className="font-bold hover:underline">Contact</a>
             </div>

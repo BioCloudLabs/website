@@ -1,54 +1,43 @@
-import React, { useState } from 'react';
-import { createVirtualMachine } from './../../services/vmService';
+import React, { useState, useEffect } from 'react';
+import { createVirtualMachine, fetchVMSpecs } from './../../services/vmService';
 import { notify } from '../../utils/notificationUtils';
 import { useNavigate } from 'react-router-dom';
 
-const vmSpecs = [
-  {
-    name: 'Standard B2S',
-    cpu: '2 vCPUs',
-    memory: '4 GB',
-    credits: 3,
-    description: 'Standard VM for small to medium BLAST jobs. Minimum requirements for BLAST analysis.'
-  },
-  {
-    name: 'Standard B2pls v2 - Medium performance',
-    cpu: '2 vCPUs',
-    memory: '4 GB',
-    credits: 6,
-    description: 'Economical VM for development, test servers, and low traffic web servers.'
-  },
-  {
-    name: 'Standard B4pls v2 - High performance',
-    cpu: '4 vCPUs',
-    memory: '8 GB',
-    credits: 10,
-    description: 'Economical VM for medium traffic web servers and small databases.'
-  },
-  {
-    name: 'Standard B8pls v2 - Top performance',
-    cpu: '8 vCPUs',
-    memory: '16 GB',
-    credits: 20,
-    description: 'High-performance VM for large applications and microservices.'
-  }
-];
-
 const JobRequest: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedVM, setSelectedVM] = useState(vmSpecs[0]);
+  const [vmSpecs, setVmSpecs] = useState<any[]>([]);
+  const [selectedVM, setSelectedVM] = useState<any | null>(null);
   const navigate = useNavigate();
   const userCredits = parseFloat(localStorage.getItem('userCredits') || '0');
 
+  useEffect(() => {
+    const fetchSpecs = async () => {
+      try {
+        const specs = await fetchVMSpecs();
+        setVmSpecs(specs);
+        setSelectedVM(specs[0]); // Set the first VM spec as default
+      } catch (error) {
+        console.error('Error fetching VM specifications:', error);
+        notify('Error fetching VM specifications.', 'error');
+      }
+    };
+    fetchSpecs();
+  }, []);
+
   const handleCreateVirtualMachine = async () => {
-    if (userCredits < 1) { // Check if user has enough credits, it requires at least 1 credit to run a VM
+    if (!selectedVM || userCredits < selectedVM.credits) { // Check if user has enough credits
       notify('Insufficient credits to run this VM.', 'error');
       return;
     }
     notify('Initiating VM creation process...', 'info');
     setIsLoading(true);
     sessionStorage.setItem('vmSetupInProgress', 'true'); // Indicate that VM setup is in progress
-    createVirtualMachine(selectedVM.name)
+    sessionStorage.setItem('notifiedSetupInProgress', 'false'); // Reset notification flag
+    sessionStorage.setItem('notifiedNoDetails', 'false'); // Reset notification flag for no details
+
+    navigate('/status-vm', { state: { vmName: selectedVM.name } }); // Redirect to VM status page
+
+    createVirtualMachine() // Removed selectedVM parameter
       .then(vm => {
         localStorage.setItem('vmDetails', JSON.stringify({
           ip: vm.ip,
@@ -57,8 +46,6 @@ const JobRequest: React.FC = () => {
           url: vm.url
         }));
         sessionStorage.setItem('vmSetupInProgress', 'false');
-        notify('Virtual machine creation process initiated.', 'info');
-        navigate('/status-vm', { state: { vmName: selectedVM.name } });
       })
       .catch(error => {
         console.error('Error creating virtual machine:', error);
@@ -92,28 +79,31 @@ const JobRequest: React.FC = () => {
           <select
             id="vmSelect"
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-            value={selectedVM.name}
+            value={selectedVM ? selectedVM.name : ''}
             onChange={handleVMSelectChange}
+            disabled={vmSpecs.length === 0}
           >
             {vmSpecs.map((vm) => (
               <option key={vm.name} value={vm.name}>
-                {vm.name}
+                <span dangerouslySetInnerHTML={{ __html: vm.name }} />
               </option>
             ))}
           </select>
         </div>
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-blue-600 mb-4">Virtual Machine Specifications</h2>
-          <div className="bg-blue-100 p-4 rounded-lg">
-            <ul className="list-disc pl-5 text-lg text-gray-800">
-              <li><strong>VM Name:</strong> {selectedVM.name}</li>
-              <li><strong>CPU:</strong> {selectedVM.cpu}</li>
-              <li><strong>Memory:</strong> {selectedVM.memory}</li>
-              <li><strong>Estimated cost:</strong> {selectedVM.credits} Credits/hour.</li>
-              <li><strong>Description:</strong> {selectedVM.description}</li>
-            </ul>
+        {selectedVM && (
+          <div className="mb-6">
+            <h2 className="text-2xl font-semibold text-blue-600 mb-4">Virtual Machine Specifications</h2>
+            <div className="bg-blue-100 p-4 rounded-lg">
+              <ul className="list-disc pl-5 text-lg text-gray-800">
+                <li><strong>VM Name:</strong> <span dangerouslySetInnerHTML={{ __html: selectedVM.name }} /></li>
+                <li><strong>CPU:</strong> {selectedVM.cpu}</li>
+                <li><strong>Memory:</strong> {selectedVM.memory}</li>
+                <li><strong>Estimated cost:</strong> {selectedVM.credits} Credits/hour.</li>
+                <li><strong>Description:</strong> {selectedVM.description}</li>
+              </ul>
+            </div>
           </div>
-        </div>
+        )}
         {isLoading ? (
           <div className="flex justify-center items-center">
             <div className="flex flex-col items-center">
@@ -126,7 +116,7 @@ const JobRequest: React.FC = () => {
             <button
               className="inline-flex items-center justify-center bg-blue-700 text-white border-0 py-3 px-8 focus:outline-none hover:bg-blue-800 rounded-lg text-lg transition duration-300 ease-in-out transform hover:-translate-y-1"
               onClick={handleCreateVirtualMachine}
-              disabled={isLoading}
+              disabled={isLoading || !selectedVM}
             >
               Run
             </button>

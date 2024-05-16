@@ -7,6 +7,7 @@ import VMStatus from './components/blast/VMStatus';
 import DashboardPage from './components/common/DashboardPage';
 import LoginPage from './components/auth/LoginPage';
 import RegisterPage from './components/auth/RegisterPage';
+import AboutUsPage from './components/common/AboutUsPage';
 import ForgotPasswordPage from './components/auth/ForgotPasswordPage';
 import ProfilePage from './components/profile/ProfilePage';
 import CreditsOffersPage from './components/payment/CreditsOffersPage';
@@ -100,7 +101,7 @@ function App() {
               <img src="/images/Brand/Brand_hero.webp" className="h-8" alt="BioCloudLabs Logo" />
               <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white overflow-hidden text-ellipsis" style={{ maxWidth: '200px' }}>BioCloudLabs</span>
             </a>
-            {/*Toggle Button - Adjust the breakpoint for the toggle visibility */}
+            { }
 
             <div className="flex items-center space-x-3 md:space-x-0 rtl:space-x-reverse">
 
@@ -144,6 +145,7 @@ function App() {
                     </>
                   ) : (
                     <>
+                      <li><Link to="/credits-offers" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Credits Offers</Link></li>
                       <li><Link to="/login" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Login</Link></li>
                       <li><Link to="/register" className="text-blue-700 hover:text-blue-800 dark:text-white md:dark:hover:text-blue-500" onClick={() => setIsOpen(false)}>Register</Link></li>
                     </>
@@ -165,6 +167,7 @@ function App() {
             <Route path="/dashboard" element={<ProtectedRoute isAuthenticated={isAuthenticated}><DashboardPage /></ProtectedRoute>} />
             <Route path="/login" element={<LoginPage onLoginSuccess={() => setIsAuthenticated(true)} setIsAuthenticated={setIsAuthenticated} />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/about-us" element={<AboutUsPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/change-password" element={<ProtectedRoute isAuthenticated={isAuthenticated}><ChangePasswordPage /></ProtectedRoute>} />
             <Route path="/recoverpassword" element={<RecoverPasswordPage />} />
@@ -172,12 +175,47 @@ function App() {
             <Route path="/profile" element={<AuthGuard><ProfilePage /></AuthGuard>} />
             <Route path="/success" element={<ProtectedRoute isAuthenticated={isAuthenticated}><SuccessPage /> </ProtectedRoute>} />
             <Route path="/cancelled" element={<ProtectedRoute isAuthenticated={isAuthenticated}><CancelledPage /> </ProtectedRoute>} />Ç
-           
+
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
       </div>
       <ToastContainer />
+
+      <footer className="bg-white rounded-lg shadow mt-0 mb-4 mx-4 light:bg-gray-100">
+        <div className="w-full mx-auto max-w-screen-xl p-4 flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
+          <div className="flex flex-col md:flex-row justify-between items-center w-full space-y-2 md:space-y-0">
+            <span className="text-sm text-gray-700 dark:text-gray-400 md:text-left flex-grow md:flex-grow-0">
+              © {new Date().getFullYear()} <a href="/" className="hover:underline">BioCloudLabs™</a>. All Rights Reserved.
+            </span>
+            <div className="flex justify-center md:justify-center items-center space-x-4">
+              <a href="#" className="text-gray-400 hover:text-gray-900 dark:hover:text-white">
+                <svg className="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 .333A9.911 9.911 0 0 0 6.866 19.65c.5.092.678-.215.678-.477 0-.237-.01-1.017-.014-1.845-2.757.6-3.338-1.169-3.338-1.169a2.627 2.627 0 0 0-1.1-1.451c-.9-.615.07-.6.07-.6a2.084 2.084 0 0 1 1.518 1.021 2.11 2.11 0 0 0 2.884.823c.044-.503.268-.973.63-1.325-2.2-.25-4.516-1.1-4.516-4.9A3.832 3.832 0 0 1 4.7 7.068a3.56 3.56 0 0 1 .095-2.623s.832-.266 2.726 1.016a9.409 9.409 0 0 1 4.962 0c1.89-1.282 2.717-1.016 2.717-1.016.366.83.402 1.768.1 2.623a3.827 3.827 0 0 1 1.02 2.659c0 3.807-2.319 4.644-4.525 4.889a2.366 2.366 0 0 1 .673 1.834c0 1.326-.012 2.394-.012 2.72 0 .263.18.572.681.475A9.911 9.911 0 0 0 10 .333Z" clipRule="evenodd" />
+                </svg>
+                <span className="sr-only">GitHub account</span>
+              </a>
+              <a href="/about-us" className="hover:underline">About us</a>
+              <a href="mailto:info@biocloudlabs.es" className="hover:underline">Contact</a>
+            </div>
+          </div>
+        </div>
+        <div className="w-full mx-auto max-w-screen-xl p-4 text-sm text-gray-700 sm:text-center dark:text-gray-400 mt-2 flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
+          <p className="text-center md:text-left w-full md:w-auto">
+            <a property="dct:title" rel="cc:attributionURL" href="https://github.com/BioCloudLabs/">BioCloudLabs</a> by
+            <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://github.com/BioCloudLabs/"> BioCloudLabs Team</a> is licensed under
+            <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" className="inline-flex items-center">
+              CC BY-NC-ND 4.0
+              <img className="ml-2 h-5" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt="CC" />
+              <img className="ml-2 h-5" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt="BY" />
+              <img className="ml-2 h-5" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1" alt="NC" />
+              <img className="ml-2 h-5" src="https://mirrors.creativecommons.org/presskit/icons/nd.svg?ref=chooser-v1" alt="ND" />
+            </a>
+          </p>
+        </div>
+      </footer>
+
+
     </Router>
   );
 }

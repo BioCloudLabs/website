@@ -32,6 +32,11 @@ const JobRequest: React.FC = () => {
     notify('Initiating VM creation process...', 'info');
     setIsLoading(true);
     sessionStorage.setItem('vmSetupInProgress', 'true'); // Indicate that VM setup is in progress
+    sessionStorage.setItem('notifiedSetupInProgress', 'false'); // Reset notification flag
+    sessionStorage.setItem('notifiedNoDetails', 'false'); // Reset notification flag for no details
+
+    navigate('/status-vm', { state: { vmName: selectedVM.name } }); // Redirect to VM status page
+
     createVirtualMachine() // Removed selectedVM parameter
       .then(vm => {
         localStorage.setItem('vmDetails', JSON.stringify({
@@ -41,8 +46,6 @@ const JobRequest: React.FC = () => {
           url: vm.url
         }));
         sessionStorage.setItem('vmSetupInProgress', 'false');
-        notify('Virtual machine creation process initiated.', 'info');
-        navigate('/status-vm', { state: { vmName: selectedVM.name } });
       })
       .catch(error => {
         console.error('Error creating virtual machine:', error);
@@ -82,7 +85,7 @@ const JobRequest: React.FC = () => {
           >
             {vmSpecs.map((vm) => (
               <option key={vm.name} value={vm.name}>
-                {vm.name}
+                <span dangerouslySetInnerHTML={{ __html: vm.name }} />
               </option>
             ))}
           </select>
@@ -92,7 +95,7 @@ const JobRequest: React.FC = () => {
             <h2 className="text-2xl font-semibold text-blue-600 mb-4">Virtual Machine Specifications</h2>
             <div className="bg-blue-100 p-4 rounded-lg">
               <ul className="list-disc pl-5 text-lg text-gray-800">
-                <li><strong>VM Name:</strong> {selectedVM.name}</li>
+                <li><strong>VM Name:</strong> <span dangerouslySetInnerHTML={{ __html: selectedVM.name }} /></li>
                 <li><strong>CPU:</strong> {selectedVM.cpu}</li>
                 <li><strong>Memory:</strong> {selectedVM.memory}</li>
                 <li><strong>Estimated cost:</strong> {selectedVM.credits} Credits/hour.</li>

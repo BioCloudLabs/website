@@ -132,8 +132,12 @@ class CheckCredits(MethodView):
 
     def get(self, vm_name):
 
+        print('entra maquina')
         vm = models.VirtualMachineModel.query.filter_by(name=vm_name).one_or_404(description="VM not found")
+        print('sale maquina')
+        print('entra user')
         user = models.UserModel.query.filter_by(id=vm.user_id).one_or_404(description="User not found")
+        print('sale user')
         user_credits = user.credits
 
         vm_actual_cost = calc_vm_credits_costs(vm)

@@ -78,8 +78,7 @@ const JobRequest: React.FC = () => {
           <label htmlFor="vmSelect" className="block text-sm font-medium text-gray-700">Select VM</label>
           <select
             id="vmSelect"
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-            value={selectedVM ? selectedVM.name : ''}
+            className="mt-1 block w-full text-lg p-3 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"            value={selectedVM ? selectedVM.name : ''}
             onChange={handleVMSelectChange}
             disabled={vmSpecs.length === 0}
           >

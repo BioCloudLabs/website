@@ -141,7 +141,7 @@ class CheckCredits(MethodView):
         credits_left = user_credits - vm_actual_cost
 
         if credits_left <= 0:
-            requests.get(f"http://localhost:4000/vm/poweroff/{vm_name.split(".")[0]}")
+            requests.get(f"http://localhost:4000/vm/poweroff/{vm_name.split('.')[0]}")
 
             vm.powered_off_at = datetime.now()
             user.credits = 0

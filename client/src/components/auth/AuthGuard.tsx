@@ -13,7 +13,6 @@ const AuthGuard = ({ children }: { children: React.ReactNode }) => {
                 const valid = await isTokenValid();
                 setIsValid(valid);
                 if (!valid) {
-                    // Redirect to login or a specific error page based on token validation failure
                     navigate('/login', { replace: true });
                 }
             } catch (error) {

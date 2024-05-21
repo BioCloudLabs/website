@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { getVirtualMachinesHistory, powerOffVirtualMachine } from './../../services/vmService'; // Ensure the path matches your project structure
+import { getVirtualMachinesHistory, powerOffVirtualMachine } from './../../services/vmService'; 
 import { VirtualMachineHistory } from './../../models/VirtualMachineHistory';
-import { notify } from './../../utils/notificationUtils'; // Ensure the path matches your project structure
+import { notify } from './../../utils/notificationUtils'; 
 
 
 function DashboardPage() {
@@ -172,7 +172,7 @@ function DashboardPage() {
                     <div className="flex items-center">
                         <label htmlFor="filter" className="mr-2">Filter by VM status:</label>
                         <select id="filter" value={filter} onChange={handleFilterChange} className="border rounded p-2">
-                            <option value="ALL">All</option>
+                            <option value="ALL">ALL</option>
                             <option value="ON">ON</option>
                             <option value="OFF">OFF</option>
                         </select>
@@ -181,7 +181,7 @@ function DashboardPage() {
                 {loading ? (
                     <div className="text-center">Loading virtual machines history...</div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 py-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 py-4 justify-items-center">
                         {filteredData.length === 0 ? (
                             <div className="col-span-full flex justify-center mt-4">
                                 <div className="text-center text-gray-600 border border-gray-200 rounded-lg p-4 max-w-md">

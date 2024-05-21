@@ -89,7 +89,7 @@ const CreditsOffersPage: React.FC = () => {
               <p className="text-gray-600">{offer.price}</p>
               <button
                 onClick={() => handleCheckoutClick(offer.priceId, parseFloat(offer.price.replace('€', '').trim()))}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md cursor-pointer mt-3 transition-colors duration-300 hover:bg-blue-400"
+                className="bg-blue-600 text-white px-4 py-2 rounded-md cursor-pointer mt-3 transition-colors duration-300 hover:bg-blue-500"
               >
                 Checkout
               </button>

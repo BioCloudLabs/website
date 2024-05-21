@@ -25,6 +25,11 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!localStorage.getItem('token'));
   const [userCredits, setUserCredits] = useState<number | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
 
   useEffect(() => {
     const handleStorageChange = () => {
@@ -180,7 +185,7 @@ function App() {
           </Routes>
         </div>
       </div>
-      
+
       <ToastContainer />
       <footer className="bg-white rounded-lg shadow mt-0 mb-4 mx-4 light:bg-gray-100">
         <div className="w-full mx-auto max-w-screen-xl p-4 flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0 border-b border-gray-200 dark:border-gray-600">
@@ -196,7 +201,28 @@ function App() {
                 <span className="sr-only">GitHub account</span>
               </a>
               <a href="/about-us" className="font-bold hover:underline">About us</a>
-              <a href="mailto:info@biocloudlabs.es" className="font-bold hover:underline">Contact</a>
+
+              <div className="relative inline-block text-left">
+                <button
+                  onClick={toggleDropdown}
+                  className="font-bold hover:underline"
+                >
+                  Contact
+                </button>
+                {isDropdownOpen && (
+                  <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                      <a
+                        href="mailto:info@biocloudlabs.es"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                        role="menuitem"
+                      >
+                        info@biocloudlabs.es
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -213,9 +239,8 @@ function App() {
             </a>
           </p>
         </div>
+        
       </footer>
-
-
 
     </Router>
   );

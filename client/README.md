@@ -1,15 +1,13 @@
 # BioCloudLabs
 
-**Note:** _BioCloudLabs is a conceptual mock-up designed for illustrative purposes. The features, services, and interfaces mentioned in this document are intended to showcase the potential capabilities of a cloud-based bioinformatics platform and do not currently exist._
-
-Welcome to BioCloudLabs, the leading platform for omics analysis in the cloud. BioCloudLabs offers a comprehensive suite of tools for bioinformatics research, enabling scientists and researchers to perform high-performance BLAST analyses and manage their projects efficiently in a cloud-based environment.
+Welcome to BioCloudLabs a bioinformatics project by Aymane El Hanbali, Albert Martin Moreno, Christian González Acosta, focused on automated cloud processes for omics applications, starting with BLAST, aimed to transform massive analysis tasks with exceptional performance and scalability.
 
 ## Features
 
 BioCloudLabs provides a range of features designed to enhance your bioinformatics research:
 
 - **High-Performance Computing**: Experience fast and reliable analysis of your genomic data with our scalable cloud infrastructure.
-- **Unlimited Cloud Usage**: Enjoy unrestricted access to our cloud resources, facilitating extensive data analysis without limitations.
+- **Unlimited Cloud Usage**: Enjoy unrestricted access to our cloud resources, facilitating extensive data analysis without usage limitations.
 - **User-Friendly Interface**: Navigate our platform with ease, thanks to our intuitive user interface designed for scientists of all technical levels.
 
 ## Getting Started
@@ -43,4 +41,4 @@ npm run dev
 
 ## Acknowledgments
 
-- Special thanks to our teachers for their guidance and knowledge have been instrumental in shaping this project.
+- Special thanks to our tutors, whose guidance and knowledge have been instrumental in shaping this project.

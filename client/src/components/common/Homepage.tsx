@@ -47,7 +47,7 @@ function Homepage() {
                   <h2 className="text-black text-lg title-font font-medium">High Performance</h2>
                 </div>
                 <div className="flex-grow">
-                  <p className="leading-relaxed text-gray-800 text-base">Experience fast and reliable analysis of your genomic data.</p>
+                  <p className="leading-relaxed text-gray-800 text-base">Experience rapid and consistent analysis of your genomic projects.</p>
                 </div>
               </div>
             </div>

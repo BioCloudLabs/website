@@ -9,7 +9,7 @@ const AboutUs = () => {
                     <h2 className="text-2xl font-semibold mb-2">Introduction</h2>
                     <h3 className="text-xl font-semibold mb-2">Overview of the Project</h3>
                     <p className="text-gray-700 mb-4">
-                        Welcome to BioCloudLabs - Memoria, a cutting-edge project by Aymane El Hanbali, Albert Martin Moreno, Christian González Acosta, aimed at simplifying bioinformatics for users without specialized IT resources. Focused on Web Development in Bioinformatics, this project introduces an automated cloud platform for omics applications, starting with BLAST, to transform massive analysis tasks with exceptional performance and scalability.
+                        Welcome to BioCloudLabs a cutting-edge project by Aymane El Hanbali, Albert Martin Moreno, Christian González Acosta, focused on Bioinformatics automated cloud processes for omics applications, starting with BLAST, aimed to transform massive analysis tasks with exceptional performance and scalability.
                     </p>
                 </section>
 
@@ -23,7 +23,6 @@ const AboutUs = () => {
                         “Automated cloud deployment of pay-per-use omics applications, starting with BLAST, for users who need to perform massive point-in-time analysis with high performance needs.”
                     </blockquote>
                     <p className="text-gray-700 mb-4">
-                        Based on ElasticBlast: The project is inspired by the ElasticBLAST concept, which leverages cloud resources to efficiently distribute BLAST searches across multiple cloud instances, allowing for scalability and rapid processing of large datasets.
                     </p>
                 </section>
 

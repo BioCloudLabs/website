@@ -13,12 +13,14 @@ function Homepage() {
       <section className="text-gray-700 body-font">
         {/* Example previous version: <div className="container mx-auto flex px-5 py-10 md:flex-row flex-col items-center"> */}
         <div className="container mx-auto flex px-12 py-20 md:flex-row flex-col items-center">
-                <div className="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-8 md:mb-0 items-center text-center">
+          <div className="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-8 md:mb-0 items-center text-center">
             <h1 className="text-3xl lg:text-4xl mb-4 font-medium text-gray-900">Welcome to BioCloudLabs</h1>
             <p className="mb-4 leading-relaxed">The leading platform for omics analysis in the cloud. Explore our platform to enhance your research and development processes.</p>
             <div className="flex justify-center">
               <button className="inline-flex items-center justify-center bg-blue-700 text-white border-0 py-4 px-6 focus:outline-none hover:bg-blue-800 rounded text-lg transition duration-300 ease-in-out transform hover:-translate-y-1">
-                Get Started
+                <a href="/about-us">
+                  Get Started
+                </a>
               </button>
             </div>
           </div>

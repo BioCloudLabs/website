@@ -8,9 +8,15 @@ const AboutUs = () => {
                 <section className="mb-8">
                     <h2 className="text-2xl font-semibold mb-2">Introduction</h2>
                     <h3 className="text-xl font-semibold mb-2">Overview of the Project</h3>
+
+
                     <p className="text-gray-700 mb-4">
-                    Welcome to BioCloudLabs, a bioinformatics project by Aymane El Hanbali, Albert Martin Moreno, and Christian González Acosta, focused on automated cloud processes for omics applications. Starting with BLAST, it aims to transform massive analysis tasks with exceptional performance and scalability.
+                    Welcome to BioCloudLabs, a bioinformatics project by Aymane El Hanbali, Albert Martin Moreno, and Christian González Acosta, focused on automated cloud processes for omics applications. Starting with BLAST, it aims to transform massive analysis tasks with exceptional performance and scalability. 
+                    <a href="/register" className="font-bold text-blue-600"> Join us now.</a>
                     </p>
+
+
+
                 </section>
 
                 <section className="mb-8">

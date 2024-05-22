@@ -118,7 +118,7 @@ function App() {
                       <circle cx="45" cy="45" r="35" style={{ stroke: "none", strokeWidth: 1, strokeDasharray: "none", strokeLinecap: "butt", strokeLinejoin: "miter", strokeMiterlimit: 10, fill: "rgb(211,135,0)", fillRule: "nonzero", opacity: 1 }} transform="matrix(1 0 0 1 0 0)" />
                       <path d="M 46.524 26.367 l 5.019 10.169 c 0.248 0.501 0.726 0.849 1.279 0.93 l 11.222 1.631 c 1.394 0.203 1.95 1.915 0.942 2.898 l -8.12 7.915 c -0.4 0.39 -0.583 0.953 -0.489 1.504 l 1.917 11.176 c 0.238 1.388 -1.219 2.447 -2.465 1.791 l -10.037 -5.277 c -0.495 -0.26 -1.086 -0.26 -1.581 0 l -10.037 5.277 c -1.247 0.655 -2.703 -0.403 -2.465 -1.791 l 1.917 -11.176 c 0.095 -0.551 -0.088 -1.114 -0.489 -1.504 l -8.12 -7.915 c -1.008 -0.983 -0.452 -2.696 0.942 -2.898 l 11.222 -1.631 c 0.553 -0.08 1.032 -0.428 1.279 -0.93 l 5.019 -10.169 C 44.1 25.104 45.9 25.104 46.524 26.367 z" style={{ stroke: "none", strokeWidth: 1, strokeDasharray: "none", strokeLinecap: "butt", strokeLinejoin: "miter", strokeMiterlimit: 10, fill: "rgb(255,200,67)", fillRule: "nonzero", opacity: 1 }} transform="matrix(1 0 0 1 0 0)" strokeLinecap="round" />
                     </g>
-                  </svg>
+                  </svg> {/* SVG Icon taken from */}
 
                 </Link>
 
@@ -162,7 +162,7 @@ function App() {
           </div>
         </nav>
 
-        <div className="flex-grow pt-8">
+        <div className="bg-gray-100 flex-grow pt-8">
           <Routes>
             <Route path="/" element={<><Homepage /></>} /> {/* This is the default route, it will render Homepage component when the path is correct */}
             <Route path="/launch-vm" element={<ProtectedRoute isAuthenticated={isAuthenticated}><JobRequest /></ProtectedRoute>} />
@@ -185,7 +185,7 @@ function App() {
       </div>
 
       <ToastContainer />
-      <footer className="bg-white rounded-lg shadow mt-0 mb-4 mx-4 light:bg-gray-100">
+      <footer className=" shadow mt-0 bg-gray-100">
         <div className="w-full mx-auto max-w-screen-xl p-4 flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0 border-b border-gray-200  border-gray-600">
           <div className="flex flex-col md:flex-row justify-between items-center w-full space-y-2 md:space-y-0">
             <span className="text-sm text-black-800  text-black-200 md:text-left flex-grow md:flex-grow-0">
@@ -212,7 +212,7 @@ function App() {
                   Contact
                 </button>
                 {isDropdownOpen && (
-                  <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <div className="origin-top-right absolute right-0 mt-2 w-56 shadow-lg bg-gray-100 ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                       <p
                         className="block px-4 py-2 text-sm text-black-700 hover:bg-black-100 hover:text-black-900"
@@ -240,9 +240,7 @@ function App() {
             </a>
           </p>
         </div>
-
       </footer>
-
     </Router>
   );
 }

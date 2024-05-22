@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { getVirtualMachinesHistory, powerOffVirtualMachine } from './../../services/vmService'; 
+import { getVirtualMachinesHistory, powerOffVirtualMachine } from './../../services/vmService';
 import { VirtualMachineHistory } from './../../models/VirtualMachineHistory';
-import { notify } from './../../utils/notificationUtils'; 
+import { notify } from './../../utils/notificationUtils';
 
 
 function DashboardPage() {
@@ -131,7 +131,7 @@ function DashboardPage() {
 
 
     const VirtualMachineCard = ({ vm }: { vm: VirtualMachineHistory }) => (
-        <div className="bg-white shadow-lg rounded-lg py-6 px-4 mb-4 flex flex-col justify-between mx-4">
+        <div className="bg-white shadow-lg rounded-lg py-6 px-4 mb-4 flex flex-col justify-between mx-4 w-full sm:w-1/2 lg:w-1/3">
             <a href={`/vm/${vm.id}`} className="text-lg font-semibold text-center text-blue-600 hover:underline">
                 {vm.name}
             </a>
@@ -181,7 +181,7 @@ function DashboardPage() {
                 {loading ? (
                     <div className="text-center">Loading virtual machines history...</div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 py-4 justify-items-center">
+                    <div className="flex flex-wrap justify-center gap-6 px-4 py-4">
                         {filteredData.length === 0 ? (
                             <div className="col-span-full flex justify-center mt-4">
                                 <div className="text-center text-gray-600 border border-gray-200 rounded-lg p-4 max-w-md">
@@ -197,6 +197,7 @@ function DashboardPage() {
                 )}
                 <Pagination />
             </div>
+
 
             <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center">Quick actions</h2>
             <div className="flex flex-wrap justify-center gap-4 mt-6">

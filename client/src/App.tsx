@@ -228,9 +228,9 @@ function App() {
         <div className="w-full mx-auto max-w-screen-xl p-4 text-sm text-gray-700 sm:text-center dark:text-gray-400 mt-2 flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
           <p className="text-center md:text-left w-full md:w-auto">
             <a property="dct:title" rel="cc:attributionURL" href="https://github.com/BioCloudLabs/">BioCloudLabs</a> by
-            <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://github.com/BioCloudLabs/"> BioCloudLabs Team</a> is licensed under
+            <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://github.com/BioCloudLabs/"> BioCloudLabs Team</a> is licensed under 
             <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" className="inline-flex items-center">
-              CC BY-NC-ND 4.0
+              &nbsp;CC BY-NC-ND 4.0 {/* Added "&nbsp;" for an extra space */}
               <img className="ml-2 h-5" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt="CC" />
               <img className="ml-2 h-5" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt="BY" />
               <img className="ml-2 h-5" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1" alt="NC" />

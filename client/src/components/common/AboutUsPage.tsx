@@ -37,18 +37,7 @@ const AboutUs = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         {/* Team Member 1 */}
                         <div className="bg-white shadow-lg rounded-lg p-4 flex flex-col items-center">
-                            <img src="/images/Team/Aymane.jpeg" alt="Aymane" className="w-32 h-32 object-cover rounded-full mb-4" />
-                            <h3 className="text-xl font-semibold mb-1 text-center">
-                                Aymane El Hanbali
-                            </h3>
-                            <p className="text-gray-700 text-center overflow-hidden text-ellipsis">
-                                Aymane focuses on frontend design and infrastructure, ensuring a seamless and user-friendly interface.
-                            </p>
-                        </div>
-
-                        {/* Team Member 2 */}
-                        <div className="bg-white shadow-lg rounded-lg p-4 flex flex-col items-center">
-                            <img src="/images/Team/Albert.jpeg" alt="Albert" className="w-32 h-32 object-cover rounded-full mb-4" />
+                            <img src="/images/Team/Albert.jpeg" alt="Albert photo" className="w-32 h-32 object-cover rounded-full mb-4" />
                             <h3 className="text-xl font-semibold mb-1 text-center">
                                 Albert Martin Moreno
                             </h3>
@@ -57,9 +46,23 @@ const AboutUs = () => {
                             </p>
                         </div>
 
+                        {/* Team Member 2 */}
+
+                        <div className="bg-white shadow-lg rounded-lg p-4 flex flex-col items-center">
+                            <img src="/images/Team/Aymane.jpeg" alt="Aymane photo" className="w-32 h-32 object-cover rounded-full mb-4" />
+                            <h3 className="text-xl font-semibold mb-1 text-center">
+                                Aymane El Hanbali
+                            </h3>
+                            <p className="text-gray-700 text-center overflow-hidden text-ellipsis">
+                                Aymane focuses on frontend design and infrastructure, ensuring a seamless and user-friendly interface.
+                            </p>
+                        </div>
+
+
+
                         {/* Team Member 3 */}
                         <div className="bg-white shadow-lg rounded-lg p-4 flex flex-col items-center">
-                            <img src="/images/Team/Christian.jpeg" alt="Christian" className="w-32 h-32 object-cover rounded-full mb-4" />
+                            <img src="/images/Team/Christian.jpeg" alt="Christian photo" className="w-32 h-32 object-cover rounded-full mb-4" />
                             <h3 className="text-xl font-semibold mb-1 text-center">
                                 Christian González Acosta
                             </h3>

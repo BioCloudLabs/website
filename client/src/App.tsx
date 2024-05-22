@@ -189,7 +189,7 @@ function App() {
         <div className="w-full mx-auto max-w-screen-xl p-4 flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0 border-b border-gray-200  border-gray-600">
           <div className="flex flex-col md:flex-row justify-between items-center w-full space-y-2 md:space-y-0">
             <span className="text-sm text-black-800  text-black-200 md:text-left flex-grow md:flex-grow-0">
-              © {new Date().getFullYear()} <a className="hover:underline">BioCloudLabs™</a>. All Rights Reserved.
+              © {new Date().getFullYear()} <a>BioCloudLabs™</a>. All Rights Reserved.
             </span>
 
             <div className="flex justify-center md:justify-center items-center space-x-4">

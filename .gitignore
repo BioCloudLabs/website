@@ -5,11 +5,5 @@ node_modules/
 ./api/app.py
 ./api/database.py
 migations/
-api/migrations/alembic.ini
-api/migrations/env.py
-api/migrations/README
-api/migrations/script.py.mako
-api/migrations/versions/e1fd59cfdb9f_.py
+api/migations/
 dist/
-api/migrations/versions/b1549c6a444c_.py
-api/migrations/versions/fa615e40cb18_.py

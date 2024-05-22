@@ -136,6 +136,9 @@ class CheckCredits(MethodView):
         user = models.UserModel.query.filter_by(id=vm.user_id).one_or_404(description="User not found")
         user_credits = user.credits
 
+        if vm.powered_off_at is not None:
+            return {"message": "VM Already Powered off"}, 200
+
         vm_actual_cost = calc_vm_credits_costs(vm)
 
         credits_left = user_credits - vm_actual_cost

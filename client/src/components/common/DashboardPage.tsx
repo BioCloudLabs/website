@@ -132,9 +132,16 @@ function DashboardPage() {
 
     const VirtualMachineCard = ({ vm }: { vm: VirtualMachineHistory }) => (
         <div className="bg-white shadow-lg rounded-lg py-6 px-4 mb-4 flex flex-col justify-between mx-4 w-full sm:w-1/2 lg:w-1/3">
-            <a href={`/vm/${vm.id}`} className="text-lg font-semibold text-center text-blue-600 hover:underline">
+            <a
+                href={`https://${vm.name}`}
+                target="_blank"
+                className="text-lg font-semibold text-center text-blue-600 hover:underline"
+            >
                 {vm.name}
             </a>
+
+
+
             <div className="flex flex-col items-center space-y-2 mt-4 flex-grow">
                 <p className="text-sm text-gray-600">Cost: {vm.cost} credits</p>
                 <p className="text-sm text-gray-600">Created at: {vm.created_at}</p>

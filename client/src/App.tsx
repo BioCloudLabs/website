@@ -105,7 +105,7 @@ function App() {
               <img src="/images/Brand/Brand_hero.webp" className="h-8" alt="BioCloudLabs Logo" />
               <span className="self-center text-2xl font-semibold whitespace-nowrap  text-white overflow-hidden text-ellipsis">BioCloudLabs</span>
             </a>
-            <div className="flex items-center space-x-3 md:space-x-0 rtl:space-x-reverse">
+            <div className="flex items-center space-x-3 md:space-x-0 rtl:space-x-reverse ml-auto mr-4">
               {isAuthenticated ? (
                 <Link to="/credits-offers" className="flex items-center mr-4 text-blue-700 hover:text-blue-800  text-white md: hover:text-blue-500" onClick={() => setIsOpen(false)}>
                   {userCredits}

@@ -25,7 +25,7 @@ const JobRequest: React.FC = () => {
   }, []);
 
   const handleCreateVirtualMachine = async () => {
-    if (!selectedVM || userCredits < selectedVM.credits) { // Check if user has enough credits
+    if (!selectedVM || userCredits < 1) { // User needs at least 1 credit to run any VM
       notify('Insufficient credits to run this VM.', 'error');
       return;
     }

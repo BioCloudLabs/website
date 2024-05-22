@@ -130,7 +130,7 @@ function App() {
                 className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-black-500 rounded-lg lg:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200  text-black-400  hover:bg-gray-700  focus:ring-gray-600"
                 aria-controls="navbar-sticky"
                 aria-expanded={isOpen}>
-                <span className="sr-only text-black bg-white-900">
+                <span className="sr-only text-black bg-gray-100">
                   Open main menu
                 </span>
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 17 14" xmlns="http://www.w3.org/2000/svg">

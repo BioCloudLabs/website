@@ -26,8 +26,8 @@ const JobRequest: React.FC = () => {
 
   const handleCreateVirtualMachine = async () => {
     if (!selectedVM || userCredits < 1) { // User needs at least 1 credit to run any VM
-      notify('Insufficient credits to run this VM.', 'error');
-      return;
+        notify('Insufficient credits to run this VM.', 'error');
+        return;
     }
     notify('Initiating VM creation process...', 'info');
     setIsLoading(true);
@@ -37,25 +37,26 @@ const JobRequest: React.FC = () => {
 
     navigate('/status-vm', { state: { vmName: selectedVM.name } }); // Redirect to VM status page
 
-    createVirtualMachine() // Removed selectedVM parameter
-      .then(vm => {
-        localStorage.setItem('vmDetails', JSON.stringify({
-          ip: vm.ip,
-          dns: vm.dns,
-          price: vm.price,
-          url: vm.url
-        }));
-        sessionStorage.setItem('vmSetupInProgress', 'false');
-      })
-      .catch(error => {
-        console.error('Error creating virtual machine:', error);
-        notify(`Error creating virtual machine: ${(error as Error).message}`, 'error');
-        sessionStorage.setItem('vmSetupInProgress', 'false');
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
+    createVirtualMachine() // Create the virtual machine and store the details
+        .then(vm => {
+            localStorage.setItem('vmDetails', JSON.stringify({
+                ip: vm.ip,
+                dns: vm.dns,
+                price: vm.price,
+                url: vm.url
+            }));
+            sessionStorage.setItem('vmSetupInProgress', 'false');
+        })
+        .catch(error => {
+            console.error('Error creating virtual machine:', error);
+            notify(`Error creating virtual machine: ${(error as Error).message}`, 'error');
+            sessionStorage.setItem('vmSetupInProgress', 'false');
+        })
+        .finally(() => {
+            setIsLoading(false);
+        });
+};
+
 
   const handleVMSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedVM = vmSpecs.find(vm => vm.name === e.target.value);
@@ -78,7 +79,7 @@ const JobRequest: React.FC = () => {
           <label htmlFor="vmSelect" className="block text-sm font-medium text-gray-700">Select VM</label>
           <select
             id="vmSelect"
-            className="w-6 mt-1 block w-full text-lg p-3 mb-8 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"            value={selectedVM ? selectedVM.name : ''}
+            className="w-6 mt-1 block w-full text-lg p-3 mb-8 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" value={selectedVM ? selectedVM.name : ''}
             onChange={handleVMSelectChange}
             disabled={vmSpecs.length === 0}
           >

@@ -11,16 +11,16 @@ const VMStatus: React.FC = () => {
             const ongoingSetup = sessionStorage.getItem('vmSetupInProgress') === 'true';
             const setupNotified = sessionStorage.getItem('notifiedSetupInProgress') === 'true';
             const noDetailsNotified = sessionStorage.getItem('notifiedNoDetails') === 'true';
-            
+    
             if (ongoingSetup && !setupNotified) {
                 notify('VM setup in progress...', 'info');
                 sessionStorage.setItem('notifiedSetupInProgress', 'true');
             }
-
+    
             // Perform a check for VM details
             const storedVm = localStorage.getItem('vmDetails');
             const vmDetails = storedVm ? JSON.parse(storedVm) : null;
-
+    
             if (vmDetails && vmDetails.ip && vmDetails.dns && !ongoingSetup) {
                 setVm({ // Set the VM details
                     ip: vmDetails.ip,
@@ -34,18 +34,27 @@ const VMStatus: React.FC = () => {
                 notify('Virtual machine is ready!', 'success');
                 setIsLoading(false);
                 clearInterval(intervalId); // Stop checking once VM is ready
+            } else if (!vmDetails && !ongoingSetup) {
+                if (!noDetailsNotified) {
+                    notify('Failed to load VM details. Please check the system and try again later.', 'error');
+                    sessionStorage.setItem('notifiedNoDetails', 'true');
+                }
+                setIsLoading(false);
+                clearInterval(intervalId); // Stop checking on failure
             } else if (!ongoingSetup && !noDetailsNotified) {
                 notify('No VM details available. Waiting for VM setup to complete.', 'info');
                 sessionStorage.setItem('notifiedNoDetails', 'true');
             }
         };
-
+    
         const intervalId = setInterval(() => {
             checkVMStatus();
         }, 1000); // Check every second
-
+    
         return () => clearInterval(intervalId); // Clean up on unmount
     }, []);
+    
+
 
     return (
         <div className="container mx-auto px-4 py-8 pt-20">

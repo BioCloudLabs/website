@@ -140,7 +140,11 @@ export const logoutUserLocally = (): void => {
   localStorage.removeItem('token');
   localStorage.removeItem('userData');
   localStorage.removeItem('userCredits');
+  sessionStorage.removeItem('vmSetupInProgress');
+  sessionStorage.removeItem('notifiedSetupInProgress');
+  sessionStorage.removeItem('notifiedNoDetails');
 };
+
 
 /****************** LOGOUT SECTION END ******************/
 

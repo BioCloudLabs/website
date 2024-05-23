@@ -4,6 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Offer } from '../../models/Offer';
 import { fetchProducts, handleUserCheckout } from '../../services/creditsService';
+import { notify } from '../../utils/notificationUtils';
 
 const CreditsOffersPage: React.FC = () => {
   const [offers, setOffers] = useState<Offer[]>([]);
@@ -31,7 +32,7 @@ const CreditsOffersPage: React.FC = () => {
   };
 
   const onNotAuthenticated = () => {
-    toast.info("You are not authenticated. Redirecting to login.");
+    notify("You are not authenticated. Redirecting to login.", "info");
     setCheckoutLoading(false);
     setTimeout(() => navigate('/login'), 2500);
   };

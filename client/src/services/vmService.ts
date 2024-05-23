@@ -61,7 +61,7 @@ export async function createVirtualMachine(): Promise<VirtualMachine> { // Remov
 
     const data = await response.json();
     if (!response.ok) {
-      console.error('HTTP error: ', data.message);
+      // console.error('HTTP error: ', data.message);
       throw new Error(`HTTP error! Status: ${response.status} Message: ${data.message}`);
     }
 
@@ -72,7 +72,7 @@ export async function createVirtualMachine(): Promise<VirtualMachine> { // Remov
       price: data.price // Assuming the API response includes the price
     };
   } catch (error) {
-    console.error("Failed to create virtual machine:", error);
+    // console.error("Failed to create virtual machine:", error);
     throw error;
   }
 }
@@ -97,13 +97,13 @@ export async function powerOffVirtualMachine(vmId: number): Promise<string> {
 
     const data = await response.json();
     if (!response.ok) {
-      console.error('HTTP error: ', data.message);
+      // console.error('HTTP error: ', data.message);
       throw new Error(`HTTP error! Status: ${response.status} Message: ${data.message}`);
     }
 
     return data.message;
   } catch (error) {
-    console.error("Failed to power off virtual machine:", error);
+    // console.error("Failed to power off virtual machine:", error);
     throw error;
   }
 }
@@ -150,7 +150,7 @@ export async function getVirtualMachinesHistory(): Promise<VirtualMachineHistory
       cost: vm.cost
     }));
   } catch (error) {
-    console.error('Failed to retrieve virtual machine history:', error);
+    // console.error('Failed to retrieve virtual machine history:', error);
     throw error;
   }
 }

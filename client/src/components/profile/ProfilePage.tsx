@@ -5,9 +5,9 @@ import { User } from '../../models/User';
 import { Location } from '../../models/Locations';
 import { notify } from '../../utils/notificationUtils';
 
-
 const ProfilePage = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [initialUser, setInitialUser] = useState<User | null>(null);
   const [locations, setLocations] = useState<Location[]>([]);
   const [credits, setCredits] = useState<number | null>(null);
   const [password, setPassword] = useState('');
@@ -23,9 +23,9 @@ const ProfilePage = () => {
         const userData = await fetchUserProfile();
         const locationData = await getLocationOptions();
         const userCredits = await fetchUserCredits();
-        // console.log("Credits fetched:", userCredits); // Log the fetched credits
         if (!userData) throw new Error('User not found');
         setUser(userData);
+        setInitialUser(userData); // Store the initial user data
         setLocations(locationData);
         setCredits(userCredits);
       } catch (error) {
@@ -37,7 +37,6 @@ const ProfilePage = () => {
 
     fetchUserData();
   }, []);
-
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = event.target;
@@ -53,9 +52,26 @@ const ProfilePage = () => {
     }
   };
 
+  const hasUserChanged = () => {
+    if (!user || !initialUser) return false;
+
+    for (const key in user) {
+      if (user[key as keyof User] !== initialUser[key as keyof User]) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!user) return;
+
+    if (!hasUserChanged() && !password.trim()) {
+      notify('No changes were made.', "info");
+      return;
+    }
 
     const updateData = {
       ...user,
@@ -66,6 +82,7 @@ const ProfilePage = () => {
     try {
       await updateUserProfile(updateData);
       notify('Profile updated successfully!', "success");
+      setInitialUser(user); // Update the initial user to the current user after successful update
       setTimeout(() => {
         setSuccessMessage('');
       }, 1500);
@@ -75,6 +92,7 @@ const ProfilePage = () => {
       setIsUpdating(false);
     }
   };
+
 
   if (loading) {
     return <div className="flex justify-center items-center h-screen">
@@ -96,7 +114,6 @@ const ProfilePage = () => {
 
             <label htmlFor="surname" className="block text-sm font-medium text-gray-700">Surname</label>
             <input id="surname" type="text" name="surname" autoComplete="surname" value={user?.surname || ''} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
-
 
             <label htmlFor="location_id" className="block text-sm font-medium text-gray-700">Location</label>
             <select id="location_id" name="location_id" value={user?.location_id || ''} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">

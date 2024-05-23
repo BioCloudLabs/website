@@ -17,7 +17,7 @@ const JobRequest: React.FC = () => {
         setVmSpecs(specs);
         setSelectedVM(specs[0]); // Set the first VM spec as default
       } catch (error) {
-        console.error('Error fetching VM specifications:', error);
+        // console.error('Error fetching VM specifications:', error);
         notify('Error fetching VM specifications.', 'error');
       }
     };
@@ -48,7 +48,7 @@ const JobRequest: React.FC = () => {
             sessionStorage.setItem('vmSetupInProgress', 'false');
         })
         .catch(error => {
-            console.error('Error creating virtual machine:', error);
+            // console.error('Error creating virtual machine:', error);
             notify(`Error creating virtual machine: ${(error as Error).message}`, 'error');
             sessionStorage.setItem('vmSetupInProgress', 'false');
         })

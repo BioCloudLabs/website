@@ -16,7 +16,7 @@ const AuthGuard = ({ children }: { children: React.ReactNode }) => {
                     navigate('/login', { replace: true });
                 }
             } catch (error) {
-                console.error('Error validating token:', error);
+                // // console.error('Error validating token:', error);
                 notify('Error validating token. Please try again later.', 'error');
                 navigate('/error', { replace: true }); // Redirect to a generic error page
             }

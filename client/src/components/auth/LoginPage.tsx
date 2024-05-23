@@ -28,7 +28,7 @@ function LoginPage({ onLoginSuccess, setIsAuthenticated }: LoginPageProps) {
                 setLoginError('Failed to log in. Please check your credentials and try again.');
             }
         } catch (error: unknown) {
-            console.error('Login error:', error);
+            // console.error('Login error:', error);
             if (error instanceof Error) {
                 setLoginError(error.message || 'Failed to log in. Please check your credentials and try again.');
             } else {

@@ -104,7 +104,7 @@ function DashboardPage() {
                     .reverse() // Reverse the order to show the newest first
             );
         } catch (error) {
-            console.error("Error fetching VM history:", error);
+            // console.error("Error fetching VM history:", error);
         } finally {
             setLoading(false);
         }
@@ -122,7 +122,7 @@ function DashboardPage() {
             await fetchVmHistory();
             notify('VM has been powered off successfully', 'success');
         } catch (error) {
-            console.error("Error powering off virtual machine:", error);
+            // console.error("Error powering off virtual machine:", error);
             notify('Failed to power off the VM', 'error');
         } finally {
             setLoadingVms((prev) => ({ ...prev, [vmId]: false }));

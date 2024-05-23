@@ -20,7 +20,7 @@ function ForgotPasswordPage() {
       setMessage('If your account exists, a reset link is on its way. Please check your email inbox.');
     } catch (error) {
       setError('Failed to send reset instructions. Please try again.'); // It's critical to handle errors explicitly
-      console.error('Error sending password reset email:', error);
+      // console.error('Error sending password reset email:', error);
     } finally {
       setLoading(false);
     }

@@ -24,7 +24,7 @@ export const handleUserCheckout = async (
   // Convert price to a number
   const numericPrice = parseFloat(price.replace('€', '').trim());
   if (isNaN(numericPrice)) {
-    console.error('Invalid price value:', price);
+    // console.error('Invalid price value:', price);
     onError('Invalid price value');
     return;
   }
@@ -32,7 +32,7 @@ export const handleUserCheckout = async (
     await checkout(priceId, numericPrice, navigate);
     onSuccess();
   } catch (error) {
-    console.error('Checkout error:', error);
+    // console.error('Checkout error:', error);
     if (error instanceof Error) {
       onError(error.message);
     } else {
@@ -50,7 +50,7 @@ export const handleUserCheckout = async (
 export const checkout = async (price_id: string, price: number, _navigate: (path: string) => void): Promise<void> => {
   const token = localStorage.getItem('token');
   if (!token) {
-    console.error('Authentication token not found');
+    // console.error('Authentication token not found');
     throw new Error('Authentication token not found');
   }
 
@@ -58,7 +58,7 @@ export const checkout = async (price_id: string, price: number, _navigate: (path
   // console.log(`Sending payload:`, { price_id, price });
 
   if (isNaN(price)) {
-    console.error('Invalid price value:', price);
+    // console.error('Invalid price value:', price);
     throw new Error('Invalid price value');
   }
 
@@ -76,7 +76,7 @@ export const checkout = async (price_id: string, price: number, _navigate: (path
 
   if (!response.ok) {
     const errorResponse = await response.json();
-    console.error('HTTP Response Not OK:', errorResponse);
+    // console.error('HTTP Response Not OK:', errorResponse);
     throw new Error(`HTTP error! Status: ${response.status} - Message: ${errorResponse.message}`);
   }
 
@@ -119,7 +119,7 @@ export const fetchProducts = async (): Promise<Offer[]> => {
       credits: product.credits,
     }));
   } catch (error) {
-    console.error('Error fetching products:', error);
+    // console.error('Error fetching products:', error);
     throw error;  // Re-throw the error to handle it in the component (e.g., to show a message)
   }
 };

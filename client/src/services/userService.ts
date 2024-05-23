@@ -20,7 +20,7 @@ export const getCurrentUser = async (): Promise<User | null> => {
     const userProfile = JSON.parse(userProfileString);
     return userProfile as User;
   } catch (error) {
-    console.error('Error fetching user profile from localStorage:', error);
+    // console.error('Error fetching user profile from localStorage:', error);
     return null;
   }
 };
@@ -75,7 +75,7 @@ export const isTokenValid = async (): Promise<boolean> => {
 
     return true;
   } catch (error) {
-    console.error('Error validating token:', error);
+    // console.error('Error validating token:', error);
     notify('A network or server error occurred. Please check your connection and try again.', 'error');
     logoutUser()
     return false;
@@ -116,7 +116,7 @@ export const logoutUser = async (isTokenInvalid = false): Promise<void> => {
   try {
     await invalidateToken();  // Attempt to invalidate server-side session first
   } catch (error) {
-    console.error('Logout error:', error); // Log any error that occurs during the logout process
+    // console.error('Logout error:', error); // Log any error that occurs during the logout process
     notify('Logout failed. Please try again.', 'error');
   }
 
@@ -184,7 +184,7 @@ export const registerUser = async (userDetails: RegistrationForm): Promise<boole
     }
     return true;
   } catch (error) {
-    console.error('Registration error:', error);
+    // console.error('Registration error:', error);
     throw error;
   }
 };
@@ -269,7 +269,7 @@ export const loginUser = async (email: string, password: string): Promise<LoginR
     return data;
   } catch (error) {
     // Log the error to the console and rethrow to handle it appropriately elsewhere
-    console.error('Login error:', error);
+    // console.error('Login error:', error);
     throw error;
   }
 };
@@ -311,7 +311,7 @@ export const fetchUserProfile = async (): Promise<User | null> => {
       }
 
       const errorData = await response.json();
-      console.error('Failed to fetch profile:', errorData);
+      // console.error('Failed to fetch profile:', errorData);
       throw new Error(`Failed to fetch user profile with status: ${response.status}`);
     }
 
@@ -319,10 +319,10 @@ export const fetchUserProfile = async (): Promise<User | null> => {
     return user;
   } catch (error) {
     if (error instanceof Error) {
-      console.error('Error fetching user profile:', error.message);
+      // console.error('Error fetching user profile:', error.message);
       throw new Error(`Error fetching user profile: ${error.message}`);
     } else {
-      console.error('An unexpected error occurred:', error);
+      // console.error('An unexpected error occurred:', error);
       throw new Error('An unexpected error occurred');
     }
   }
@@ -352,10 +352,10 @@ export const updateUserProfile = async (user: User): Promise<void> => {
     // Uncomment the lines below to log the response data
 
     const responseData = await response.json();
-    console.error('Profile update response:', responseData); // Log the response for debugging
+    // console.error('Profile update response:', responseData); // Log the response for debugging
 
   } catch (error) {
-    console.error('Error updating user profile:', error);
+    // console.error('Error updating user profile:', error);
     throw error;
   }
 };
@@ -387,7 +387,7 @@ export const getLocationOptions = async (): Promise<{ id: number; display_name: 
       name: location.name,
     }));
   } catch (error) {
-    console.error('Error fetching locations:', error);
+    // console.error('Error fetching locations:', error);
     throw error;
   }
 };
@@ -425,7 +425,7 @@ export const fetchUserCredits = async (): Promise<number | null> => {
       }
 
       const errorData = await response.json();
-      console.error('Failed to fetch user credits:', errorData);
+      // console.error('Failed to fetch user credits:', errorData);
       throw new Error(`Failed to fetch user credits with status: ${response.status}`);
     }
 
@@ -434,10 +434,10 @@ export const fetchUserCredits = async (): Promise<number | null> => {
     return data.credits;
   } catch (error) {
     if (error instanceof Error) {
-      console.error('Error fetching user credits:', error.message);
+      // console.error('Error fetching user credits:', error.message);
       throw new Error(`Error fetching user credits: ${error.message}`);
     } else {
-      console.error('An unexpected error occurred:', error);
+      // console.error('An unexpected error occurred:', error);
       throw new Error('An unexpected error occurred');
     }
   }
@@ -498,7 +498,7 @@ export const changeUserPassword = async (oldPassword: string, newPassword: strin
     notify(data.message, 'success');
     return Promise.resolve(true);  // Indicating success to the caller
   } catch (error) {
-    console.error('Error changing password:', error);
+    // console.error('Error changing password:', error);
     notify('An error occurred while changing your password. Please try again.', 'error');
     return Promise.reject(error);
   }
@@ -532,7 +532,7 @@ export const sendRecoverPasswordEmail = async (email: string): Promise<void> => 
 
     notify(`Email has been sent to ${email}. Check your inbox for further instructions.`, 'success');
   } catch (error: unknown) {
-    console.error('Error sending recovery email:', error);
+    // console.error('Error sending recovery email:', error);
     if (error instanceof Error) {
       notify(error.message || 'An error occurred while sending the recovery email. Please try again.', 'error');
     } else {
@@ -587,9 +587,9 @@ export const recoverPassword = async (newPassword: string, token: string): Promi
       }
     }
     const data = await response.json();
-    console.error('Password reset response:', data); // Log the response for debugging
+    // console.error('Password reset response:', data); // Log the response for debugging
   } catch (error: unknown) {
-    console.error('Error resetting password:', error);
+    // console.error('Error resetting password:', error);
     if (!(error instanceof Error && (error.message === "New password is the same as the old one." || error.message === "The token has expired. Please request a new password reset."))) {
       // Only notify if not already handled specifically
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred while resetting your password. Please try again.';

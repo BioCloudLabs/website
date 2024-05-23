@@ -35,7 +35,7 @@ function RegisterPage() {
                     setLocationId(locationData[0].id.toString());
                 }
             } catch (error) {
-                console.error('Failed to fetch locations:', error);
+                // console.error('Failed to fetch locations:', error);
                 notify('Failed to fetch locations', 'error');
             }
         };
@@ -78,7 +78,7 @@ function RegisterPage() {
                 setTimeout(() => navigate('/login'), 3000); // Navigate after successful registration
             }
         } catch (error) {
-            console.error('Failed to register user:', error);
+            // console.error('Failed to register user:', error);
         }
     };
 

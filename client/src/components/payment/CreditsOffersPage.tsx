@@ -23,7 +23,7 @@ const CreditsOffersPage: React.FC = () => {
       setOffers(products);
       setError(null); // Reset error state on successful fetch
     } catch (error) {
-      console.error('Failed to load products:', error);
+      // console.error('Failed to load products:', error);
       setError('Failed to load products. Please try again later.');
       toast.error('Failed to load products. Please try again later.');
     } finally {

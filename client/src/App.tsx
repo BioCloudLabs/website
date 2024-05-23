@@ -80,7 +80,7 @@ function App() {
       // Attempt to invalidate the server-side session first
       await invalidateToken();
     } catch (error) {
-      console.error('Logout error:', error);
+      // // console.error('Logout error:', error);
       notify('Logout failed. Please try again.', 'error');
       isTokenInvalid = true;  //  Set the flag to true if the token is invalid
     }

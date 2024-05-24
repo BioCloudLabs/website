@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { VirtualMachine } from './../../models/VirtualMachines';
 import { notify } from '../../utils/notificationUtils';
+import './VMStatus.css';
+
 
 const VMStatus: React.FC = () => {
     const [vm, setVm] = useState<VirtualMachine | null>(null);
@@ -11,16 +13,16 @@ const VMStatus: React.FC = () => {
             const ongoingSetup = sessionStorage.getItem('vmSetupInProgress') === 'true';
             const setupNotified = sessionStorage.getItem('notifiedSetupInProgress') === 'true';
             const noDetailsNotified = sessionStorage.getItem('notifiedNoDetails') === 'true';
-    
+
             if (ongoingSetup && !setupNotified) {
                 notify('VM setup in progress...', 'info');
                 sessionStorage.setItem('notifiedSetupInProgress', 'true');
             }
-    
+
             // Perform a check for VM details
             const storedVm = localStorage.getItem('vmDetails');
             const vmDetails = storedVm ? JSON.parse(storedVm) : null;
-    
+
             if (vmDetails && vmDetails.ip && vmDetails.dns && !ongoingSetup) {
                 setVm({ // Set the VM details
                     ip: vmDetails.ip,
@@ -34,11 +36,9 @@ const VMStatus: React.FC = () => {
                 notify('Virtual machine is ready!', 'success');
                 setIsLoading(false);
                 clearInterval(intervalId); // Stop checking once VM is ready
-            } else if (!vmDetails && !ongoingSetup) {
-                if (!noDetailsNotified) {
-                    notify('Failed to load VM details. Please check the system and try again later.', 'error');
-                    sessionStorage.setItem('notifiedNoDetails', 'true');
-                }
+            } else if (!vmDetails && !ongoingSetup && !noDetailsNotified) {
+                notify('Failed to load VM details. Please check the system and try again later.', 'error');
+                sessionStorage.setItem('notifiedNoDetails', 'true');
                 setIsLoading(false);
                 clearInterval(intervalId); // Stop checking on failure
             } else if (!ongoingSetup && !noDetailsNotified) {
@@ -46,23 +46,28 @@ const VMStatus: React.FC = () => {
                 sessionStorage.setItem('notifiedNoDetails', 'true');
             }
         };
-    
+
         const intervalId = setInterval(() => {
             checkVMStatus();
         }, 1000); // Check every second
-    
-        return () => clearInterval(intervalId); // Clean up on unmount
-    }, []);
-    
 
+        return () => {
+            clearInterval(intervalId); // Clean up on unmount
+            sessionStorage.removeItem('vmSetupInProgress');
+            sessionStorage.removeItem('notifiedSetupInProgress');
+            sessionStorage.removeItem('notifiedNoDetails');
+            localStorage.removeItem('vmDetails'); // Clear any existing VM details
+        };
+    }, []);
 
     return (
         <div className="container mx-auto px-4 py-8 pt-20">
             <h1 className="text-3xl font-bold mb-4">VM Status</h1>
             {isLoading ? (
-                <div className="flex flex-col justify-center items-center pt-20">
-                    <h2 className="text-xl font-semibold text-blue-500 mb-4">Checking VM status...</h2>
-                    <div className="loader animate-spin rounded-full border-t-4 border-b-4 border-blue-500 w-12 h-12"></div>
+                <div className="animation-container">
+                    <img src="/images/Animation/earth-globe-12154.svg" alt="Earth" className="earth" />
+                    <img src="/images/Animation/rocket-12236.svg" alt="Rocket" className="rocket" />
+                    <h2 className="text-xl font-semibold text-blue-500 mt-4">Creating virtual machine...</h2>
                 </div>
             ) : vm ? (
                 <div className="bg-white shadow overflow-hidden sm:rounded-lg">

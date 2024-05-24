@@ -72,7 +72,6 @@ export const isTokenValid = async (): Promise<boolean> => {
       logoutUser(true);
       return false;
     }
-
     return true;
   } catch (error) {
     // console.error('Error validating token:', error);
@@ -122,7 +121,6 @@ export const logoutUser = async (isTokenInvalid = false): Promise<void> => {
 
   logoutUserLocally(); // Then clear local storage
 
-
   if (isTokenInvalid) { // If at this point the token was found invalid, redirect to login page
     sessionStorage.setItem('postLogoutMessage', 'Session expired or token invalid. Please log in again.');
     window.location.href = '/login';  // Redirect to login page
@@ -140,15 +138,15 @@ export const logoutUserLocally = (): void => {
   localStorage.removeItem('token');
   localStorage.removeItem('userData');
   localStorage.removeItem('userCredits');
+  localStorage.removeItem('vmDetails');
   sessionStorage.removeItem('vmSetupInProgress');
   sessionStorage.removeItem('notifiedSetupInProgress');
   sessionStorage.removeItem('notifiedNoDetails');
 };
 
 
+
 /****************** LOGOUT SECTION END ******************/
-
-
 
 /****************** REGISTER SECTION START ******************/
 

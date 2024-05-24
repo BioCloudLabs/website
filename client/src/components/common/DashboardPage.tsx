@@ -138,7 +138,7 @@ function DashboardPage() {
 
             {vm.powered_off_at === 'Still Running' ? (
                 <a
-                    href={`http://${vm.name}`}
+                    href={`https://${vm.name}`}
                     target="_blank"
                     className="text-lg font-semibold text-center text-blue-600 hover:underline"
                 >

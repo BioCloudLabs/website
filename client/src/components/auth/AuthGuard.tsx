@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { isTokenValid } from './../../services/userService';
 import { notify } from './../../utils/notificationUtils';
 
-const AuthGuard = ({ children, authenticatedRedirectPath }: { children: React.ReactNode, authenticatedRedirectPath?: string }) => {
+const AuthGuard = ({ children }: { children: React.ReactNode }) => {
     const navigate = useNavigate();
     const [isValid, setIsValid] = useState<boolean | null>(null);
 
@@ -12,9 +12,7 @@ const AuthGuard = ({ children, authenticatedRedirectPath }: { children: React.Re
             try {
                 const valid = await isTokenValid();
                 setIsValid(valid);
-                if (valid && authenticatedRedirectPath) {
-                    navigate(authenticatedRedirectPath, { replace: true });
-                } else if (!valid) {
+                if (!valid) {
                     navigate('/login', { replace: true });
                 }
             } catch (error) {

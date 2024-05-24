@@ -168,7 +168,7 @@ function App() {
             <Route path="/status-vm" element={<ProtectedRoute isAuthenticated={isAuthenticated}><VMStatus /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute isAuthenticated={isAuthenticated}><DashboardPage /></ProtectedRoute>} />
             <Route path="/login" element={<LoginPage onLoginSuccess={() => setIsAuthenticated(true)} setIsAuthenticated={setIsAuthenticated} />} />
-            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/register" element={<AuthGuard authenticatedRedirectPath="/dashboard"><RegisterPage /></AuthGuard>} />
             <Route path="/about-us" element={<AboutUsPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/change-password" element={<ProtectedRoute isAuthenticated={isAuthenticated}><ChangePasswordPage /></ProtectedRoute>} />
@@ -176,8 +176,7 @@ function App() {
             <Route path="/credits-offers" element={<CreditsOffersPage />} />
             <Route path="/profile" element={<AuthGuard><ProfilePage /></AuthGuard>} />
             <Route path="/success" element={<ProtectedRoute isAuthenticated={isAuthenticated}><SuccessPage /> </ProtectedRoute>} />
-            <Route path="/cancelled" element={<ProtectedRoute isAuthenticated={isAuthenticated}><CancelledPage /> </ProtectedRoute>} />Ç
-
+            <Route path="/cancelled" element={<ProtectedRoute isAuthenticated={isAuthenticated}><CancelledPage /> </ProtectedRoute>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

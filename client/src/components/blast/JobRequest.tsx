@@ -17,7 +17,6 @@ const JobRequest: React.FC = () => {
         setVmSpecs(specs);
         setSelectedVM(specs[0]); // Set the first VM spec as default
       } catch (error) {
-        // console.error('Error fetching VM specifications:', error);
         notify('Error fetching VM specifications.', 'error');
       }
     };
@@ -26,8 +25,8 @@ const JobRequest: React.FC = () => {
 
   const handleCreateVirtualMachine = async () => {
     if (!selectedVM || userCredits < 1) { // User needs at least 1 credit to run any VM
-        notify('Insufficient credits to run this VM.', 'error');
-        return;
+      notify('Insufficient credits to run this VM.', 'error');
+      return;
     }
     notify('Initiating VM creation process...', 'info');
     setIsLoading(true);
@@ -38,25 +37,23 @@ const JobRequest: React.FC = () => {
     navigate('/status-vm', { state: { vmName: selectedVM.name } }); // Redirect to VM status page
 
     createVirtualMachine() // Create the virtual machine and store the details
-        .then(vm => {
-            localStorage.setItem('vmDetails', JSON.stringify({
-                ip: vm.ip,
-                dns: vm.dns,
-                price: vm.price,
-                url: vm.url
-            }));
-            sessionStorage.setItem('vmSetupInProgress', 'false');
-        })
-        .catch(error => {
-            // console.error('Error creating virtual machine:', error);
-            notify(`Error creating virtual machine: ${(error as Error).message}`, 'error');
-            sessionStorage.setItem('vmSetupInProgress', 'false');
-        })
-        .finally(() => {
-            setIsLoading(false);
-        });
-};
-
+      .then(vm => {
+        localStorage.setItem('vmDetails', JSON.stringify({
+          ip: vm.ip,
+          dns: vm.dns,
+          price: vm.price,
+          url: vm.url
+        }));
+        sessionStorage.setItem('vmSetupInProgress', 'false');
+      })
+      .catch(error => {
+        notify(`Error creating virtual machine: ${(error as Error).message}`, 'error');
+        sessionStorage.setItem('vmSetupInProgress', 'false');
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   const handleVMSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedVM = vmSpecs.find(vm => vm.name === e.target.value);

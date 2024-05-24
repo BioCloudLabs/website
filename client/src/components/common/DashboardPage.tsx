@@ -97,8 +97,8 @@ function DashboardPage() {
                     .map(vm => ({
                         ...vm,
                         id: vm.id.toString(),
-                        created_at: new Date(Date.parse(vm.created_at)).toLocaleString('en-US', { timeZone: 'UTC' }),
-                        powered_off_at: vm.powered_off_at ? new Date(Date.parse(vm.powered_off_at)).toLocaleString('en-US', { timeZone: 'UTC' }) : 'Still Running',
+                        created_at: new Date(Date.parse(vm.created_at)).toLocaleString('en-GB', { timeZone: 'Europe/Madrid' }),
+                        powered_off_at: vm.powered_off_at ? new Date(Date.parse(vm.powered_off_at)).toLocaleString('en-GB', { timeZone: 'Europe/Madrid' }) : 'Still Running',
                         cost: vm.cost
                     }))
                     .reverse() // Reverse the order to show the newest first
@@ -109,10 +109,13 @@ function DashboardPage() {
             setLoading(false);
         }
     };
-
+    
     useEffect(() => {
         fetchVmHistory();
     }, []);
+    
+    
+    
 
     const handlePowerOffClick = async (vmId: string) => {
         setLoadingVms((prev) => ({ ...prev, [vmId]: true }));

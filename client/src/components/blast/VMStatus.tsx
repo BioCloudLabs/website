@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { VirtualMachine } from './../../models/VirtualMachines';
 import { notify } from '../../utils/notificationUtils';
-import './VMStatus.css';
-
 
 const VMStatus: React.FC = () => {
     const [vm, setVm] = useState<VirtualMachine | null>(null);
@@ -53,10 +51,6 @@ const VMStatus: React.FC = () => {
 
         return () => {
             clearInterval(intervalId); // Clean up on unmount
-            sessionStorage.removeItem('vmSetupInProgress');
-            sessionStorage.removeItem('notifiedSetupInProgress');
-            sessionStorage.removeItem('notifiedNoDetails');
-            localStorage.removeItem('vmDetails'); // Clear any existing VM details
         };
     }, []);
 
@@ -64,10 +58,11 @@ const VMStatus: React.FC = () => {
         <div className="container mx-auto px-4 py-8 pt-20">
             <h1 className="text-3xl font-bold mb-4">VM Status</h1>
             {isLoading ? (
-                <div className="animation-container">
-                    <img src="/images/Animation/earth-globe-12154.svg" alt="Earth" className="earth" />
-                    <img src="/images/Animation/rocket-12236.svg" alt="Rocket" className="rocket" />
-                    <h2 className="text-xl font-semibold text-blue-500 mt-4">Creating virtual machine...</h2>
+                <div className="flex justify-center items-center h-screen">
+                    <div className="flex flex-col items-center">
+                        <h2 className="text-lg font-semibold text-blue-500 mb-4">Creating VM...</h2>
+                        <div className="loader animate-spin rounded-full border-t-4 border-b-4 border-blue-500 w-12 h-12"></div>
+                    </div>
                 </div>
             ) : vm ? (
                 <div className="bg-white shadow overflow-hidden sm:rounded-lg">

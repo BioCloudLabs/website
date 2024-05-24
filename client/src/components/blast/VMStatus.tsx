@@ -38,10 +38,12 @@ const VMStatus: React.FC = () => {
                 notify('Failed to load VM details. Please check the system and try again later.', 'error');
                 sessionStorage.setItem('notifiedNoDetails', 'true');
                 setIsLoading(false);
+                localStorage.removeItem('vmDetails'); // Remove old VM data
                 clearInterval(intervalId); // Stop checking on failure
             } else if (!ongoingSetup && !noDetailsNotified) {
                 notify('No VM details available. Waiting for VM setup to complete.', 'info');
                 sessionStorage.setItem('notifiedNoDetails', 'true');
+                localStorage.removeItem('vmDetails'); // Remove old VM data
             }
         };
 
@@ -58,13 +60,14 @@ const VMStatus: React.FC = () => {
         <div className="container mx-auto px-4 py-8 pt-20">
             <h1 className="text-3xl font-bold mb-4">VM Status</h1>
             {isLoading ? (
-                <div className="flex justify-center items-center h-screen">
+                <div className="flex justify-center items-center h-1/2 mt-20"> {/* Adjust height and margin to position vertically */}
                     <div className="flex flex-col items-center">
                         <h2 className="text-lg font-semibold text-blue-500 mb-4">Creating VM...</h2>
                         <div className="loader animate-spin rounded-full border-t-4 border-b-4 border-blue-500 w-12 h-12"></div>
                     </div>
                 </div>
             ) : vm ? (
+
                 <div className="bg-white shadow overflow-hidden sm:rounded-lg">
                     <div className="px-4 py-5 sm:px-6">
                         <h3 className="text-lg leading-6 font-medium text-gray-900">Virtual Machine Details</h3>

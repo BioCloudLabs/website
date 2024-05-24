@@ -37,14 +37,15 @@ def calc_vm_credits_costs(vm):
     TOTAL_CREDITS_MINUTE = VM_CREDITS_MINUTE + IP_CREDITS_MINUTE + DISK_CREDITS_MINUTE
 
     if vm.powered_off_at is None:
-        powered_off_time = datetime.now(timezone.gmt)
+        powered_off_time = datetime.now(timezone(timedelta(hours=0)))
     else:
         powered_off_time = vm.powered_off_at
 
     created_at_time = vm.created_at
 
     if created_at_time.tzinfo is None:
-        created_at_time = created_at_time.replace(tzinfo=timezone.utc)
+        created_at_time = created_at_time.replace(tzinfo=timezone(timedelta(hours=0)))
+
 
     vm_total_minutes = (powered_off_time - created_at_time).total_seconds() / 60.0
     return round((vm_total_minutes * TOTAL_CREDITS_MINUTE) + 1)

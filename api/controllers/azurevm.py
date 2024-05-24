@@ -34,18 +34,20 @@ def calc_vm_credits_costs(vm):
     IP_CREDITS_MINUTE = IP_EUROS_MINUTE * 25.06
     DISK_CREDITS_MINUTE = DISK_EUROS_MINUTE * 25.06
 
-    TOTAL_CREDITS_MINUTE = VM_CREDITS_MINUTE + IP_CREDITS_MINUTE + DISK_CREDITS_MINUTE + 1
+    TOTAL_CREDITS_MINUTE = VM_CREDITS_MINUTE + IP_CREDITS_MINUTE + DISK_CREDITS_MINUTE
 
     if vm.powered_off_at is None:
-        powered_off_time = datetime.now(timezone.utc) + timedelta(hours=2)
+        powered_off_time = datetime.now(timezone.gmt)
     else:
-        powered_off_time = vm.powered_off_at.replace(tzinfo=timezone.utc)
+        powered_off_time = vm.powered_off_at
 
+    created_at_time = vm.created_at
 
-    created_at_time = vm.created_at.replace(tzinfo=timezone.utc)
+    if created_at_time.tzinfo is None:
+        created_at_time = created_at_time.replace(tzinfo=timezone.utc)
 
     vm_total_minutes = (powered_off_time - created_at_time).total_seconds() / 60.0
-    return round(vm_total_minutes * TOTAL_CREDITS_MINUTE)
+    return round((vm_total_minutes * TOTAL_CREDITS_MINUTE) + 1)
 
 @blp.route("/setup")
 class SetupVirtualMachine(MethodView):
@@ -62,7 +64,7 @@ class SetupVirtualMachine(MethodView):
         if user.credits <= 0:
             abort(401, message="Not enough credits.")
 
-        res = requests.get("http://localhost:4000/vm/setup")
+        res = requests.get("http://biocloudlabs.es:4000/vm/setup")
         json_res = res.json()
 
         if "code" in json_res:
@@ -106,7 +108,7 @@ class PowerOffMachine(MethodView):
 
         vm_name = vm.name.split('.')[0]
 
-        res = requests.get(f"http://localhost:4000/vm/poweroff/{vm_name}")
+        res = requests.get(f"http://biocloudlabs.es:4000/vm/poweroff/{vm_name}")
         json_res = res.json()
 
         if "code" in json_res:
@@ -144,7 +146,7 @@ class CheckCredits(MethodView):
         credits_left = user_credits - vm_actual_cost
 
         if credits_left <= 0:
-            requests.get(f"http://localhost:4000/vm/poweroff/{vm_name.split('.')[0]}")
+            requests.get(f"http://biocloudlabs.es:4000/vm/poweroff/{vm_name.split('.')[0]}")
 
             vm.powered_off_at = datetime.now()
             user.credits = 0

@@ -13,32 +13,21 @@ BioCloudLabs provides a range of features designed to enhance your bioinformatic
 ## Getting Started
 
 
-This project is built using React for the frontend a backend API service for handling BLAST analyses. To run this project locally, follow these instructions:
+This project is built using React for the frontend a backend API service for handling BLAST analyses. To run this project on production, follow these instructions:
 
 ```bash
 # Clone the repository
-git clone https://github.com/BioCloudLabs/web.git
+git clone https://github.com/BioCloudLabs/website.git
 
 # Navigate to the project directory
-cd BioCloudLabs
+cd website
 
-# Install dependencies 
-npm install -r requirements.txt
+# Run docker compose: 
+docker-compose up --build
 
-
-# Start the backend server
-flask run
-
-# Move to the client folder to setup the Frontend:
-cd ../client
-
-# Install the dependencies:
-npm install
-
-# Start the development server:
-npm run dev
+# Now the website part of the project will be up and working.
 ```
 
-## Acknowledgments
-
-- Special thanks to our tutors, whose guidance and knowledge have been instrumental in shaping this project.
+### IMPORTANT INFO
+- This project needs also the blast-control API in order to work:
+- https://github.com/BioCloudLabs/blast-control
